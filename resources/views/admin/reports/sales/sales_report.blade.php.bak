@@ -1,0 +1,260 @@
+@extends('layouts.admin.master')
+@section('title', 'Sales Reports')
+<link rel="stylesheet" href="{{ asset('css/links_css/dataTable.2.0.8.css') }}">
+<link rel="stylesheet" href="{{ asset('css/links_css/buttons.dataTables.3.0.2.css') }}">
+
+@section('content')
+    <section class="home-section">
+        <div class="home-title">
+            <i class='bx bx-menu'></i>
+            <span class="text">Sales Reports</span>
+        </div>
+        <div class="home-content" style="margin-left: 20px">
+            <div class="table_buttons_container mb-3"
+                style="display: flex; justify-content:end; gap:5px; margin-right:11px">
+                <button class="btn btn-primary" id="btn_itemSummary_print"><i class="fa-solid fa-print"></i> Print</button>
+                <button class="btn btn-success" id="btn_itemSummary_excel"><i class="fa-solid fa-file-excel"></i>
+                    Excel</button>
+                <button class="btn btn-danger" id="btn_itemSummary_pdf"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+            </div>
+            <div class="sales_report_container row">
+                <div class="col-3 sales_filter sale-report-left">
+                    <div class="border border-1 p-3 rounded-2 mt-3">
+                        <label class="mb-3" style="color: #512da8">Search By Date:</label>
+						<div class="mb-3 ms-3">
+                            <label class="form-label">Start Date & Time</label>
+                            <input type="datetime-local" class="form-control" id="startDate" name="startDate">
+                        </div>
+
+                        <div class="mb-3 ms-3">
+                            <label class="form-label">End Date & Time</label>
+                            <input type="datetime-local" class="form-control" id="endDate" name="endDate">
+                        </div>
+                    </div>
+                    <div class="border border-1 p-3 mt-3 rounded-2 checkByFOC">
+                        <label class="mb-3" style="color: #512da8">Search By FOC</label>
+                        <div class="form-check mb-3 mx-3">
+                            <input class="form-check-input" type="checkbox" id="byFOCCheck"
+                                name="byFOCCheck">
+                            <label class="form-check-label" for="byFOCCheck">By FOC Summary</label>
+                        </div>
+                        <div class="form-check mb-3 mx-3">
+                            <input class="form-check-input" type="checkbox" id="byDiscountCheck"
+                                name="byDiscountCheck">
+                            <label class="form-check-label" for="byDiscountCheck">By Discount Summary</label>
+                        </div>
+                        <div class="form-check mb-3 mx-3">
+                            <input class="form-check-input" type="checkbox" id="byKPayCheck"
+                                name="byKPayCheck">
+                            <label class="form-check-label" for="byKPayCheck">By KPay Summary</label>
+                        </div>
+                        <div class="form-check mb-3 mx-3">
+                            <input class="form-check-input" type="checkbox" id="byDeletedCheck"
+                                name="byDeletedCheck">
+                            <label class="form-check-label" for="byDeletedCheck">By Deleted Summary</label>
+                        </div>
+                    </div>
+                    <div class="border border-1 p-3 mt-3 rounded-2 checkItemSummary">
+                        <label class="mb-3" style="color: #512da8">Search By Item Summary:</label>
+                        <div class="form-check mb-3 mx-3">
+                            <input class="form-check-input" type="checkbox" id="byItemSummaryCheck"
+                                name="byItemSummaryCheck">
+                            <label class="form-check-label" for="byItemSummaryCheck">By Item Summary</label>
+                        </div>
+                        <div class="searchCategoryCheck_div form-check mb-3 ms-5 d-none">
+                            <input class="form-check-input" type="checkbox" name="bySearchCategory" id="bySearchCategory">
+                            <label class="form-check-label" for="bySearchCategory">By Category</label>
+                        </div>
+                        <div class="searchItemCheck_div form-check mb-3 ms-5 d-none">
+                            <input class="form-check-input" type="checkbox" name="bySearchStockItem" id="bySearchStockItem">
+                            <label class="form-check-label" for="bySearchStockItem">By Stock Item</label>
+                        </div>
+                        {{-- <div class="searchEmployeeCheck_div form-check mb-3 ms-5 d-none">
+                            <input class="form-check-input" type="checkbox" name="bySearchEmployee" id="bySearchEmployee">
+                            <label class="form-check-label" for="bySearchEmployee">By Employee</label>
+                        </div> --}}
+                        {{-- <div class="searchDeletedOrderCheck_div form-check mb-3 ms-5 d-none">
+                            <input class="form-check-input" type="checkbox" name="bySearchDeletedOrder" id="bySearchDeletedOrder">
+                            <label class="form-check-label" for="bySearchDeletedOrder">By Deleted Order</label>
+                        </div> --}}
+                        <div class="selectCategory_div mx-3 d-none">
+                            <select class="form-select form-select-sm" id="categoryList" name="categoryList">
+                                {{-- <option value="0">--Select Category</option> --}}
+                            </select>
+                        </div>
+                        <div class="selectItem_div mx-3 d-none">
+                            <select class="form-select form-select-sm" id="stockItemList" name="stockItemList">
+                                {{-- <option value="0">--Select Item</option> --}}
+                            </select>
+                        </div>
+                        <div class="selectEmployee_div mx-3 d-none">
+                            <select class="form-select form-select-sm" id="employeeList" name="employeeList">
+                                {{-- <option value="0">--Select Item</option> --}}
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content:end">
+                        <button class="btn custom_btn" id="btn_sales_search" name="-">Search</button>
+                    </div>
+                </div>
+                <div class="col-9 sale-report-right">
+                    <div class="sales_table p-3">
+                        {{-- <div class="table_buttons_container mb-3" style="display: flex; justify-content:end; gap:5px;">
+                            <button class="btn btn-primary" id="btn_itemSummary_print"><i class="fa-solid fa-print"></i> Print</button>
+                            <button class="btn btn-success" id="btn_itemSummary_export"><i class="fa-solid fa-file-excel"></i> Excel</button>
+                            <button class="btn btn-danger" id="btn_itemSummary_pdf"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+                        </div> --}}
+                        <div class="report_by_default_container">
+                            <table id="sales_report_list_by_default" class="display nowrap" style="width:100%;">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Voucher No:</th>
+                                        <th>Floor Name</th>
+                                        <th>Table Name</th>
+                                        <th>Table Order No:</th>
+                                        <th>Customer Name</th>
+                                        <th>Waiter Name</th>
+                                        <th>Cashier Name</th>
+                                        <th>Order Date</th>
+                                        <th>Total Amount</th>
+                                        <th>Item Promo</th>
+                                        <th>Net Amount</th>
+                                        <th>Paid Amount</th>
+                                        <th>Balance</th>
+                                        <th>Change</th>
+                                        <th>Delivery Charges</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @php
+                                        $totalAmount = 0;
+                                        $totalPromo = 0;
+                                        $totalOnlinePayment = 0;
+                                    @endphp
+                                    @if (count($sales) != 0)
+                                        @php
+                                            $count = 1;
+                                        @endphp
+                                        @foreach ($sales as $sale)
+                                            <tr>
+                                                <td>{{ $count }}</td>
+                                                <td>{{ $sale['sale_voucher_number'] }}</td>
+                                                <td>{{ $sale['floor_name'] }}</td>
+                                                <td>{{ $sale['table_name'] }}</td>
+                                                <td>{{ $sale['table_order_number'] }}</td>
+                                                <td>{{ $sale['customer_name'] }}</td>
+                                                <td>{{ $sale['waiter_name'] }}</td>
+                                                <td>{{ $sale['cashier_name'] }}</td>
+                                                <td>{{ date('d-M-y', strtotime($sale['order_date'])) }}</td>
+                                                <td style="text-align:end; padding-right:25px">{{ $sale['total_amount'] }}
+                                                </td>
+                                                @if ($sale['total_item_promo_amount'] != null)
+                                                    <td style="text-align:end; padding-right:25px">
+                                                        {{ $sale['total_item_promo_amount'] }}
+                                                        @php
+                                                            $totalPromo += $sale['total_item_promo_amount'];
+                                                        @endphp
+                                                    </td>
+                                                @else
+                                                    <td style="text-align:end; padding-right:25px">
+                                                        @php
+                                                            $totalPromo += 0;
+                                                        @endphp
+                                                    </td>
+                                                @endif
+                                                <td style="text-align:end; padding-right:25px">{{ $sale['net_amount'] }}
+                                                </td>
+                                                <td style="text-align:end; padding-right:25px">{{ $sale['paid_amount'] }}
+                                                </td>
+                                                <td style="text-align:end; padding-right:25px">
+                                                    {{ $sale['balance_amount'] }}</td>
+                                                <td style="text-align:end; padding-right:25px">{{ $sale['change_amount'] }}
+                                                </td>
+                                                <td style="text-align:end; padding-right:25px">
+                                                    {{ $sale['delivery_charges'] }}</td>
+                                            </tr>
+                                            @php
+                                                $count++;
+                                                $totalAmount += $sale['total_amount']-$sale['change_amount'];
+                                                $totalOnlinePayment += $sale['online_paid'];
+                                            @endphp
+                                        @endforeach
+                                    @endif
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="report_by_search_container d-none">
+                            <table id="sales_report_list_by_search" class="display nowrap" style="width:100%;">
+                                <thead class="table_header">
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Purchase Date</th>
+                                        <th>Purchase Voucher</th>
+                                        <th>Supplier</th>
+                                        <th>Item Name</th>
+                                        <th>Category</th>
+                                        <th>Unit</th>
+                                        <th>Qty</th>
+                                        <th>Unit Cost</th>
+                                        <th>Amount</th>
+                                        <th>Expire Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="body_data">
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="sale_total_div">
+                        <div class="form-group">
+                            <label class="form-label">Total Cost:</label>
+                            <input class="form-control muted text-end" type="text" id="total_cost"
+                                name="total_cost" value="0" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Total Amount:</label>
+                            <input class="form-control muted text-end" type="text" id="total_amount"
+                                name="total_amount" value="{{ number_format($totalAmount) }}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Total Online Payment:</label>
+                            <input class="form-control muted text-end" type="text" id="total_online_payment"
+                                name="total_online_payment" value="{{ number_format($totalOnlinePayment) }}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Total Item Promo:</label>
+                            <input class="form-control muted text-end" type="text" id="total_promo"
+                                name="total_promo" value="{{ number_format($totalPromo) }}" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="{{ asset('script/links_js/jquery.3.6.4.min.js') }}"></script>
+    <script src="{{ asset('script/links_js/jquery.validate.1.19.5.js') }}"></script>
+    <script src="{{ asset('script/links_js/jquery.dataTables.1.13.7.min.js') }}"></script>
+    <script src="{{ asset('script/links_js/dataTables.bootstrap5_1.13.7.min.js') }}"></script>
+
+    <script src="{{ asset('script/links_js/jquery.table2excel.1.1.0.min.js') }}"></script>
+    <script src="{{ asset('script/links_js/jspdf.umd.min.js') }}"></script>
+    <script src="{{ asset('script/links_js/tableExport.1.30.0.min.js') }}"></script>
+    <script src="{{ asset('script/printThis.js') }}"></script>
+
+    <script src="{{ asset('script/sales_report_script.js') }}"></script>
+@endsection

@@ -1,0 +1,798 @@
+@extends('layouts.admin.master')
+@section('title', 'Stock Purchase')
+
+@section('content')
+    <section class="home-section">
+        <div class="home-title">
+            <i class='bx bx-menu'></i>
+            <span class="text">Stock Purchase</span>
+        </div>
+        <div class="home-content">
+            <div class="row pb-3 align-items-center" style="color:#512DA8; font-weight:bold">
+                <div class="col">
+                    <label>Update Stock Purchase</label>
+                </div>
+                <div class="col" style="text-align: right">
+                    <a href="{{ route('stockControl#stock_purchase#purchaseListPage') }}"><button class="btn btn-success"
+                            id="btn_Exit"><i class="fa-solid fa-circle-left"
+                                style="padding-right: 5px"></i>Exit</button></a>
+                    <button class="btn btn-primary" id="btn_Save"><i class="fa-regular fa-floppy-disk"
+                            style="padding-right: 5px"></i>Update</button>
+                </div>
+            </div>
+            <div id="voucher_info_label" class="row align-items-center bg-white">
+                <div class="col-6">
+                    <label><i class="fa-regular fa-newspaper" style="padding-left:5px; padding-right: 12px"></i>Voucher
+                        Info</label>
+                </div>
+                <div class="col-6" style="text-align: right">
+                    <i class="bx bxs-chevron-down arrow"></i>
+                </div>
+            </div>
+            <div class="voucher_info_container shadow-sm show_container">
+                <div class="row">
+                    <div class="col-4">
+                        <div class="row">
+                            <div class="col-5 mb-3">
+                                <label class="form-label">Voucher No</label>
+                            </div>
+                            <div class="col-7">
+                                <input type="text" id="loginUserID" name="loginUserID" value="{{ Auth::User()->id }}"
+                                    hidden>
+                                <input class="form-control" type="hidden" id="purchaseID" name="purchaseID"
+                                    value="{{ $selectedPurchase[0]['purchase_id'] }}">
+                                <input class="form-control" type="text" id="voucher_no"
+                                    value="{{ $selectedPurchase[0]['purchase_voucher_number'] }}">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-5">
+                                <label class="form-label">Date</label>
+                            </div>
+                            <div class="col-7">
+                                <input class="form-control" type="date" id="purchase_date" name="purchase_date"
+                                    value="{{ date('Y-m-d', strtotime($selectedPurchase[0]['purchase_date'])) }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-5">
+                        <div class="row">
+                            <div class="col-5 mb-3">
+                                <label class="form-label">Supplier Name</label>
+                            </div>
+                            <div class="col-7">
+                                <select class="form-select" id="supplier_name" name="supplier_name">
+                                    <option>--Select--</option>
+                                    @if ($supplierList->count() > 0)
+                                        @foreach ($supplierList as $supplier)
+                                            <option value="{{ $supplier->supplier_id }}"
+                                                {{ $selectedPurchase[0]['supplier_id'] == $supplier->supplier_id ? 'selected="selected"' : '' }}>
+                                                {{ $supplier->supplier_name }}</option>
+                                        @endForeach
+                                    @endif
+                                </select>
+                                <span class="text-danger">
+                                    <span id="supplier_name_error"></span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-5 mb-3">
+                                <label class="form-label">Due Date</label>
+                            </div>
+                            <div class="col-7">
+                                <input class="form-control" type="date" id="due_date" name="due_date"
+                                    value="{{ date('Y-m-d', strtotime($selectedPurchase[0]['due_date'])) }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <textarea class="form-control" rows="3" placeholder="Remarks" id="remark" name="remark">{{ $selectedPurchase[0]['remark'] }}</textarea>
+                    </div>
+
+                </div>
+            </div>
+            <div id="item_details_info_label" class="row align-items-center bg-white">
+                <div class="col-6">
+                    <label><i class="fa-solid fa-cookie-bite" style="padding-left:5px; padding-right: 13px"></i>Item
+                        Details
+                        Info</label>
+                </div>
+                <div class="col-6" style="text-align: right">
+                    <i class="bx bxs-chevron-down arrow"></i>
+                </div>
+            </div>
+            <div class="item_details_info_container shadow-sm show_container">
+                <div class="row">
+                    <div class="col-4" style="height: 75vh; overflow-y:auto">
+                        {{-- <span class="text-danger">
+                            <h5 id="purchase_detaillist_error"></h5>
+                        </span> --}}
+                        <div class="row mb-3">
+                            <div class="col-5">
+                                <label class="form-label">Item Name</label>
+                            </div>
+                            <div class="col-7">
+                                <select class="form-select" id="item_name" name="item_name">
+                                    <option value="0">--Select--</option>
+                                    @if ($itemList->count() > 0)
+                                        @foreach ($itemList as $item)
+                                            <option value="{{ $item->item_id }}">{{ $item->item_name }}</option>
+                                        @endForeach
+                                    @endif
+                                </select>
+                                <span class="text-danger">
+                                    <span id="item_name_error"></span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-5">
+                                <label class="form-label">Item Code</label>
+                            </div>
+                            <div class="col-7">
+                                <select class="form-select" id="item_code" name="item_code">
+                                    <option value="0">--Select--</option>
+                                    @if ($itemList->count() > 0)
+                                        @foreach ($itemList as $item)
+                                            <option value="{{ $item->item_id }}">{{ $item->item_code }}</option>
+                                        @endForeach
+                                    @endif
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-5">
+                                <label class="form-label">Bar Code</label>
+                            </div>
+                            <div class="col-7">
+                                <input class="form-control muted" type="text" id="barcode" name="barcode" readonly>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-5">
+                                <label class="form-label">Unit</label>
+                            </div>
+                            <div class="col-7">
+                                <select class="form-select" id="unit_id" name="unit_id" readonly>
+                                </select>
+                                {{-- <input class="form-control" type="text" id="unit_id" readonly> --}}
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-5">
+                                <label class="form-label">Quantity</label>
+                            </div>
+                            <div class="col-7">
+                                <input class="form-control" type="number" id="qty" name="qty"
+                                    required="required" min="1" onkeypress="return /[0-9]/i.test(event.key)"
+                                    value="1" min="1">
+                                <span class="text-danger">
+                                    <span id="qty_error"></span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-5">
+                                <label class="form-label">Unit Cost</label>
+                            </div>
+                            <div class="col-7">
+                                <input class="form-control" type="text" id="unit_cost" name="unit_cost"
+                                    placeholder="0" required="required" onkeypress="return /[0-9]/i.test(event.key)">
+                                <span class="text-danger">
+                                    <span id="unit_cost_error"></span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-5">
+                                <label class="form-label">Amount</label>
+                            </div>
+                            <div class="col-7">
+                                <input class="form-control muted" type="text" id="amount" name="amount" readonly>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-5">
+                                <label class="form-label">Discount</label>
+                            </div>
+                            <div class="col-7">
+                                <input class="form-control" type="text" id="discount" name="discount"
+                                    value="0">
+                                <span class="text-danger">
+                                    <span id="discount_error"></span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-5">
+                                <label class="form-label">Net Amount</label>
+                            </div>
+                            <div class="col-7">
+                                <input class="form-control muted" type="text" id="net_amount" name="net_amount"
+                                    readonly>
+                            </div>
+                        </div>
+                        <div class="row mb-4">
+                            <div class="col-5">
+                                <label class="form-label">Expire Date</label>
+                            </div>
+                            <div class="col-7">
+                                <input class="form-control" type="date" id="expire_date" name="expire_date">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-5">
+                                <label class="form-label" for="is_foc">FOC</label>
+                            </div>
+                            <div class="col-7">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="is_foc">
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <button class="btn btn-primary mt-2" id="btn_Add"><i class="fa-solid fa-plus"
+                                    style="padding-right: 5px"></i>Add</button>
+                            <button class="btn btn-warning text-white mt-2" id="btn_Remove"><i class="fa-solid fa-minus"
+                                    style="padding-right: 5px"></i>Remove</button>
+                            <button class="btn btn-danger mt-2" id="btn_Clear"><i class="fa-solid fa-eraser"
+                                    style="padding-right: 5px"></i>Clear</button>
+                        </div>
+                    </div>
+                    <div class="col-8">
+                        <div class=".table-responsive border border-2"
+                            style="height:580px; overflow-x:auto; white-space:nowrap; padding-left:10px; padding-right:10px; border-radius:10px;">
+                            <table class="table table-hover">
+                                <thead class="sticky-top">
+                                    <tr>
+                                        <th scope="col">No</th>
+                                        <th scope="col">Item Name</th>
+                                        <th scope="col">Item Code</th>
+                                        <th scope="col">Bar Code</th>
+                                        <th scope="col">Unit</th>
+                                        <th scope="col">Quantity</th>
+                                        <th scope="col">Unit Cost</th>
+                                        <th scope="col">Amount</th>
+                                        <th scope="col">Disocunt</th>
+                                        <th scope="col">Net Amount</th>
+                                        <th scope="col">FOC</th>
+                                        <th scope="col">Expire Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="purchase_detail">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="voucher_details_info_label" class="row align-items-center bg-white">
+                <div class="col-6">
+                    <label><i class="fa-brands fa-stack-overflow"
+                            style="padding-left:5px; padding-right: 12px"></i>Voucher Details
+                        Info</label>
+                </div>
+                <div class="col-6" style="text-align: right">
+                    <i class="bx bxs-chevron-down arrow"></i>
+                </div>
+            </div>
+            <div class="voucher_details_info_container shadow-sm show_container">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="row">
+                            <div class="col-5 mb-3">
+                                <label class="form-label">Total Amount</label>
+                            </div>
+                            <div class="col-7">
+                                <input class="form-control muted" type="text" id="totalAmount" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="row">
+                            <div class="col-5 mb-3">
+                                <label class="form-label">Total Item Discount</label>
+                            </div>
+                            <div class="col-7">
+                                <input class="form-control muted" type="text" id="totalItemDiscount" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Item Deletail Validation Modal --}}
+        <div class="modal fade modal-sm" id="checkErrorModal" tabindex="-1" role="dialog" aria-hidden="true"
+            data-bs-keyboard="false" data-bs-backdrop="static">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: #512DA8">
+                        <h5 class="modal-title fs-5 w-100" style="color: white">Warning</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-danger"><i class="fa-solid fa-triangle-exclamation text-danger me-2"></i><span
+                                id="error_text"></span></p>
+                    </div>
+                    <div class="modal-footer bg-secondary-subtle">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal"
+                            id="btn_CheckOk">OK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Success Modal --}}
+        <div class="modal fade modal-sm" id="successModal" tabindex="-1" aria-labelledby="successModalLabel"
+            data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: #512DA8">
+                        <h5 class="modal-title fs-5 w-100" id="successModalLabel" style="color: white">Success</h5>
+                    </div>
+                    <div class="modal-body">
+                        <h6 id="success_text"><i class="fa-solid fa-circle-exclamation text-primary"></i></h6>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn custom_btn" data-bs-dismiss="modal"
+                            id="btn_successOK">OK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script src="{{ asset('script/links_js/jquery.3.6.4.min.js') }}"></script>
+    <script src="{{ asset('script/links_js/jquery.validate.1.19.5.js') }}"></script>
+    <script src="{{ asset('script/links_js/jquery.dataTables.1.13.7.min.js') }}"></script>
+    <script src="{{ asset('script/links_js/dataTables.bootstrap5_1.13.7.min.js') }}"></script>
+    <script src="{{ asset('script/purchase_script.js') }}"></script>
+
+    <script>
+        $(document).ready(function() {
+            var tableDoubleClick = false;
+            // ------------Purchase Detail List Data Add--------------------
+            var selectedPurchaseDetailList = {!! json_encode($selectedPurchaseDetailList->toArray()) !!};
+            if (selectedPurchaseDetailList.length > 0) {
+                $.each(selectedPurchaseDetailList, function(key, value) {
+                    var expire_date = new Date(value.expire_date);
+                    var tableBody = document.getElementById('purchase_detail');
+                    $('#purchase_detail').append(
+                        `<tr><td>${tableBody.rows.length+1}</td>
+                    <td style="word-wrap:break-world; white-space:normal;">${value.item_name}</td><td>${value.item_code}</td><td>${value.barcode}</td><td>${value.unit_name}</td>
+                    <td>${parseInt(value.qty)}</td><td>${parseInt(value.unit_cost)}</td><td>${parseInt(value.amount)}</td>
+                    <td>${parseInt(value.discount)}</td><td>${parseInt(value.net_amount)}</td><td><input type="checkbox" ${value.foc?'checked':'unchecked'} disabled></td><td>${('0' + expire_date.getDate()).slice(-2)+ '/' + ('0' + (expire_date.getMonth() + 1)).slice(-2) + '/' + expire_date.getFullYear()}</td></tr>`
+                    );
+                })
+            }
+            // setRowNumber_changed();
+            // clearDetail();
+            calculateTotal();
+
+            var foc_status;
+            var today = new Date();
+            var now = today.getFullYear() + '-' + ('0' + (today.getMonth() + 1)).slice(-2) + '-' + ('0' + today
+                    .getDate())
+                .slice(-2);
+            $('#expire_date').val(now);
+
+            // ------------Item Selected Change Event--------------------
+            $(document).on("change", "#item_name, #item_code", ItemSelectedChange);
+
+            function ItemSelectedChange() {
+                let itemID = $(this).val();
+                let items = {!! json_encode($itemList->toArray()) !!};
+                const selected_item = items.filter(x => x.item_id == itemID);
+                if (itemID > 0) {
+                    $('#item_name').val(selected_item[0].item_id);
+                    $('#item_code').val(selected_item[0].item_id);
+                    $('#barcode').val(selected_item[0].bar_code);
+                    $('#unit_id').empty();
+                    $('#unit_id').append('<option value="' + selected_item[0].unit_id + '">' + selected_item[0]
+                        .unit_name +
+                        '</option>');
+                    $('#unit_id').val(selected_item[0].unit_id);
+                    $('#qty').val(1);
+                    $('#is_foc').prop('checked', false);
+                } else {
+                    $('#item_name').val(0);
+                    $('#item_code').val(0);
+                    $('#barcode').val(null);
+                    $('#unit_id').empty();
+                    $('#qty').val(null);
+                    $('#is_foc').prop('checked', false);
+                }
+                CalculateItemDetail();
+            };
+            // ------------Table Double Click--------------------
+            $('#purchase_detail').on('dblclick', 'tr', function() {
+                tableDoubleClick = true;
+                var $rowClicked = $(this);
+                var itemcode = $rowClicked.find('td:eq(2)').text();
+                var foc = $rowClicked.find("input:checkbox").is(':checked');
+                if (foc) {
+                    $('#btn_Add').html('<i class="fa-solid fa-plus" style="padding-right: 5px"></i>Update');
+                    $('#btn_Add').prop('disabled', true);
+                } else {
+                    $('#btn_Add').prop('disabled', false);
+                    $('#btn_Add').html('<i class="fa-solid fa-plus" style="padding-right: 5px"></i>Update');
+                }
+                var selecteddetail = selectedPurchaseDetailList.filter(x => x.item_code == itemcode && x
+                    .foc ==
+                    foc);
+                if (selecteddetail[0] != undefined) {
+                    $('#item_name').val(selecteddetail[0].itemID);
+                    $('#item_code').val(selecteddetail[0].itemID);
+                    $('#barcode').val(selecteddetail[0].barcode);
+
+                    $('#unit_id').append('<option value="' + selecteddetail[0].unit_id + '">' +
+                        selecteddetail[0]
+                        .unit_name + '</option>');
+                    $('#unit_id').val(selecteddetail[0].unit_id);
+                    $('#qty').val(parseFloat(selecteddetail[0].qty));
+                    $('#unit_cost').val(parseFloat(selecteddetail[0].unit_cost));
+                    $('#discount').val(parseFloat(selecteddetail[0].discount));
+                    CalculateItemDetail();
+
+                    var expireDate = new Date(selecteddetail[0].expire_date);
+                    $('#expire_date').val(expireDate.getFullYear() + '-' + ('0' + (expireDate.getMonth() +
+                        1)).slice(-
+                        2) + '-' + ('0' + expireDate.getDate()).slice(-2));
+
+                    foc_status = selecteddetail[0].foc;
+                    $("#is_foc").prop("checked", foc_status);
+                    $('#item_name').prop('disabled', true);
+                    $('#item_code').prop('disabled', true);
+                    $('#unit_id').prop('disabled', true);
+
+                }
+            });
+            // -----------------------Set Or Update----------------------------
+            var itemDetailList = {
+                set: function(purchase_detail_entry) {
+                    selectedPurchaseDetailList.push(purchase_detail_entry);
+                    var expire_date = new Date(purchase_detail_entry.expire_date);
+                    $('#purchase_detail').append(
+                        `<tr><td>${purchase_detail_entry.no}</td>
+                                <td style="word-wrap:break-world; white-space:normal;">${purchase_detail_entry.item_name}</td><td>${purchase_detail_entry.item_code}</td><td>${purchase_detail_entry.barcode}</td><td>${purchase_detail_entry.unit_name}</td>
+                                <td>${purchase_detail_entry.qty}</td><td>${purchase_detail_entry.unit_cost}</td><td>${purchase_detail_entry.amount}</td>
+                                <td>${purchase_detail_entry.discount}</td><td>${purchase_detail_entry.net_amount}</td><td><input type="checkbox" ${purchase_detail_entry.foc?'checked':'unchecked'} disabled></td><td>${('0' + expire_date.getDate()).slice(-2)+ '/' + ('0' + (expire_date.getMonth() + 1)).slice(-2) + '/' + expire_date.getFullYear()}</td></tr>`
+                    );
+                    setRowNumber_changed();
+                    return purchase_detail_entry;
+                },
+                update: function(purchase_detail_entry) {
+                    var isFOC = $('#is_foc').is(":checked");
+                    var qty = 0;
+
+                    selecteddetail = selectedPurchaseDetailList.filter(x => x.itemID == $('#item_name')
+                        .val() && x
+                        .unit_id == purchase_detail_entry.unit_id && x.foc == isFOC);
+
+                    if (selecteddetail.length != 0) {
+                        if (!tableDoubleClick) {
+                            qty = selecteddetail[0].qty;
+                            purchase_detail_entry.qty = parseInt(qty) + parseInt(purchase_detail_entry.qty);
+                            purchase_detail_entry.amount = parseInt(purchase_detail_entry.unit_cost) *
+                                parseInt(purchase_detail_entry.qty);
+                            purchase_detail_entry.net_amount = parseInt(purchase_detail_entry.amount) -
+                                parseInt(purchase_detail_entry.discount);
+                        }
+                    }
+                    index = selectedPurchaseDetailList.findIndex(x => x == selecteddetail[0]);
+                    selectedPurchaseDetailList.splice(index, 1); //remove object with specific index
+                    selectedPurchaseDetailList.splice(index, 0,
+                        purchase_detail_entry); //insert object with specific index
+
+                    var tbody = document.getElementById("purchase_detail");
+                    if (tbody.rows.length) {
+                        tbody.deleteRow(index);
+                    }
+                    var table = document.getElementById("purchase_detail");
+                    var row = table.insertRow(index);
+                    var j = 0;
+                    $.each(purchase_detail_entry, function(key, value) {
+                        if (key != "itemID" && key != "unit_id") {
+                            var cell = row.insertCell(j);
+                            if (key == "foc") {
+                                var chkbox = document.createElement('input');
+                                chkbox.type = "checkbox";
+                                chkbox.checked = value;
+                                chkbox.disabled = true;
+                                cell.appendChild(chkbox);
+                            } else if (key == "expire_date") {
+                                let expire_date = new Date(value);
+                                cell.innerHTML = ('0' + expire_date.getDate()).slice(-2) + '/' + (
+                                        '0' + (
+                                            expire_date.getMonth() + 1)).slice(-2) + '/' +
+                                    expire_date.getFullYear();
+                            } else {
+                                cell.innerHTML = value;
+                            }
+                            j++;
+                        }
+                    });
+                    setRowNumber_changed();
+                    return purchase_detail_entry;
+                },
+            };
+            // ------------Add Btn Click--------------------
+            $('#btn_Add').click(function(e) {
+                var purchase_detail_entry = {
+                    no: '',
+                    itemID: $('#item_name :selected').val(),
+                    item_name: $('#item_name :selected').text(),
+                    item_code: $('#item_code :selected').text(),
+                    barcode: $('#barcode').val(),
+                    unit_id: $('#unit_id :selected').val(),
+                    unit_name: $('#unit_id :selected').text(),
+                    qty: $('#qty').val(),
+                    unit_cost: $('#unit_cost').val(),
+                    amount: $('#amount').val(),
+                    discount: $('#discount').val(),
+                    net_amount: $('#net_amount').val(),
+                    foc: $('#is_foc').is(":checked"),
+                    expire_date: $('#expire_date').val()
+                };
+                var url = '{{ route('stockControl#stock_purchase#updateCheckPurchaseDetailValidation') }}';
+                $.ajax({
+                    url: url,
+                    type: "get",
+                    data: purchase_detail_entry,
+                    contentType: 'application/json; charset=utf-8',
+                    success: function(response) {
+                        clearError();
+                        if (response.errors) {
+                            $.each(response.errors, function(key, value) {
+                                if (key == "itemID") {
+                                    $('#item_name_error').html(value);
+                                    $('#item_name').addClass('is-invalid');
+                                }
+                                if (key == "qty") {
+                                    $('#qty_error').html(value);
+                                    $('#qty').addClass('is-invalid');
+                                }
+                                if (key == "unit_cost") {
+                                    $('#unit_cost_error').html(value);
+                                    $('#unit_cost').addClass('is-invalid');
+                                }
+                                if (key == "discount") {
+                                    $('#discount_error').html(value);
+                                    $('#discount').addClass('is-invalid');
+                                }
+                            });
+                        } else if (response.success) {
+                            if (tableDoubleClick) {
+                                var selecteddetail = selectedPurchaseDetailList.filter(x => x
+                                    .itemID ==
+                                    purchase_detail_entry.itemID && x.unit_id ==
+                                    purchase_detail_entry
+                                    .unit_id);
+                            } else {
+                                var selecteddetail = selectedPurchaseDetailList.filter(x => x
+                                    .itemID ==
+                                    purchase_detail_entry.itemID && x.unit_id ==
+                                    purchase_detail_entry
+                                    .unit_id && x.foc == purchase_detail_entry.foc);
+                            }
+                            if (selecteddetail[0] != undefined) {
+                                itemDetailList.update(purchase_detail_entry);
+                            } else if (selecteddetail[0] == undefined) {
+                                itemDetailList.set(purchase_detail_entry);
+                            }
+                            $('#btn_Add').html(
+                                '<i class="fa-solid fa-plus" style="padding-right: 5px"></i>Add'
+                            );
+                            $('#btn_Add').prop('disabled', false);
+                            clearDetail();
+                            calculateTotal();
+                            tableDoubleClick = false;
+                        }
+                    },
+                });
+            });
+            // ------------Remove Btn Click--------------------
+            $('#btn_Remove').click(function() {
+                tableDoubleClick = false;
+                $('#btn_Add').prop('disabled', false);
+                $('#btn_Add').html('<i class="fa-solid fa-plus" style="padding-right: 5px"></i>Add');
+                var selecteddetail = selectedPurchaseDetailList.filter(x => x.itemID == $('#item_name')
+                    .val() && x
+                    .unit_id == $('#unit_id :selected').val() && x.foc == $('#is_foc').is(":checked"));
+                if (selecteddetail[0] != undefined) {
+                    index = selectedPurchaseDetailList.findIndex(x => x == selecteddetail[0]);
+                    selectedPurchaseDetailList.splice(index, 1);
+                    localStorage.setItem("update_purchase_detail_list", JSON.stringify(
+                        selectedPurchaseDetailList));
+
+                    var tbody = document.getElementById("purchase_detail");
+                    if (tbody.rows.length) {
+                        tbody.deleteRow(index);
+                    }
+                    clearDetail();
+                    clearError();
+                    setRowNumber_changed();
+                }
+            });
+            // ------------Save Btn Click--------------------
+            $('#btn_Save').click(function() {
+                tableDoubleClick = false;
+                if (selectedPurchaseDetailList.length == 0) {
+                    $('#error_text').empty();
+                    $('#error_text').text('You need to set item detail !');
+                    $('#checkErrorModal').modal('show');
+                    return;
+                }
+                let totalAmt = $('#totalAmount').val().replace(/\D/g, '');
+                let total_discount = parseFloat($('#totalItemDiscount').val().replace(/\D/g, ''));
+
+                var purchase_master_entry = {
+                    loginUserID: $('#loginUserID').val(),
+                    purchaseID: $('#purchaseID').val(),
+                    voucher_no: $('#voucher_no').val(),
+                    purchase_date: $('#purchase_date').val(),
+                    due_date: $('#due_date').val(),
+                    supplier_name: $('#supplier_name :selected').val(),
+                    due_date: $('#due_date').val(),
+                    remark: $('#remark').val(),
+                    totalAmount: totalAmt,
+                    totalDiscount: total_discount,
+                    purchase_detailList: selectedPurchaseDetailList
+                };
+                var url = '{{ route('stockControl#stock_purchase#updatePurchase') }}';
+                $.ajax({
+                    url: url,
+                    type: "get",
+                    data: purchase_master_entry,
+                    contentType: 'application/json; charset=utf-8',
+                    success: function(response) {
+                        clearError();
+                        if (response.errors) {
+                            if (typeof(response.errors) === 'object') {
+                                $.each(response.errors, function(key, value) {
+                                    if (key == "supplier_name") {
+                                        $('#supplier_name_error').html(value);
+                                        $('#supplier_name').addClass('is-invalid');
+                                    }
+                                });
+                            }
+                        } else if (response.success) {
+                            $('#success_text').html(response.success);
+                            $('#successModal').modal('show');
+                        }
+                    }
+                });
+            })
+            // ------------------Item Detail Calculation------------------
+            $(document).on("input", "#qty, #unit_cost, #tax, #discount", CalculateItemDetail);
+
+            function CalculateItemDetail() {
+                var _qty = $('#qty').val();
+                var _unitCost = $('#unit_cost').val();
+                var _discount = $('#discount').val();
+                var _amount = (_qty * _unitCost);
+                $('#amount').val(_amount.toLocaleString());
+                $('#net_amount').val((_amount - _discount).toLocaleString());
+            };
+            //Validation test with javascript
+            function validationDetail() {
+                clearError();
+                var hasErrorCount = 0;
+                if ($('#item_name').val() == 0) {
+                    $('#item_name_error').html("You need to select item");
+                    $('#item_name').addClass('is-invalid');
+                    hasErrorCount += 1;
+                }
+                if ($('#qty').val() == "" || $('#qty').val() == "0") {
+                    $('#qty_error').html("You need to enter quantity");
+                    $('#qty').addClass('is-invalid');
+                    hasErrorCount += 1;
+                }
+                if ($('#unit_cost').val() == "" || $('#unit_cost').val() == "0") {
+                    $('#unit_cost_error').html("You need to enter unit cost");
+                    $('#unit_cost').addClass('is-invalid');
+                    hasErrorCount += 1;
+                }
+                if (hasErrorCount > 0) {
+                    console.log(hasErrorCount);
+                    throw '';
+                }
+            };
+
+            function setRowNumber_changed() {
+                var j = 0;
+                $('#purchase_detail tr').each(function(key, value) {
+                    ++j;
+                    $('td:first-child', this).text(j);
+                });
+            };
+            $('#btn_Clear').click(function() {
+                $('#btn_Add').prop('disabled', false);
+                $('#btn_Add').html('<i class="fa-solid fa-plus" style="padding-right: 5px"></i>Add');
+                clearDetail();
+                clearError();
+                tableDoubleClick = false;
+            });
+            $('#btn_Exit').click(function() {
+                tableDoubleClick = false;
+                // localStorage.removeItem('update_purchase_detail_list');
+            });
+            $('#btn_CheckOk').on('click', function() {
+                location.reload();
+            });
+            $('#btn_successOK').click(function() {
+                window.close();
+                var url = "{{ route('stockControl#stock_purchase#purchaseListPage') }}";
+                $(location).attr('href', url);
+            });
+
+            function clearDetail() {
+                $('#item_name').val(0);
+                $('#item_code').val(0);
+                $('#barcode').val(null);
+                $('#unit_id').empty();
+                $('#qty').val(null);
+                $('#unit_cost').val(0);
+                $('#amount').val(0);
+                $('#discount').val(0);
+                $('#net_amount').val(0);
+                $('#expire_date').val(now);
+                $("#is_foc").prop("checked", false);
+                foc_status = false;
+                $('#item_name').prop('disabled', false);
+                $('#item_code').prop('disabled', false);
+                $('#unit_id').prop('disabled', false);
+                clearError();
+            };
+
+            function clearError() {
+                $('#item_name').removeClass('is-invalid');
+                $('#item_name_error').html("");
+                $('#qty').removeClass('is-invalid');
+                $('#qty_error').html("");
+                $('#unit_cost').removeClass('is-invalid');
+                $('#unit_cost_error').html("");
+                $('#discount').removeClass('is-invalid');
+                $('#discount_error').html("");
+                $('#supplier_name').removeClass('is-invalid');
+                $('#supplier_name_error').html("");
+                $('#purchase_detaillist_error').html("");
+            };
+            $(document).on("keyup", "#transportCharges, #otherCharges, #tax, #voucherDiscount, #payment",
+                calculateTotal);
+            $(document).on("input",
+                "#unit_cost, #discount, #transportCharges, #otherCharges, #tax, #voucherDiscount, #payment",
+                function() {
+                    if (this.value == "" || this.value == null) {
+                        this.value = 0;
+                    }
+                });
+            // ------------Total Calculation--------------------
+            function calculateTotal() {
+                let total_amount = selectedPurchaseDetailList.reduce((accumulator, x) => {
+                    return accumulator + parseFloat(x.qty * x.unit_cost);
+                }, 0);
+                let total_itemDiscount = selectedPurchaseDetailList.reduce((accumulator, x) => {
+                    return accumulator + parseFloat(x.discount);
+                }, 0);
+                total_itemDiscount = isNaN(total_itemDiscount) ? 0 : total_itemDiscount;
+                $('#totalAmount').val(total_amount.toLocaleString());
+                $('#totalItemDiscount').val(total_itemDiscount.toLocaleString());
+            }
+            // ------------FOC Click--------------------
+            $('#is_foc').click(function(e) {
+                if (this.checked == true) {
+                    $('#unit_cost').val(0);
+                } else {
+                    let items = {!! json_encode($itemList->toArray()) !!};
+                    const selectedItem = items.filter(x => x.item_id == $('#item_name :selected').val());
+                    if (selectedItem.length > 0) {
+                        $('#unit_cost').val(selectedItem[0].item_price);
+                    }
+                }
+                CalculateItemDetail();
+            });
+        });
+    </script>
+@endsection

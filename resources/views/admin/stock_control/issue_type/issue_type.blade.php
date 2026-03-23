@@ -1,0 +1,279 @@
+@extends('layouts.admin.master')
+@section('title', 'Issue Type')
+
+@section('content')
+    <section class="home-section">
+        <div class="home-title">
+            <i class='bx bx-menu'></i>
+            <span class="text">Issue Type</span>
+        </div>
+        <div class="home-content show">
+            <form action="{{ route('stockControl#issue_type#createStockIssueType') }}" method="post"
+                enctype="multipart/form-data">
+                @csrf
+                <div class="row pb-3 align-items-center" style="color:#512DA8; font-weight:bold">
+                    <div class="col-12 col-md-7">
+                        <label>Add New Issue Type</label>
+                    </div>
+                    <div class="col-12 col-md-5 text-md-end text-start mt-3 mt-md-0">
+                        <button type="reset" class="btn btn-danger customBtn-clear"><i class="fa-solid fa-eraser"
+                                style="padding-right: 5px"></i>Clear</button>
+                        <button class="btn btn-primary customBtn-save ms-1 mt-0"><i class="fa-regular fa-floppy-disk"
+                                style="padding-right: 5px"></i>Save</button>
+                    </div>
+                </div>
+
+                @if(session('success'))
+                    <div id="flash-message" class="alert alert-success alert-dismissible d-flex align-items-center fade show">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <strong class="mx-2">Success!</strong> {{ session('success') }}
+                    </div>
+                @endif
+
+                <div id="issue_type_info_label" class="row align-items-center bg-white">
+                    <div class="col-10">
+                        <label><i class="fa-solid fa-triangle-exclamation"
+                                style="padding-left:5px; padding-right: 15px"></i>Issue Type
+                            Info</label>
+                    </div>
+                    <div class="col-2" style="text-align: right">
+                        <i class="bx bxs-chevron-down arrow"></i>
+                    </div>
+                </div>
+                <div class="issue_type_info_container shadow-sm show_container">
+                    <div class="row align-items-center mb-3 justify-content-center">
+                        <div class="col-3 issueType-info-label">
+                            <label class="col-form-label">Issue Type Code <span style="color: red">*</span></label>
+                        </div>
+                        <div class="col-4 issueType-info-text">
+                            <input type="text" id="loginUserID" name="loginUserID" value="{{ Auth::User()->id }}" hidden>
+                            <input class="form-control @error('issue_type_code') is-invalid @enderror" type="text"
+                                name="issue_type_code" id="issue_type_code" value="{{ old('issue_type_code') }}">
+                            @error('issue_type_code')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="row align-items-center mb-3 justify-content-center">
+                        <div class="col-3 issueType-info-label">
+                            <label class="col-form-label">Issue Type Name <span style="color: red">*</span></label>
+                        </div>
+                        <div class="col-4 issueType-info-text">
+                            <input class="form-control @error('issue_type_name1') is-invalid @enderror" type="text"
+                                name="issue_type_name1">
+                            @error('issue_type_name1')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="row align-items-center mb-3 justify-content-center">
+                        <div class="col-3 issueType-info-label">
+                            <label class="col-form-label">Other Name</label>
+                        </div>
+                        <div class="col-4 issueType-info-text">
+                            <input class="form-control" type="text" name="issue_type_name2">
+                        </div>
+                    </div>
+                    <div class="row align-items-center justify-content-center">
+                        <div class="col-3 issueType-info-label">
+                            <label class="col-form-label">Discontinued</label>
+                        </div>
+                        <div class="col-4 issueType-info-text">
+                            <input class="form-check-input" type="checkbox" name="is_discontinued">
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div id="issue_type_list_label" class="row align-items-center bg-white show">
+                <div class="col-10">
+                    <label><i class="fa-solid fa-table-list" style="padding-left:5px; padding-right: 16px"></i>Issue
+                        Type Lists</label>
+                </div>
+                <div class="col-2" style="text-align: right">
+                    <i class="bx bxs-chevron-down arrow"></i>
+                </div>
+            </div>
+            <div class="issue_type_list_container shadow-sm show_container">
+                <table id="issue_type_list" class="table table-striped nowrap" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Issue Type Code</th>
+                            <th>Issue Type Name</th>
+                            <th>Other Name</th>
+                            <th>Discontinued</th>
+                            <th>Edit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (count($stockIssueTypeList) != 0)
+                            @foreach ($stockIssueTypeList as $detail)
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $detail->issue_type_code }}</td>
+                                    <td>{{ $detail->issue_type_name_1 }}</td>
+                                    <td>{{ $detail->issue_type_name_2 }}</td>
+                                    <td><input class="form-check-input" type="checkbox"
+                                            {{ $detail->is_discontinued ? 'checked' : 'unchecked' }}
+                                            onclick="return false;"></td>
+                                    <td>
+                                        <a onclick='showIssueType({{ $detail->issue_type_id }})' data-bs-toggle="modal"
+                                            data-bs-target="#myModalIssueTypeEdit"><i class="fa-solid fa-pen-to-square"
+                                                style="color: orange;cursor: pointer;"></i></a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        @endif
+                    </tbody>
+
+                </table>
+            </div>
+
+            {{-- Edit Modal --}}
+            <div class="modal fade modal-lg" id="myModalIssueTypeEdit" data-bs-backdrop="static" data-bs-keyboard="false"
+                tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header text-center" style="background-color: #512DA8">
+                            <h1 class="modal-title fs-5 w-100" id="staticBackdropLabel" style="color: white">Update
+                                Issue Type
+                            </h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <form action="{{ route('stockControl#issue_type#updateStockIssueType') }}" method="post"
+                            enctype="multipart/form-data" id="myModalIssueTypeEditForm">
+                            @csrf
+                            <div class="modal-body">
+                                <input type="hidden" name="issue_type_id" id="issue_type_id">
+                                <input type="text" id="loginUserID" name="loginUserID"
+                                    value="{{ Auth::User()->id }}" hidden>
+                                <div class="row align-items-center mb-3 justify-content-center">
+                                    <div class="col-3">
+                                        <label class="col-form-label">Issue Type Code</label>
+                                    </div>
+                                    <div class="col-4">
+                                        <input class="form-control" type="text" name="edit_issue_type_code"
+                                            id="edit_issue_type_code">
+                                        <span class="text-danger">
+                                            <span id="edit_issue_type_code_error"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="row align-items-center mb-3 justify-content-center">
+                                    <div class="col-3">
+                                        <label class="col-form-label">Issue Type Name</label>
+                                    </div>
+                                    <div class="col-4">
+                                        <input class="form-control" type="text" name="edit_issue_type_name1"
+                                            id="edit_issue_type_name1">
+                                        <span class="text-danger">
+                                            <span id="edit_issue_type_name1_error"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="row align-items-center mb-3 justify-content-center">
+                                    <div class="col-3">
+                                        <label class="col-form-label">Other Name</label>
+                                    </div>
+                                    <div class="col-4">
+                                        <input class="form-control" type="text" name="edit_issue_type_name2"
+                                            id="edit_issue_type_name2">
+                                    </div>
+                                </div>
+                                <div class="row align-items-center justify-content-center">
+                                    <div class="col-3">
+                                        <label class="col-form-label">Discontinued</label>
+                                    </div>
+                                    <div class="col-4">
+                                        <input class="form-check-input" type="checkbox" name="edit_is_discontinued"
+                                            id="edit_is_discontinued">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer bg-secondary-subtle">
+                                <input class="btn custom_btn" type="submit" value="Update" id="btn_Edit">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script src="{{ asset('script/links_js/jquery.3.6.4.min.js') }}"></script>
+    <script src="{{ asset('script/links_js/jquery.validate.1.19.5.js') }}"></script>
+    <script src="{{ asset('script/links_js/jquery.dataTables.1.13.7.min.js') }}"></script>
+    <script src="{{ asset('script/links_js/dataTables.bootstrap5_1.13.7.min.js') }}"></script>
+    <script src="{{ asset('script/issue_type_script.js') }}"></script>
+    <script>
+        new DataTable('#issue_type_list', {
+            scrollX: true,
+        });
+
+        function showIssueType($id) {
+            console.log($id);
+            var url = '{{ route('stockControl#issue_type#updateStockIssueTypeModal') }}';
+            $.ajax({
+                url: url,
+                type: "get",
+                data: {
+                    issue_type_id: $id
+                },
+                contentType: 'application/json; charset=utf-8',
+                success: function(response) {
+                    var selectedIssueType = response.success;
+                    if (selectedIssueType.length > 0) {
+                        selectedIssueType = selectedIssueType[0];
+                        $('#issue_type_id').val(selectedIssueType.issue_type_id);
+                        $('#edit_issue_type_code').val(selectedIssueType.issue_type_code);
+                        $('#edit_issue_type_name1').val(selectedIssueType.issue_type_name_1);
+                        $('#edit_issue_type_name2').val(selectedIssueType.issue_type_name_2);
+                        $('#edit_is_discontinued').prop('checked', selectedIssueType.is_discontinued);
+                        clearValidationError();
+                    }
+                }
+            });
+        }
+
+        $('#myModalIssueTypeEditForm').submit(function(e) {
+            e.preventDefault();
+            var url = $(this).attr("action");
+            let formData = new FormData(this);
+
+            $.ajax({
+                type: 'post',
+                url: url,
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: (response, data) => {
+                    // console.log(response);
+                    if (response.errors) {
+                        $.each(response.errors, function(key, value) {
+                            if (key == "edit_issue_type_code") {
+                                $('#edit_issue_type_code_error').html(value);
+                                $('#edit_issue_type_code').addClass('is-invalid');
+                            } else if (key == "edit_issue_type_name1") {
+                                $('#edit_issue_type_name1_error').html(value);
+                                $('#edit_issue_type_name1').addClass('is-invalid');
+                            }
+                        });
+                    } else if (response.success) {
+                        console.log(response.success);
+                        location.reload();
+                    }
+                }
+            });
+        });
+
+        function clearValidationError() {
+            $('#edit_issue_type_code_error').html("");
+            $('#edit_issue_type_code').removeClass('is-invalid');
+            $('#edit_issue_type_name1_error').html("");
+            $('#edit_issue_type_name1').removeClass('is-invalid');
+        }
+    </script>
+@endsection

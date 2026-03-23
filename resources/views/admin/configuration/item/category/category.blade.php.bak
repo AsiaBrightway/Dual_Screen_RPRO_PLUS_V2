@@ -1,0 +1,1362 @@
+@extends('layouts.admin.master')
+@section('title', 'Category')
+
+@section('content')
+    <section class="home-section">
+        <div class="home-title">
+            <i class='bx bx-menu'></i>
+            <span class="text">Category</span>
+        </div>
+        <div class="home-content">
+            <div class="row pb-3 align-items-center" style="color:#512DA8; font-weight:bold">
+                <div class="col-7">
+                    <label>Add New Category</label>
+                </div>
+                <div class="col" style="text-align: right">
+                    {{-- <button class="btn btn-danger"><i class="fa-solid fa-eraser"
+                            style="padding-right: 5px"></i>Clear</button>
+                    <button class="btn btn-primary"><i class="fa-regular fa-floppy-disk"
+                            style="padding-right: 5px"></i>Save</button> --}}
+                </div>
+            </div>
+            <div id="bar_label" class="row align-items-center bg-white">
+                <div class="col-10">
+                    <label><i class="fa-solid fa-kitchen-set " style="padding-left:5px; padding-right: 12px"></i>Kitchen</label>
+                </div>
+                <div class="col-2" style="text-align: right">
+                    <i class="bx bxs-chevron-down arrow"></i>
+                </div>
+            </div>
+            <div class="bar_container shadow-sm">
+                <table id="bar" class="table table-striped nowrap" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Image</th>
+                            <th>Category Name</th>
+                            <th>Discontinued</th>
+                            <th>Edit</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (count($Bars) != 0)
+                            @php
+                                $count = 1;
+                            @endphp
+                            @foreach ($Bars as $Bar)
+                                <tr>
+                                    <td>{{ $count }}</td>
+                                    @if ($Bar['menu_category_image'] == null)
+                                        <td> <img src="{{ asset('404_image.png') }}" alt=""
+                                                class="img-thumbnail shadow-sm" style="width:60px; height:60px"></td>
+                                    @else
+                                        <td><img src="{{ asset('storage/Images/' . $Bar['menu_category_image']) }}"
+                                                alt="" class="img-thumbnail shadow-sm"
+                                                style="width:60px; height:60px"></td>
+                                    @endif
+                                    <td>{{ $Bar['menu_category_name'] }}</td>
+                                    @if ($Bar['is_discontinued'] == 0)
+                                        <td><input class="form-check-input" type="checkbox" onclick="return false;"></td>
+                                    @elseif ($Bar['is_discontinued'] == 1)
+                                        <td><input class="form-check-input" type="checkbox" checked onclick="return false;">
+                                        </td>
+                                    @endif
+                                    <td><a data-bar_category_id="{{ $Bar['category_id'] }}"
+                                            data-bar_category_name="{{ $Bar['menu_category_name'] }}"
+                                            data-bar_is_discontinued="{{ $Bar['is_discontinued'] }}" data-bs-toggle="modal"
+                                            data-bs-target="#edit_bar_modal" class="edit_bar_modal_dialog"><i
+                                                class="fa-solid fa-pen" style="color: blue; cursor: pointer;"></i></a></td>
+                                    <td><a data-bar_category_id="{{ $Bar['category_id'] }}"
+                                            data-bar_category_name="{{ $Bar['menu_category_name'] }}" data-bs-toggle="modal"
+                                            data-bs-target="#delete_bar_modal" class="delete_bar_modal_dialog"><i
+                                                class="fa-regular fa-trash-can" style="color: red;cursor: pointer;"></i></a>
+                                    </td>
+
+                                </tr>
+                                @php
+                                    $count++;
+                                @endphp
+                            @endforeach
+                        @endif
+
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>No</th>
+                            <th>Image</th>
+                            <th>Category Name</th>
+                            <th>Discontinued</th>
+                            <th>Edit</th>
+                            <th>Delete</th>
+                        </tr>
+                    </tfoot>
+                </table>
+                <div class="d-flex justify-content-end mt-3">
+                    <button type="button" class="btn custom_btn" data-bs-toggle="modal" data-bs-target="#bar_modal">
+                        New Category
+                    </button>
+                </div>
+                <!--Add Bar Modal -->
+                <div class="modal fade" id="bar_modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+                    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header text-center" style="background-color: #512DA8">
+                                <h1 class="modal-title fs-5 w-100" id="staticBackdropLabel" style="color: white">Kitchen
+                                </h1>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+
+                            </div>
+                            <form action="{{ route('barCategory#create') }}" method="POST" enctype="multipart/form-data"
+                                id="barAddModalForm">
+                                @csrf
+                                <div class="modal-body" style="margin-left: 20px; margin-right:20px">
+                                    <div class="row mb-3 mt-3">
+                                        <div class="col-5">
+                                            <label class="form-label">Category Name <span
+                                                    style="color: red">*</span></label>
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-control " type="text" name="bar_category_name"
+                                                id="bar_category_name">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3 mt-3">
+                                        <div class="col-5">
+                                            <label class="form-label">Category Image</label>
+                                        </div>
+                                        <div class="col">
+                                            <input type="file" class="form-control form-control-sm"
+                                                id="bar_menu_category_image" name="bar_menu_category_image">
+                                        </div>
+                                    </div>
+                                    <div class="row align-items-center mb-3">
+                                        <div class="col-5">
+                                            <label class="form-label text-danger">Discontinued</label>
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-check-input" type="checkbox" name="bar_is_discontinued"
+                                                id="bar_is_discontinued">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer" style="margin-right: 20px">
+
+                                    <input type="submit" id="submitBtn" class="btn custom_btn" value="Create">
+
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!--Edit Bar Modal -->
+                <div class="modal fade" id="edit_bar_modal" data-bs-backdrop="static" data-bs-keyboard="false"
+                    tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header text-center" style="background-color: #512DA8">
+                                <h1 class="modal-title fs-5 w-100" id="staticBackdropLabel" style="color: white">Update
+                                    Bar's Category
+                                </h1>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <form action="{{ route('barCategory#update') }}" method="POST"
+                                enctype="multipart/form-data" id="barEditModalForm">
+                                @csrf
+                                <div class="modal-body" style="margin-left: 20px; margin-right:20px">
+                                    <input type="text" name="edit_bar_category_id" id="edit_bar_category_id" hidden>
+                                    <div class="row mb-3 mt-3">
+                                        <div class="col-5">
+                                            <label class="form-label">Category Name <span
+                                                    style="color: red">*</span></label>
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-control" type="text" name="edit_bar_category_name"
+                                                id="edit_bar_category_name">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3 mt-3">
+                                        <div class="col-5">
+                                            <label class="form-label">Category Image</label>
+                                        </div>
+                                        <div class="col">
+                                            <input type="file" class="form-control form-control-sm"
+                                                id="edit_bar_menu_category_image" name="edit_bar_menu_category_image">
+                                        </div>
+                                    </div>
+                                    <div class="row align-items-center mb-3">
+                                        <div class="col-5">
+                                            <label class="form-label text-danger">Discontinued</label>
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-check-input" type="checkbox"
+                                                name="edit_bar_is_discontinued" id="edit_bar_is_discontinued">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer" style="margin-right: 20px">
+                                    <input type="submit" class="btn custom_btn" value="Update">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!--Delete Bar Modal -->
+                <div class="modal fade" id="delete_bar_modal" data-bs-backdrop="static" data-bs-keyboard="false"
+                    tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header text-center" style="background-color: #512DA8">
+                                <h1 class="modal-title fs-5 w-100" id="delete_modal_header" style="color: white">
+                                </h1>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+
+                            </div>
+                            <form action="{{ route('barCategory#delete') }}" method="POST">
+                                @csrf
+                                <div class="modal-body" style="margin-left: 20px; margin-right:20px">
+                                    <input type="text" name="delete_bar_category_id" id="delete_bar_category_id"
+                                        hidden>
+                                    <div class="row align-items-center mb-3 mt-3">
+                                        <div>
+                                            <label class="form-label">Are you sure want to delete?</label>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                                <div class="modal-footer" style="margin-right: 20px">
+                                    <input type="submit" class="btn btn-danger" value="Delete">
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="kitchen_label" class="row align-items-center bg-white">
+                <div class="col-10">
+                    <label><i class="fa-solid fa-fish" style="padding-left:5px; padding-right: 12px"></i>BBQ</label>
+                </div>
+                <div class="col-2" style="text-align: right">
+                    <i class="bx bxs-chevron-down arrow"></i>
+                </div>
+            </div>
+            <div class="kitchen_container shadow-sm">
+                <table id="kitchen" class="table table-striped" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Image</th>
+                            <th>Category Name</th>
+                            <th>Discontinued</th>
+                            <th>Edit</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (count($Kitchens) != 0)
+                            @php
+                                $count = 1;
+                            @endphp
+                            @foreach ($Kitchens as $Kitchen)
+                                <tr>
+                                    <td>{{ $count }}</td>
+                                    @if ($Kitchen['menu_category_image'] == null)
+                                        <td> <img src="{{ asset('404_image.png') }}" alt=""
+                                                class="img-thumbnail shadow-sm" style="width:60px; height:60px"></td>
+                                    @else
+                                        <td><img src="{{ asset('storage/Images/' . $Kitchen['menu_category_image']) }}"
+                                                alt="" class="img-thumbnail shadow-sm"
+                                                style="width:60px; height:60px"></td>
+                                    @endif
+                                    <td>{{ $Kitchen['menu_category_name'] }}</td>
+                                    @if ($Kitchen['is_discontinued'] == 0)
+                                        <td><input class="form-check-input" type="checkbox" onclick="return false;"></td>
+                                    @elseif ($Kitchen['is_discontinued'] == 1)
+                                        <td><input class="form-check-input" type="checkbox" checked
+                                                onclick="return false;">
+                                        </td>
+                                    @endif
+                                    <td><a data-kitchen_category_id="{{ $Kitchen['category_id'] }}"
+                                            data-kitchen_category_name="{{ $Kitchen['menu_category_name'] }}"
+                                            data-kitchen_is_discontinued="{{ $Kitchen['is_discontinued'] }}"
+                                            data-bs-toggle="modal" data-bs-target="#edit_kitchen_modal"
+                                            class="edit_kitchen_modal_dialog"><i class="fa-solid fa-pen"
+                                                style="color: blue; cursor: pointer;"></i></a>
+                                    </td>
+                                    <td><a data-kitchen_category_id="{{ $Kitchen['category_id'] }}"
+                                            data-kitchen_category_name="{{ $Kitchen['menu_category_name'] }}"
+                                            data-bs-toggle="modal" data-bs-target="#delete_kitchen_modal"
+                                            class="delete_kitchen_modal_dialog"><i class="fa-regular fa-trash-can"
+                                                style="color: red;cursor: pointer;"></i></a>
+                                    </td>
+
+                                </tr>
+                                @php
+                                    $count++;
+                                @endphp
+                            @endforeach
+                        @endif
+
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>No</th>
+                            <th>Image</th>
+                            <th>Category Name</th>
+                            <th>Discontinued</th>
+                            <th>Edit</th>
+                            <th>Delete</th>
+                        </tr>
+                    </tfoot>
+                </table>
+                <div class="d-flex justify-content-end mt-3">
+                    <button type="button" class="btn custom_btn" data-bs-toggle="modal"
+                        data-bs-target="#kitchen_modal">
+                        New Category
+                    </button>
+                </div>
+                <!--Add Kitchen Modal -->
+                <div class="modal fade" id="kitchen_modal" data-bs-backdrop="static" data-bs-keyboard="false"
+                    tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header text-center" style="background-color: #512DA8">
+                                <h1 class="modal-title fs-5 w-100" id="staticBackdropLabel" style="color: white">BBQ
+                                </h1>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+
+                            </div>
+                            <form action="{{ route('kitchenCategory#create') }}" method="POST"
+                                enctype="multipart/form-data" id="kitchenAddModalForm">
+                                @csrf
+                                <div class="modal-body" style="margin-left: 20px; margin-right:20px">
+                                    <div class="row mb-3 mt-3">
+                                        <div class="col-5">
+                                            <label class="form-label">Category Name <span
+                                                    style="color: red">*</span></label>
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-control" type="text" name="kitchen_category_name"
+                                                id="kitchen_category_name">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3 mt-3">
+                                        <div class="col-5">
+                                            <label class="form-label">Category Image</label>
+                                        </div>
+                                        <div class="col">
+                                            <input type="file" class="form-control form-control-sm"
+                                                id="kitchen_menu_category_image" name="kitchen_menu_category_image">
+                                        </div>
+                                    </div>
+                                    <div class="row align-items-center mb-3">
+                                        <div class="col-5">
+                                            <label class="form-label text-danger">Discontinued</label>
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-check-input" type="checkbox"
+                                                name="kitchen_is_discontinued" id="kitchen_is_discontinued">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer" style="margin-right: 20px">
+                                    <input type="submit" class="btn custom_btn" value="Create">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!--Edit Kitchen Modal -->
+                <div class="modal fade" id="edit_kitchen_modal" data-bs-backdrop="static" data-bs-keyboard="false"
+                    tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header text-center" style="background-color: #512DA8">
+                                <h1 class="modal-title fs-5 w-100" id="staticBackdropLabel" style="color: white">Update
+                                    Kitchen's Category
+                                </h1>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+
+                            </div>
+                            <form action="{{ route('kitchenCategory#update') }}" method="POST"
+                                enctype="multipart/form-data" id="kitchenEditModalForm">
+                                @csrf
+                                <div class="modal-body" style="margin-left: 20px; margin-right:20px">
+                                    <input type="text" name="edit_kitchen_category_id" id="edit_kitchen_category_id"
+                                        hidden>
+                                    <div class="row mb-3 mt-3">
+                                        <div class="col-5">
+                                            <label class="form-label">Category Name <span
+                                                    style="color: red">*</span></label>
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-control" type="text" name="edit_kitchen_category_name"
+                                                id="edit_kitchen_category_name">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3 mt-3">
+                                        <div class="col-5">
+                                            <label class="form-label">Category Image</label>
+                                        </div>
+                                        <div class="col">
+                                            <input type="file" class="form-control form-control-sm"
+                                                id="edit_kitchen_menu_category_image"
+                                                name="edit_kitchen_menu_category_image">
+                                        </div>
+                                    </div>
+                                    <div class="row align-items-center mb-3">
+                                        <div class="col-5">
+                                            <label class="form-label text-danger">Discontinued</label>
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-check-input" type="checkbox"
+                                                name="edit_kitchen_is_discontinued" id="edit_kitchen_is_discontinued">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer" style="margin-right: 20px">
+                                    <input type="submit" class="btn custom_btn" value="Update">
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+                <!--Delete Kitchen Modal -->
+                <div class="modal fade" id="delete_kitchen_modal" data-bs-backdrop="static" data-bs-keyboard="false"
+                    tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header text-center" style="background-color: #512DA8">
+                                <h1 class="modal-title fs-5 w-100" id="delete_modal_header" style="color: white">
+                                </h1>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <form action="{{ route('kitchenCategory#delete') }}" method="POST">
+                                @csrf
+                                <div class="modal-body" style="margin-left: 20px; margin-right:20px">
+                                    <input type="text" name="delete_kitchen_category_id"
+                                        id="delete_kitchen_category_id" hidden>
+                                    <div class="row align-items-center mb-3 mt-3">
+                                        <div>
+                                            <label class="form-label">Are you sure want to delete?</label>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                                <div class="modal-footer" style="margin-right: 20px">
+                                    <input type="submit" class="btn btn-danger" value="Delete">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="refrigerator_label" class="row align-items-center bg-white">
+                <div class="col-10">
+                    <label><i class="fa-solid fa-beer-mug-empty" style="padding-left:5px; padding-right: 13px"></i>Bar</label>
+                </div>
+                <div class="col-2" style="text-align: right">
+                    <i class="bx bxs-chevron-down arrow"></i>
+                </div>
+            </div>
+            <div class="refrigerator_container shadow-sm">
+                <table id="refrigerator" class="table table-striped" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Image</th>
+                            <th>Category Name</th>
+                            <th>Discontinued</th>
+                            <th>Edit</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (count($Refrigerators) != 0)
+                            @php
+                                $count = 1;
+                            @endphp
+                            @foreach ($Refrigerators as $Refrigerator)
+                                <tr>
+                                    <td>{{ $count }}</td>
+                                    @if ($Refrigerator['menu_category_image'] == null)
+                                        <td> <img src="{{ asset('404_image.png') }}" alt=""
+                                                class="img-thumbnail shadow-sm" style="width:60px; height:60px"></td>
+                                    @else
+                                        <td><img src="{{ asset('storage/Images/' . $Refrigerator['menu_category_image']) }}"
+                                                alt="" class="img-thumbnail shadow-sm"
+                                                style="width:60px; height:60px"></td>
+                                    @endif
+                                    <td>{{ $Refrigerator['menu_category_name'] }}</td>
+                                    @if ($Refrigerator['is_discontinued'] == 0)
+                                        <td><input class="form-check-input" type="checkbox" onclick="return false;"></td>
+                                    @elseif ($Refrigerator['is_discontinued'] == 1)
+                                        <td><input class="form-check-input" type="checkbox" checked
+                                                onclick="return false;">
+                                        </td>
+                                    @endif
+                                    <td><a data-refrigerator_category_id="{{ $Refrigerator['category_id'] }}"
+                                            data-refrigerator_category_name="{{ $Refrigerator['menu_category_name'] }}"
+                                            data-refrigerator_is_discontinued="{{ $Refrigerator['is_discontinued'] }}"
+                                            data-bs-toggle="modal" data-bs-target="#edit_refrigerator_modal"
+                                            class="edit_refrigerator_modal_dialog"><i class="fa-solid fa-pen"
+                                                style="color: blue; cursor: pointer;"></i></a>
+                                    </td>
+                                    <td><a data-refrigerator_category_id="{{ $Refrigerator['category_id'] }}"
+                                            data-refrigerator_category_name="{{ $Refrigerator['menu_category_name'] }}"
+                                            data-bs-toggle="modal" data-bs-target="#delete_refrigerator_modal"
+                                            class="delete_refrigerator_modal_dialog"><i class="fa-regular fa-trash-can"
+                                                style="color: red;cursor: pointer;"></i></a>
+                                    </td>
+
+                                </tr>
+                                @php
+                                    $count++;
+                                @endphp
+                            @endforeach
+                        @endif
+
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>No</th>
+                            <th>Image</th>
+                            <th>Category Name</th>
+                            <th>Discontinued</th>
+                            <th>Edit</th>
+                            <th>Delete</th>
+                        </tr>
+                    </tfoot>
+                </table>
+                <div class="d-flex justify-content-end mt-3">
+                    <button type="button" class="btn custom_btn" data-bs-toggle="modal"
+                        data-bs-target="#refrigerator_modal">
+                        New Category
+                    </button>
+                </div>
+                <!--Add Refrigerator Modal -->
+                <div class="modal fade" id="refrigerator_modal" data-bs-backdrop="static" data-bs-keyboard="false"
+                    tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header text-center" style="background-color: #512DA8">
+                                <h1 class="modal-title fs-5 w-100" id="staticBackdropLabel" style="color: white">
+                                    Bar
+                                </h1>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <form action="{{ route('refrigeratorCategory#create') }}" method="POST"
+                                enctype="multipart/form-data" id="refrigeratorAddModalForm">
+                                @csrf
+                                <div class="modal-body" style="margin-left: 20px; margin-right:20px">
+                                    <div class="row mb-3 mt-3">
+                                        <div class="col-5">
+                                            <label class="form-label">Category Name <span
+                                                    style="color: red">*</span></label>
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-control" type="text" name="refrigerator_category_name"
+                                                id="refrigerator_category_name">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3 mt-3">
+                                        <div class="col-5">
+                                            <label class="form-label">Category Image</label>
+                                        </div>
+                                        <div class="col">
+                                            <input type="file" class="form-control form-control-sm"
+                                                id="refrigerator_menu_category_image"
+                                                name="refrigerator_menu_category_image">
+                                        </div>
+                                    </div>
+                                    <div class="row align-items-center mb-3">
+                                        <div class="col-5">
+                                            <label class="form-label text-danger">Discontinued</label>
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-check-input" type="checkbox"
+                                                name="refrigerator_is_discontinued" id="refrigerator_is_discontinued">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer" style="margin-right: 20px">
+                                    <input type="submit" class="btn custom_btn" value="Create">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!--Edit Refrigerator Modal -->
+                <div class="modal fade" id="edit_refrigerator_modal" data-bs-backdrop="static" data-bs-keyboard="false"
+                    tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header text-center" style="background-color: #512DA8">
+                                <h1 class="modal-title fs-5 w-100" id="staticBackdropLabel" style="color: white">Update
+                                    Refrigerator's Category
+                                </h1>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+
+                            </div>
+                            <form action="{{ route('refrigeratorCategory#update') }}" method="POST"
+                                enctype="multipart/form-data" id="refrigeratorEditModalForm">
+                                @csrf
+                                <div class="modal-body" style="margin-left: 20px; margin-right:20px">
+                                    <input type="text" name="edit_refrigerator_category_id"
+                                        id="edit_refrigerator_category_id" hidden>
+                                    <div class="row mb-3 mt-3">
+                                        <div class="col-5">
+                                            <label class="form-label">Category Name <span
+                                                    style="color: red">*</span></label>
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-control" type="text"
+                                                name="edit_refrigerator_category_name"
+                                                id="edit_refrigerator_category_name">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3 mt-3">
+                                        <div class="col-5">
+                                            <label class="form-label">Category Image</label>
+                                        </div>
+                                        <div class="col">
+                                            <input type="file" class="form-control form-control-sm"
+                                                id="edit_refrigerator_menu_category_image"
+                                                name="edit_refrigerator_menu_category_image">
+                                        </div>
+                                    </div>
+                                    <div class="row align-items-center mb-3">
+                                        <div class="col-5">
+                                            <label class="form-label text-danger">Discontinued</label>
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-check-input" type="checkbox"
+                                                name="edit_refrigerator_is_discontinued"
+                                                id="edit_refrigerator_is_discontinued">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer" style="margin-right: 20px">
+                                    <input type="submit" class="btn custom_btn" value="Update">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!--Delete Refrigerator Modal -->
+                <div class="modal fade" id="delete_refrigerator_modal" data-bs-backdrop="static"
+                    data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header text-center" style="background-color: #512DA8">
+                                <h1 class="modal-title fs-5 w-100" id="delete_modal_header" style="color: white">
+                                </h1>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+
+                            </div>
+                            <form action="{{ route('refrigeratorCategory#delete') }}" method="POST">
+                                @csrf
+                                <div class="modal-body" style="margin-left: 20px; margin-right:20px">
+                                    <input type="text" name="delete_refrigerator_category_id"
+                                        id="delete_refrigerator_category_id" hidden>
+                                    <div class="row align-items-center mb-3 mt-3">
+                                        <div>
+                                            <label class="form-label">Are you sure want to delete?</label>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                                <div class="modal-footer" style="margin-right: 20px">
+                                    <input type="submit" class="btn btn-danger" value="Delete">
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="service_label" class="row align-items-center bg-white">
+                <div class="col-10">
+                    <label><i class="fa-solid fa-box" style="padding-left:5px; padding-right: 15px"></i>Counter</label>
+                </div>
+                <div class="col-2" style="text-align: right">
+                    <i class="bx bxs-chevron-down arrow"></i>
+                </div>
+            </div>
+            <div class="service_container shadow-sm ">
+                <table id="service" class="table table-striped" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Image</th>
+                            <th>Category Name</th>
+                            <th>Discontinued</th>
+                            <th>Edit</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (count($Services) != 0)
+                            @php
+                                $count = 1;
+                            @endphp
+                            @foreach ($Services as $Service)
+                                <tr>
+                                    <td>{{ $count }}</td>
+                                    @if ($Service['menu_category_image'] == null)
+                                        <td> <img src="{{ asset('404_image.png') }}" alt=""
+                                                class="img-thumbnail shadow-sm" style="width:60px; height:60px"></td>
+                                    @else
+                                        <td><img src="{{ asset('storage/Images/' . $Service['menu_category_image']) }}"
+                                                alt="" class="img-thumbnail shadow-sm"
+                                                style="width:60px; height:60px"></td>
+                                    @endif
+                                    <td>{{ $Service['menu_category_name'] }}</td>
+                                    @if ($Service['is_discontinued'] == 0)
+                                        <td><input class="form-check-input" type="checkbox" onclick="return false;"></td>
+                                    @elseif ($Service['is_discontinued'] == 1)
+                                        <td><input class="form-check-input" type="checkbox" checked
+                                                onclick="return false;">
+                                        </td>
+                                    @endif
+                                    <td><a data-service_category_id="{{ $Service['category_id'] }}"
+                                            data-service_category_name="{{ $Service['menu_category_name'] }}"
+                                            data-service_is_discontinued="{{ $Service['is_discontinued'] }}"
+                                            data-bs-toggle="modal" data-bs-target="#edit_service_modal"
+                                            class="edit_service_modal_dialog"><i class="fa-solid fa-pen"
+                                                style="color: blue; cursor: pointer;"></i></a>
+                                    </td>
+                                    <td><a data-service_category_id="{{ $Service['category_id'] }}"
+                                            data-service_category_name="{{ $Service['menu_category_name'] }}"
+                                            data-bs-toggle="modal" data-bs-target="#delete_service_modal"
+                                            class="delete_service_modal_dialog"><i class="fa-regular fa-trash-can"
+                                                style="color: red;cursor: pointer;"></i></a>
+                                    </td>
+
+                                </tr>
+                                @php
+                                    $count++;
+                                @endphp
+                            @endforeach
+                        @endif
+
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>No</th>
+                            <th>Image</th>
+                            <th>Category Name</th>
+                            <th>Discontinued</th>
+                            <th>Edit</th>
+                            <th>Delete</th>
+                        </tr>
+                    </tfoot>
+                </table>
+                <div class="d-flex justify-content-end mt-3">
+                    <button type="button" class="btn custom_btn" data-bs-toggle="modal"
+                        data-bs-target="#service_modal">
+                        New Category
+                    </button>
+                </div>
+                <!--Add Service Modal -->
+                <div class="modal fade" id="service_modal" data-bs-backdrop="static" data-bs-keyboard="false"
+                    tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header text-center" style="background-color: #512DA8">
+                                <h1 class="modal-title fs-5 w-100" id="staticBackdropLabel" style="color: white">
+                                    Counter
+                                </h1>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <form action="{{ route('serviceCategory#create') }}" method="POST"
+                                enctype="multipart/form-data" id="serviceAddModalForm">
+                                @csrf
+                                <div class="modal-body" style="margin-left: 20px; margin-right:20px">
+                                    <div class="row mb-3 mt-3">
+                                        <div class="col-5">
+                                            <label class="form-label">Category Name <span
+                                                    style="color: red">*</span></label>
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-control" type="text" name="service_category_name"
+                                                id="service_category_name">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3 mt-3">
+                                        <div class="col-5">
+                                            <label class="form-label">Category Image</label>
+                                        </div>
+                                        <div class="col">
+                                            <input type="file" class="form-control form-control-sm"
+                                                id="service_menu_category_image" name="service_menu_category_image">
+                                        </div>
+                                    </div>
+                                    <div class="row align-items-center mb-3">
+                                        <div class="col-5">
+                                            <label class="form-label text-danger">Discontinued</label>
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-check-input" type="checkbox"
+                                                name="service_is_discontinued" id="service_is_discontinued">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer" style="margin-right: 20px">
+                                    <input type="submit" class="btn custom_btn" value="Create">
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+                <!--Edit Service Modal -->
+                <div class="modal fade" id="edit_service_modal" data-bs-backdrop="static" data-bs-keyboard="false"
+                    tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header text-center" style="background-color: #512DA8">
+                                <h1 class="modal-title fs-5 w-100" id="staticBackdropLabel" style="color: white">Update
+                                    Service's Category
+                                </h1>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <form action="{{ route('serviceCategory#update') }}" method="POST"
+                                enctype="multipart/form-data" id="serviceEditModalForm">
+                                @csrf
+                                <div class="modal-body" style="margin-left: 20px; margin-right:20px">
+                                    <input type="text" name="edit_service_category_id" id="edit_service_category_id"
+                                        hidden>
+                                    <div class="row mb-3 mt-3">
+                                        <div class="col-5">
+                                            <label class="form-label">Category Name <span
+                                                    style="color: red">*</span></label>
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-control" type="text" name="edit_service_category_name"
+                                                id="edit_service_category_name">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3 mt-3">
+                                        <div class="col-5">
+                                            <label class="form-label">Category Image</label>
+                                        </div>
+                                        <div class="col">
+                                            <input type="file" class="form-control form-control-sm"
+                                                id="edit_service_menu_category_image"
+                                                name="edit_service_menu_category_image">
+                                        </div>
+                                    </div>
+                                    <div class="row align-items-center mb-3">
+                                        <div class="col-5">
+                                            <label class="form-label text-danger">Discontinued</label>
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-check-input" type="checkbox"
+                                                name="edit_service_is_discontinued" id="edit_service_is_discontinued">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer" style="margin-right: 20px">
+                                    <input type="submit" class="btn custom_btn" value="Update">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!--Delete Service Modal -->
+                <div class="modal fade" id="delete_service_modal" data-bs-backdrop="static" data-bs-keyboard="false"
+                    tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header text-center" style="background-color: #512DA8">
+                                <h1 class="modal-title fs-5 w-100" id="delete_modal_header" style="color: white">
+                                </h1>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <form action="{{ route('serviceCategory#delete') }}" method="POST">
+                                @csrf
+                                <div class="modal-body" style="margin-left: 20px; margin-right:20px">
+                                    <input type="text" name="delete_service_category_id"
+                                        id="delete_service_category_id" hidden>
+                                    <div class="row align-items-center mb-3 mt-3">
+                                        <div>
+                                            <label class="form-label">Are you sure want to delete?</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer" style="margin-right: 20px">
+                                    <input type="submit" class="btn btn-danger" value="Delete">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="noodle_label" class="row align-items-center bg-white">
+                <div class="col-10">
+                    <label><i class="fa-solid fa-box" style="padding-left:5px; padding-right: 12px"></i>Counter2</label>
+                </div>
+                <div class="col-2" style="text-align: right">
+                    <i class="bx bxs-chevron-down arrow"></i>
+                </div>
+            </div>
+            <div class="noodle_container shadow-sm">
+                <table id="noodle" class="table table-striped nowrap" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Image</th>
+                            <th>Category Name</th>
+                            <th>Discontinued</th>
+                            <th>Edit</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (count($Noodles) != 0)
+                            @php
+                                $count = 1;
+                            @endphp
+                            @foreach ($Noodles as $Noodle)
+                                <tr>
+                                    <td>{{ $count }}</td>
+                                    @if ($Noodle['menu_category_image'] == null)
+                                        <td> <img src="{{ asset('404_image.png') }}" alt=""
+                                                class="img-thumbnail shadow-sm" style="width:60px; height:60px"></td>
+                                    @else
+                                        <td><img src="{{ asset('storage/Images/' . $Noodle['menu_category_image']) }}"
+                                                alt="" class="img-thumbnail shadow-sm"
+                                                style="width:60px; height:60px"></td>
+                                    @endif
+                                    <td>{{ $Noodle['menu_category_name'] }}</td>
+                                    @if ($Noodle['is_discontinued'] == 0)
+                                        <td><input class="form-check-input" type="checkbox" onclick="return false;"></td>
+                                    @elseif ($Noodle['is_discontinued'] == 1)
+                                        <td><input class="form-check-input" type="checkbox" checked onclick="return false;">
+                                        </td>
+                                    @endif
+                                    <td><a data-noodle_category_id="{{ $Noodle['category_id'] }}"
+                                            data-noodle_category_name="{{ $Noodle['menu_category_name'] }}"
+                                            data-noodle_is_discontinued="{{ $Noodle['is_discontinued'] }}" data-bs-toggle="modal"
+                                            data-bs-target="#edit_noodle_modal" class="edit_noodle_modal_dialog"><i
+                                                class="fa-solid fa-pen" style="color: blue; cursor: pointer;"></i></a></td>
+                                    <td><a data-noodle_category_id="{{ $Noodle['category_id'] }}"
+                                            data-noodlecategory_name="{{ $Noodle['menu_category_name'] }}" data-bs-toggle="modal"
+                                            data-bs-target="#delete_noodle_modal" class="delete_noodle_modal_dialog"><i
+                                                class="fa-regular fa-trash-can" style="color: red;cursor: pointer;"></i></a>
+                                    </td>
+
+                                </tr>
+                                @php
+                                    $count++;
+                                @endphp
+                            @endforeach
+                        @endif
+
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>No</th>
+                            <th>Image</th>
+                            <th>Category Name</th>
+                            <th>Discontinued</th>
+                            <th>Edit</th>
+                            <th>Delete</th>
+                        </tr>
+                    </tfoot>
+                </table>
+                <div class="d-flex justify-content-end mt-3">
+                    <button type="button" class="btn custom_btn" data-bs-toggle="modal" data-bs-target="#noodle_modal">
+                        New Category
+                    </button>
+                </div>
+                <!--Add Noodle Modal -->
+                <div class="modal fade" id="noodle_modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+                    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header text-center" style="background-color: #512DA8">
+                                <h1 class="modal-title fs-5 w-100" id="staticBackdropLabel" style="color: white">သျှမ်း
+                                </h1>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+
+                            </div>
+                            <form action="{{ route('noodleCategory#create') }}" method="POST" enctype="multipart/form-data"
+                                id="noodleAddModalForm">
+                                @csrf
+                                <div class="modal-body" style="margin-left: 20px; margin-right:20px">
+                                    <div class="row mb-3 mt-3">
+                                        <div class="col-5">
+                                            <label class="form-label">Category Name <span
+                                                    style="color: red">*</span></label>
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-control " type="text" name="noodle_category_name"
+                                                id="noodle_category_name">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3 mt-3">
+                                        <div class="col-5">
+                                            <label class="form-label">Category Image</label>
+                                        </div>
+                                        <div class="col">
+                                            <input type="file" class="form-control form-control-sm"
+                                                id="noodle_menu_category_image" name="noodle_menu_category_image">
+                                        </div>
+                                    </div>
+                                    <div class="row align-items-center mb-3">
+                                        <div class="col-5">
+                                            <label class="form-label text-danger">Discontinued</label>
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-check-input" type="checkbox" name="noodle_is_discontinued"
+                                                id="noodle_is_discontinued">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer" style="margin-right: 20px">
+
+                                    <input type="submit" id="submitBtn" class="btn custom_btn" value="Create">
+
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!--Edit noodle Modal -->
+                <div class="modal fade" id="edit_noodle_modal" data-bs-backdrop="static" data-bs-keyboard="false"
+                    tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header text-center" style="background-color: #512DA8">
+                                <h1 class="modal-title fs-5 w-100" id="staticBackdropLabel" style="color: white">Update
+                                    noodle's Category
+                                </h1>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <form action="{{ route('noodleCategory#update') }}" method="POST"
+                                enctype="multipart/form-data" id="noodleEditModalForm">
+                                @csrf
+                                <div class="modal-body" style="margin-left: 20px; margin-right:20px">
+                                    <input type="text" name="edit_noodle_category_id" id="edit_noodle_category_id" hidden>
+                                    <div class="row mb-3 mt-3">
+                                        <div class="col-5">
+                                            <label class="form-label">Category Name <span
+                                                    style="color: red">*</span></label>
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-control" type="text" name="edit_noodle_category_name"
+                                                id="edit_noodle_category_name">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3 mt-3">
+                                        <div class="col-5">
+                                            <label class="form-label">Category Image</label>
+                                        </div>
+                                        <div class="col">
+                                            <input type="file" class="form-control form-control-sm"
+                                                id="edit_noodle_menu_category_image" name="edit_noodle_menu_category_image">
+                                        </div>
+                                    </div>
+                                    <div class="row align-items-center mb-3">
+                                        <div class="col-5">
+                                            <label class="form-label text-danger">Discontinued</label>
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-check-input" type="checkbox"
+                                                name="edit_noodle_is_discontinued" id="edit_noodle_is_discontinued">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer" style="margin-right: 20px">
+                                    <input type="submit" class="btn custom_btn" value="Update">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!--Delete noodle Modal -->
+                <div class="modal fade" id="delete_noodle_modal" data-bs-backdrop="static" data-bs-keyboard="false"
+                    tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header text-center" style="background-color: #512DA8">
+                                <h1 class="modal-title fs-5 w-100" id="delete_modal_header" style="color: white">
+                                </h1>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+
+                            </div>
+                            <form action="{{ route('noodleCategory#delete') }}" method="POST">
+                                @csrf
+                                <div class="modal-body" style="margin-left: 20px; margin-right:20px">
+                                    <input type="text" name="delete_noodle_category_id" id="delete_noodle_category_id"
+                                        hidden>
+                                    <div class="row align-items-center mb-3 mt-3">
+                                        <div>
+                                            <label class="form-label">Are you sure want to delete?</label>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                                <div class="modal-footer" style="margin-right: 20px">
+                                    <input type="submit" class="btn btn-danger" value="Delete">
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="cuisine_label" class="row align-items-center bg-white">
+                <div class="col-10">
+                    <label><i class="fa-solid fa-box" style="padding-left:5px; padding-right: 12px"></i>Counter3</label>
+                </div>
+                <div class="col-2" style="text-align: right">
+                    <i class="bx bxs-chevron-down arrow"></i>
+                </div>
+            </div>
+            <div class="cuisine_container shadow-sm">
+                <table id="cuisine" class="table table-striped nowrap" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Image</th>
+                            <th>Category Name</th>
+                            <th>Discontinued</th>
+                            <th>Edit</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (count($Cuisines) != 0)
+                            @php
+                                $count = 1;
+                            @endphp
+                            @foreach ($Cuisines as $Cuisine)
+                                <tr>
+                                    <td>{{ $count }}</td>
+                                    @if ($Cuisine['menu_category_image'] == null)
+                                        <td> <img src="{{ asset('404_image.png') }}" alt=""
+                                                class="img-thumbnail shadow-sm" style="width:60px; height:60px"></td>
+                                    @else
+                                        <td><img src="{{ asset('storage/Images/' . $Cuisine['menu_category_image']) }}"
+                                                alt="" class="img-thumbnail shadow-sm"
+                                                style="width:60px; height:60px"></td>
+                                    @endif
+                                    <td>{{ $Cuisine['menu_category_name'] }}</td>
+                                    @if ($Cuisine['is_discontinued'] == 0)
+                                        <td><input class="form-check-input" type="checkbox" onclick="return false;"></td>
+                                    @elseif ($Cuisine['is_discontinued'] == 1)
+                                        <td><input class="form-check-input" type="checkbox" checked onclick="return false;">
+                                        </td>
+                                    @endif
+                                    <td><a data-cuisine_category_id="{{ $Cuisine['category_id'] }}"
+                                            data-cuisine_category_name="{{ $Cuisine['menu_category_name'] }}"
+                                            data-cuisine_is_discontinued="{{ $Cuisine['is_discontinued'] }}" data-bs-toggle="modal"
+                                            data-bs-target="#edit_cuisine_modal" class="edit_cuisine_modal_dialog"><i
+                                                class="fa-solid fa-pen" style="color: blue; cursor: pointer;"></i></a></td>
+                                    <td><a data-cuisine_category_id="{{ $Cuisine['category_id'] }}"
+                                            data-cuisine_category_name="{{ $Cuisine['menu_category_name'] }}" data-bs-toggle="modal"
+                                            data-bs-target="#delete_cuisine_modal" class="delete_cuisine_modal_dialog"><i
+                                                class="fa-regular fa-trash-can" style="color: red;cursor: pointer;"></i></a>
+                                    </td>
+
+                                </tr>
+                                @php
+                                    $count++;
+                                @endphp
+                            @endforeach
+                        @endif
+
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>No</th>
+                            <th>Image</th>
+                            <th>Category Name</th>
+                            <th>Discontinued</th>
+                            <th>Edit</th>
+                            <th>Delete</th>
+                        </tr>
+                    </tfoot>
+                </table>
+                <div class="d-flex justify-content-end mt-3">
+                    <button type="button" class="btn custom_btn" data-bs-toggle="modal" data-bs-target="#cuisine_modal">
+                        New Category
+                    </button>
+                </div>
+                <!--Add Cuisine Modal -->
+                <div class="modal fade" id="cuisine_modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+                    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header text-center" style="background-color: #512DA8">
+                                <h1 class="modal-title fs-5 w-100" id="staticBackdropLabel" style="color: white">Counter3
+                                </h1>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+
+                            </div>
+                            <form action="{{ route('cuisineCategory#create') }}" method="POST" enctype="multipart/form-data"
+                                id="cuisineAddModalForm">
+                                @csrf
+                                <div class="modal-body" style="margin-left: 20px; margin-right:20px">
+                                    <div class="row mb-3 mt-3">
+                                        <div class="col-5">
+                                            <label class="form-label">Category Name <span
+                                                    style="color: red">*</span></label>
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-control " type="text" name="cuisine_category_name"
+                                                id="cuisine_category_name">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3 mt-3">
+                                        <div class="col-5">
+                                            <label class="form-label">Category Image</label>
+                                        </div>
+                                        <div class="col">
+                                            <input type="file" class="form-control form-control-sm"
+                                                id="cuisine_menu_category_image" name="cuisine_menu_category_image">
+                                        </div>
+                                    </div>
+                                    <div class="row align-items-center mb-3">
+                                        <div class="col-5">
+                                            <label class="form-label text-danger">Discontinued</label>
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-check-input" type="checkbox" name="cuisine_is_discontinued"
+                                                id="cuisine_is_discontinued">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer" style="margin-right: 20px">
+
+                                    <input type="submit" id="submitBtn" class="btn custom_btn" value="Create">
+
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!--Edit cuisine Modal -->
+                <div class="modal fade" id="edit_cuisine_modal" data-bs-backdrop="static" data-bs-keyboard="false"
+                    tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header text-center" style="background-color: #512DA8">
+                                <h1 class="modal-title fs-5 w-100" id="staticBackdropLabel" style="color: white">Update
+                                    Cuisine's Category
+                                </h1>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <form action="{{ route('cuisineCategory#update') }}" method="POST"
+                                enctype="multipart/form-data" id="cuisineEditModalForm">
+                                @csrf
+                                <div class="modal-body" style="margin-left: 20px; margin-right:20px">
+                                    <input type="text" name="edit_cuisine_category_id" id="edit_cuisine_category_id" hidden>
+                                    <div class="row mb-3 mt-3">
+                                        <div class="col-5">
+                                            <label class="form-label">Category Name <span
+                                                    style="color: red">*</span></label>
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-control" type="text" name="edit_cuisine_category_name"
+                                                id="edit_cuisine_category_name">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3 mt-3">
+                                        <div class="col-5">
+                                            <label class="form-label">Category Image</label>
+                                        </div>
+                                        <div class="col">
+                                            <input type="file" class="form-control form-control-sm"
+                                                id="edit_cuisine_menu_category_image" name="edit_cuisine_menu_category_image">
+                                        </div>
+                                    </div>
+                                    <div class="row align-items-center mb-3">
+                                        <div class="col-5">
+                                            <label class="form-label text-danger">Discontinued</label>
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-check-input" type="checkbox"
+                                                name="edit_cuisine_is_discontinued" id="edit_cuisine_is_discontinued">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer" style="margin-right: 20px">
+                                    <input type="submit" class="btn custom_btn" value="Update">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!--Delete cuisine Modal -->
+                <div class="modal fade" id="delete_cuisine_modal" data-bs-backdrop="static" data-bs-keyboard="false"
+                    tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header text-center" style="background-color: #512DA8">
+                                <h1 class="modal-title fs-5 w-100" id="delete_modal_header" style="color: white">
+                                </h1>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+
+                            </div>
+                            <form action="{{ route('cuisineCategory#delete') }}" method="POST">
+                                @csrf
+                                <div class="modal-body" style="margin-left: 20px; margin-right:20px">
+                                    <input type="text" name="delete_cuisine_category_id" id="delete_cuisine_category_id"
+                                        hidden>
+                                    <div class="row align-items-center mb-3 mt-3">
+                                        <div>
+                                            <label class="form-label">Are you sure want to delete?</label>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                                <div class="modal-footer" style="margin-right: 20px">
+                                    <input type="submit" class="btn btn-danger" value="Delete">
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <script src="{{ asset('script/links_js/jquery.3.6.4.min.js') }}"></script>
+    <script src="{{ asset('script/links_js/jquery.validate.1.19.5.js') }}"></script>
+    <script src="{{ asset('script/links_js/jquery.dataTables.1.13.7.min.js') }}"></script>
+    <script src="{{ asset('script/links_js/dataTables.bootstrap5_1.13.7.min.js') }}"></script>
+    <script src="{{ asset('script/category_script.js') }}"></script>
+
+@endsection

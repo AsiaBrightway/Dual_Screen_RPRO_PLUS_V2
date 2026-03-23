@@ -1,0 +1,525 @@
+@extends('layouts.admin.master')
+@section('title', 'Sale Order Details')
+
+@section('content')
+    <style>
+        .custom-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .custom-label {
+            margin-left: auto;
+            margin-right: 25px;
+        }
+
+        .custom-text {
+            margin-left: 0px;
+            /* Adjust margin as needed */
+        }
+    </style>
+    <section class="home-section">
+        <div class="home-title custom-title">
+            <i class='bx bx-menu'></i>
+            <span class="text custom-text">Sale Order Details</span>
+            <label class="custom-label" style="color:#512DA8; font-weight:bold"><i class="fa-solid fa-calendar-days"
+                    style="padding-right: 5px"></i>
+                {{ now()->format('l, F j, Y') }}</label>
+        </div>
+        <div class="home-content">
+            <div class="row pb-3 align-items-center" style="color:#512DA8; font-weight:bold">
+                <div class="col-7">
+                </div>
+                <div class="col" style="text-align: right; display: flex; justify-content: flex-end; gap: 8px;">
+                    <a href="{{ route('sale#saleListPage', ['dailyPrintDate' => $date]) }}">
+                        <button class="btn btn-warning text-white customBtn-exit" id="btn_Exit">
+                            <i class="fa-solid fa-circle-left" style="padding-right: 5px"></i>
+                            Back
+                        </button>
+                    </a>
+                    {{-- <a href="{{ route('prints#saleOrderPrint', $sale['sale_id']) }}" class="printBtn"> --}}
+                        <button data-sale-id="{{ $sale['sale_id'] }}" class="btn btn-primary saleOrder_print" type="button"><i class="fa-solid fa-print"
+                                style="padding-right: 5px"></i>Reprint</button>
+                    {{-- </a> --}}
+                </div>
+            </div>
+            <div id="sale_order_details_info_label" class="row align-items-center bg-white">
+                <div class="col-10">
+                    <label><i class="fa-solid fa-file-invoice"
+                            style="padding-left:5px; padding-right: 18px"></i>Info</label>
+                </div>
+                <div class="col-2" style="text-align: right">
+                    <i class="bx bxs-chevron-down arrow"></i>
+                </div>
+            </div>
+            <div class="sale_order_details_info_container shadow-sm">
+                <form method="POST" id="orderInvoiceForm">
+                    @csrf
+                    <div class="row">
+                        <div class="sale-order-details-info-left col-5">
+                            <div class="row mb-3" style="display: flex; align-items: center;">
+                                <div class="col-4">
+                                    <label class="col-form-label">Invoice Number</label>
+                                </div>
+                                <div class="col-8">
+                                    <input class="form-control" type="text" id="invoice_number"
+                                        name="invoice_number" value="{{ $saleVoucherNumber }}" readonly>
+                                </div>
+                            </div>
+                            <div class="row mb-3" style="display: flex; align-items: center;">
+                                <div class="col-4">
+                                    <label class="col-form-label">Table Name</label>
+                                </div>
+                                <div class="col-8">
+                                    <input type="text" id="table_id" name="table_id" value="{{ $table[0]['table_id'] }}"
+                                        hidden>
+                                    <input class="form-control " type="text" id="table_name" name="table_name"
+                                        value="{{ $table[0]['table_name'] }}" readonly>
+                                </div>
+                            </div>
+                            <div class="row mb-3" style="display: flex; align-items: center;">
+                                <div class="col-4">
+                                    <label class="col-form-label">Order Number</label>
+                                </div>
+                                <div class="col-8">
+                                    <input class="form-control " type="text" id="order_number" name="order_number"
+                                        value="{{ $tableOrderNumber }}" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="sale-order-details-info-right col-5 offset-md-2">
+                            <div class="row mb-3" style="display: flex; align-items: center;">
+                                <div class="col-4">
+                                    <label class="col-form-label">Customer Name</label>
+                                </div>
+                                <div class="col-8">
+                                    <input class="form-control " type="text" id="customer_name" name="customer_name"
+                                        value="{{ $customer->customer_name ?? '' }}" readonly>
+
+                                </div>
+                            </div>
+                            <div class="row mb-3" style="display: flex; align-items: center;">
+                                <div class="col-4">
+                                    <label class="col-form-label">Waiter Name</label>
+                                </div>
+                                <div class="col-8">
+                                    <input class="form-control " type="text" id="waiter_name" name="waiter_name"
+                                        value="{{ $waiter->name }}" readonly>
+                                </div>
+                            </div>
+                            <div class="row mb-3" style="display: flex; align-items: center;">
+                                <div class="col-4">
+                                    <label class="col-form-label">Cashier Name</label>
+                                </div>
+                                <div class="col-8">
+                                    <input class="form-control " type="text" id="cashier_name" name="cashier_name"
+                                        value="{{ $cashier->name }}" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div id="sale_order_details_list_label" class="row align-items-center bg-white">
+                <div class="col-10">
+                    <label><i class="fa-solid fa-table-list" style="padding-left:5px; padding-right: 19px"></i>Order
+                        Lists</label>
+                </div>
+                <div class="col-2" style="text-align: right">
+                    <i class="bx bxs-chevron-down arrow"></i>
+                </div>
+            </div>
+            <div class="sale_order_details_list_container shadow-sm ">
+                <table id="sale_order_details_list" class="table table-striped nowrap" style="width:100%;">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Item Name</th>
+                            <th>Order Date</th>
+                            <th>Order Time</th>
+                            <th>Unit</th>
+                            <th>Unit Price</th>
+                            <th>Qty</th>
+                            <th>Amount</th>
+                            <th>FOC</th>
+                            <th>Ordered By</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (count($saleDetails) != 0)
+                            @php
+                                $count = 1;
+                                $totalAmount = 0;
+                            @endphp
+                            @foreach ($saleDetails as $saleDetail)
+                                <tr>
+                                    <td style="text-align: center">{{ $count }}</td>
+                                    <td>{{ $saleDetail['item_name'] }}</td>
+                                    <td>{{ date('d-M-y', strtotime($saleDetail['order_time'])) }}</td>
+                                    <td>{{ date('h:i A', strtotime($saleDetail['order_time'])) }}</td>
+                                    <td>{{ $saleDetail['unit_name'] }}</td>
+                                    <td>{{ number_format($saleDetail['sale_price']) }} MMK</td>
+                                    <td>{{ $saleDetail['quantity'] }}</td>
+                                    <td>
+                                        @if ($saleDetail['is_foc'] == 1)
+                                            0 MMK
+                                        @elseif($saleDetail['is_foc'] == 0)
+                                            {{ number_format($saleDetail['sale_price'] * $saleDetail['quantity']) }} MMK
+                                        @endif
+                                    </td>
+                                    @if ($saleDetail['is_foc'] == 0)
+                                        <td><input class="form-check-input" type="checkbox" onclick="return false;"></td>
+                                    @elseif ($saleDetail['is_foc'] == 1)
+                                        <td><input class="form-check-input" type="checkbox" checked
+                                                onclick="return false;">
+                                        </td>
+                                    @endif
+                                    <td>{{ $saleDetail['name'] }}</td>
+                                </tr>
+                                @php
+                                    $count++;
+                                    if ($saleDetail['is_foc'] == 0) {
+                                        $totalAmount += $saleDetail['sale_price'] * $saleDetail['quantity'];
+                                    }
+                                @endphp
+                            @endforeach
+                        @endif
+
+                    </tbody>
+                </table>
+                <input type="text" id="totalAmount" name="totalAmount" value={{ $totalAmount }} hidden>
+                <!--Edit Employee Modal -->
+                {{-- <div class="modal fade" id="edit_employee_modal" data-bs-backdrop="static" data-bs-keyboard="false"
+                    tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header text-center" style="background-color: #512DA8">
+                                <h1 class="modal-title fs-5 w-100" id="staticBackdropLabel" style="color: white">Update
+                                    Employee
+                                </h1>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body" style="margin-left: 20px; margin-right:20px">
+                                <form action="{{ route('employee#update') }}" method="POST" id="employeeEditModalForm">
+                                    @csrf
+                                    <input type="text" name="edit_employee_id" id="edit_employee_id" hidden>
+                                    <div class="row mb-3 mt-3">
+                                        <div class="col-5">
+                                            <label class="form-label">Employee Name <span
+                                                    style="color: red">*</span></label>
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-control" type="text" name="edit_employee_name"
+                                                id="edit_employee_name">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3 mt-3">
+                                        <div class="col-5">
+                                            <label class="form-label">Other Name</label>
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-control" type="text" name="edit_other_name"
+                                                id="edit_other_name">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3 mt-3">
+                                        <div class="col-5">
+                                            <label class="form-label">Employee Code <span
+                                                    style="color: red">*</span></label>
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-control" type="text" name="edit_employee_code"
+                                                id="edit_employee_code">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3 mt-3">
+                                        <div class="col-5">
+                                            <label class="form-label">Employee Position <span
+                                                    style="color: red">*</span></label>
+                                        </div>
+                                        <div class="col">
+                                            <select class="form-select" id="edit_employee_position"
+                                                name="edit_employee_position">
+                                                @if (count($employeePositions) != 0)
+                                                    @foreach ($employeePositions as $employeePosition)
+                                                        <option value={{ $employeePosition['employee_position_id'] }}>
+                                                            {{ $employeePosition['position_name'] }}</option>
+                                                    @endforeach
+                                                @endif
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row align-items-center mb-3">
+                                        <div class="col-5">
+                                            <label class="form-label text-danger">Terminate</label>
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-check-input" type="checkbox" name="edit_is_terminate"
+                                                id="edit_is_terminate">
+                                        </div>
+                                    </div>
+                                </form>
+
+                            </div>
+                            <div class="modal-footer" style="margin-right: 20px">
+                                <input type="submit" class="btn custom_btn" value="Update"
+                                    form="employeeEditModalForm">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--Delete Employee Modal -->
+                <div class="modal fade" id="delete_employee_modal" data-bs-backdrop="static" data-bs-keyboard="false"
+                    tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header text-center" style="background-color: #512DA8">
+                                <h1 class="modal-title fs-5 w-100" id="delete_modal_header" style="color: white">
+                                </h1>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body" style="margin-left: 20px; margin-right:20px">
+                                <form action="{{ route('employee#delete') }}" method="POST"
+                                    id="employeeDeleteModalForm">
+                                    @csrf
+                                    <input type="text" name="delete_employee_id" id="delete_employee_id" hidden>
+                                    <div class="row align-items-center mb-3 mt-3">
+                                        <div>
+                                            <label class="form-label">Are you sure want to delete?</label>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer" style="margin-right: 20px">
+                                <input type="submit" class="btn btn-danger" value="Delete"
+                                    form="employeeDeleteModalForm">
+                            </div>
+                        </div>
+                    </div>
+                </div> --}}
+            </div>
+            <div id="sale_order_details_list_info_label" class="row align-items-center bg-white">
+                <div class="col-10">
+                    <label><i class="fa-solid fa-file-invoice" style="padding-left:5px; padding-right: 18px"></i>Order
+                        Details</label>
+                </div>
+                <div class="col-2" style="text-align: right">
+                    <i class="bx bxs-chevron-down arrow"></i>
+                </div>
+            </div>
+            <div class="sale_order_details_list_info_container shadow-sm" style="overflow-y: auto">
+                <form method="POST" id="orderInvoiceForm">
+                    @csrf
+                    <div class="row">
+                        <div class="sale-order-details-left col-4">
+                            <div class="row mb-3" style="display: flex; align-items: center;">
+                                <div class="col-5">
+                                    <label class="col-form-label">Total Amount</label>
+                                </div>
+                                <div class="col-7 col-xl-6">
+                                    <input class="form-control" type="text" id="order_number"
+                                        name="order_number" value="{{ $sale->total_amount }}" readonly>
+                                </div>
+                            </div>
+                            <div class="row mb-3" style="display: flex; align-items: center;">
+                                <div class="col-5">
+                                    <label class="col-form-label">Net Amount</label>
+                                </div>
+                                <div class="col-7 col-xl-6">
+                                    <input class="form-control" type="text" id="customer_name"
+                                        name="customer_name" value="{{ $sale->net_amount }}" readonly>
+                                </div>
+                            </div>
+                            <div class="row mb-3" style="display: flex; align-items: center;">
+                                <div class="col-5">
+                                    <label class="col-form-label">Balance Amount</label>
+                                </div>
+                                <div class="col-7 col-xl-6">
+                                    <input class="form-control" type="text" id="cashier_name"
+                                        name="cashier_name" value="{{ $sale->balance_amount }}" readonly>
+                                </div>
+                            </div>
+                            <div class="row mb-3" style="display: flex; align-items: center;">
+                                <div class="col-5">
+                                    <label class="col-form-label">Payment Type</label>
+                                </div>
+                                <div class="col-7 col-xl-6">
+                                    <input class="form-control" type="text" id="payment_type"
+                                        name="payment_type" value="{{ $sale->payment_type_name }}" readonly>
+                                </div>
+                            </div>
+                            <div class="row mb-3" style="display: flex; align-items: center;">
+                                <div class="col-5">
+                                    <label class="col-form-label">Online Paid</label>
+                                </div>
+                                <div class="col-7 col-xl-6">
+                                    <input class="form-control" type="text" id="online_paid" name="online_paid"
+                                        value="{{ $sale->online_paid }}" readonly>
+                                </div>
+                            </div>
+                            <div class="row mb-3" style="display: flex; align-items: center;">
+                                <div class="col-5">
+                                    <label class="col-form-label">Paid Amount</label>
+                                </div>
+                                <div class="col-7 col-xl-6">
+                                    <input class="form-control" type="text" id="waiter_name" name="waiter_name"
+                                        value="{{ $sale->paid_amount }}" readonly>
+                                </div>
+                            </div>
+                            <div class="row mb-3" style="display: flex; align-items: center;">
+                                <div class="col-5">
+                                    <label class="col-form-label">Change Amount</label>
+                                </div>
+                                <div class="col-7 col-xl-6">
+                                    <input class="form-control" type="text" id="cashier_name"
+                                        name="cashier_name" value="{{ $sale->change_amount }}" readonly>
+                                </div>
+                            </div>
+                            <div class="row mb-3" style="display: flex; align-items: center;">
+                                <div class="col-5">
+                                    <label class="col-form-label">Delivery Charges</label>
+                                </div>
+                                <div class="col-7 col-xl-6">
+                                    <input class="form-control" type="text" id="cashier_name"
+                                        name="cashier_name" value="{{ $sale->delivery_charges }}" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="sale-order-details-mid col-4">
+                            <div class="row mb-3">
+                                <div class="col-5">
+                                    <label class="col-form-label">Tax Amount</label>
+                                </div>
+                                <div class="col-7 col-xl-6">
+                                    <input class="form-control" type="text" id="customer_name"
+                                        name="customer_name" value="{{ $sale->tax_amount }}" readonly>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-5">
+                                    <label class="col-form-label">Tax Percent</label>
+                                </div>
+                                <div class="col-7 col-xl-6">
+                                    <input class="form-control" type="text" id="customer_name"
+                                        name="customer_name" value="{{ $sale->tax_percent }}" readonly>
+                                </div>
+                            </div>
+                            <div class="row mb-3" style="display: flex; align-items: center;">
+                                <div class="col-5">
+                                    <label class="col-form-label">Service Charges Amt</label>
+                                </div>
+                                <div class="col-7 col-xl-6">
+                                    <input class="form-control" type="text" id="cashier_name"
+                                        name="cashier_name" value="{{ $sale->service_charges_amount }}" readonly>
+                                </div>
+                            </div>
+                            <div class="row mb-3" style="display: flex; align-items: center;">
+                                <div class="col-5">
+                                    <label class="col-form-label">Service Charges (%)</label>
+                                </div>
+                                <div class="col-7 col-xl-6">
+                                    <input class="form-control" type="text" id="cashier_name"
+                                        name="cashier_name" value="{{ $sale->service_charges_percent }}" readonly>
+                                </div>
+                            </div>
+                            <div class="row mb-3" style="display: flex; align-items: center;">
+                                <div class="col-5">
+                                    <label class="col-form-label">Voucher Discount Amt</label>
+                                </div>
+                                <div class="col-7 col-xl-6">
+                                    <input class="form-control" type="text" id="waiter_name" name="waiter_name"
+                                        value="{{ $sale->voucher_discount_amount }}" readonly>
+                                </div>
+                            </div>
+                            <div class="row mb-3" style="display: flex; align-items: center;">
+                                <div class="col-5">
+                                    <label class="col-form-label">Voucher Discount (%)</label>
+                                </div>
+                                <div class="col-7 col-xl-6">
+                                    <input class="form-control" type="text" id="waiter_name" name="waiter_name"
+                                        value="{{ $sale->voucher_discount_percent }}" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="sale-order-details-right col-4">
+                            <div class="row mb-3" style="display: flex; align-items: center;">
+                                <div class="col-5">
+                                    <label class="col-form-label">Member Card Code</label>
+                                </div>
+                                <div class="col-7">
+                                    <input class="form-control" type="text" id="invoice_number"
+                                        name="invoice_number" value="{{ $sale->member_card_code }}" readonly>
+                                </div>
+                            </div>
+                            <div class="row mb-3" style="display: flex; align-items: center;">
+                                <div class="col-5">
+                                    <label class="col-form-label">Member Card Amt</label>
+                                </div>
+                                <div class="col-7">
+                                    <input class="form-control" type="text" id="customer_name"
+                                        name="customer_name" value="{{ $sale->member_card_amount }}" readonly>
+
+                                </div>
+                            </div>
+                            <div class="row mb-3" style="display: flex; align-items: center;">
+                                <div class="col-5">
+                                    <label class="col-form-label">Member Card (%)</label>
+                                </div>
+                                <div class="col-7">
+                                    <input class="form-control" type="text" id="customer_name"
+                                        name="customer_name" value="{{ $sale->member_card_percent }}" readonly>
+                                </div>
+                            </div>
+                            <div class="row mb-3" style="display: flex; align-items: center;">
+                                <div class="col-5">
+                                    <label class="col-form-label">Coupon Card Code</label>
+                                </div>
+                                <div class="col-7">
+                                    <input type="text" id="table_id" name="table_id"
+                                        value="{{ $table[0]['table_id'] }}" hidden>
+                                    <input class="form-control" type="text" id="table_name" name="table_name"
+                                        value="{{ $sale->coupon_card_code }}" readonly>
+                                </div>
+                            </div>
+                            <div class="row mb-3" style="display: flex; align-items: center;">
+                                <div class="col-5">
+                                    <label class="col-form-label">Coupon Card Amt</label>
+                                </div>
+                                <div class="col-7">
+                                    <input class="form-control" type="text" id="waiter_name" name="waiter_name"
+                                        value="{{ $sale->coupon_card_amount }}" readonly>
+                                </div>
+                            </div>
+                            <div class="row mb-3" style="display: flex; align-items: center;">
+                                <div class="col-5">
+                                    <label class="col-form-label">Coupon Card (%)</label>
+                                </div>
+                                <div class="col-7">
+                                    <input class="form-control" type="text" id="waiter_name" name="waiter_name"
+                                        value="{{ $sale->coupon_card_percent }}" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+
+    </section>
+
+    <script src="{{ asset('script/links_js/jquery.3.6.4.min.js') }}"></script>
+    <script src="{{ asset('script/links_js/jquery.validate.1.19.5.js') }}"></script>
+    <script src="{{ asset('script/links_js/jquery.dataTables.1.13.7.min.js') }}"></script>
+    <script src="{{ asset('script/links_js/dataTables.bootstrap5_1.13.7.min.js') }}"></script>
+    <script src="{{ asset('script/sale_order_details_script.js') }}"></script>
+    <script src="{{ asset('script/jquery.printPage.js') }}"></script>
+    <script>
+        // $('.printBtn').printPage();
+    </script>
+
+
+@endsection

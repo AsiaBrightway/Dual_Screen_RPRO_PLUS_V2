@@ -1,0 +1,400 @@
+@extends('layouts.admin.master')
+@section('title', 'Customer')
+
+@section('content')
+    <style>
+        .customer_list {
+            table-layout: fixed;
+            width: 100%;
+        }
+
+        .customer_list th {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
+    <section class="home-section">
+        <div class="home-title">
+            <i class='bx bx-menu'></i>
+            <span class="text">Customer</span>
+        </div>
+        <div class="home-content">
+            <div class="row pb-3 align-items-center" style="color:#512DA8; font-weight:bold">
+                <div class="col-12 col-md-7">
+                    <label>Add New Customer</label>
+                </div>
+                <div class="col-12 col-md-5 text-md-end text-start mt-3 mt-md-0">
+                    <button class="btn btn-danger customBtn-clear" id="clear"><i class="fa-solid fa-eraser"
+                            style="padding-right: 5px"></i>Clear</button>
+                    <button type="submit" form="customerFormCreate" class="btn btn-primary customBtn-save ms-1 mt-0"><i
+                            class="fa-regular fa-floppy-disk" style="padding-right: 5px"></i>Save</button>
+                </div>
+            </div>
+            
+            @if(session('success'))
+                <div id="flash-message" class="alert alert-success alert-dismissible d-flex align-items-center fade show">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <strong class="mx-2">Success!</strong> {{ session('success') }}
+                </div>
+            @elseif(session('update'))
+                <div id="flash-message" class="alert alert-success alert-dismissible d-flex align-items-center fade show">
+                    <i class="fas fa-edit"></i>
+                    <strong class="mx-2">Updated!</strong> {{ session('update') }}
+                </div>
+            @elseif(session('delete'))
+                <div id="flash-message" class="alert alert-danger alert-dismissible d-flex align-items-center fade show">
+                    <i class="fa-solid fa-trash"></i>
+                    <strong class="mx-2">Deleted!</strong> {{ session('delete') }}
+                </div>
+            @endif
+
+            <div id="customer_info_label" class="row align-items-center bg-white">
+                <div class="col-6">
+                    <label><i class="fa-solid fa-user-pen" style="padding-left:5px; padding-right: 12px"></i>Customer
+                        Info</label>
+                </div>
+                <div class="col-6" style="text-align: right">
+                    <i class="bx bxs-chevron-down arrow"></i>
+                </div>
+            </div>
+            <div class="customer_info_container shadow-sm">
+                <form action="{{ route('customer#create') }}" method="POST" id="customerFormCreate">
+                    @csrf
+                    <div class="row border border-4 border-gray-800" style="border-radius: 10px">
+                        <div class="customer-left-info col-6 pt-4 pb-4 border-end border-4 border-gray-800">
+                            <div class="row mb-3 justify-content-center">
+                                <div class="col-5">
+                                    <label class="col-form-label">Customer Name <span style="color: red">*</span></label>
+                                </div>
+                                <div class="col-5">
+                                    <input class="form-control @error('customer_name') is-invalid @enderror" type="text"
+                                        id="customer_name" name="customer_name" value="{{ old('customer_name') }}">
+                                    @error('customer_name')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="row align-items-center mb-3 justify-content-center">
+                                <div class="col-5">
+                                    <label class="col-form-label">Other Name</label>
+                                </div>
+                                <div class="col-5">
+                                    <input class="form-control" type="text" id="other_name" name="other_name"
+                                        value="{{ old('other_name') }}">
+                                </div>
+                            </div>
+                            <div class="row mb-3 justify-content-center">
+                                <div class="col-5">
+                                    <label class="col-form-label">Customer Code <span style="color: red">*</span></label>
+                                </div>
+                                <div class="col-5">
+                                    <input class="form-control @error('customer_code') is-invalid @enderror" type="text"
+                                        id="customer_code" name="customer_code" value="{{ old('customer_code') }}">
+                                    @error('customer_code')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="row mb-3 justify-content-center">
+                                <div class="col-5">
+                                    <label class="col-form-label">Customer Type <span style="color: red">*</span></label>
+                                </div>
+                                <div class="col-5">
+                                    <select class="form-select @error('customer_type') is-invalid @enderror"
+                                        id="customer_type" name="customer_type">
+                                        <option value="0">Select-</option>
+                                        @if (count($customerTypes) != 0)
+                                            @foreach ($customerTypes as $customerType)
+                                                <option value={{ $customerType['customer_type_id'] }}>
+                                                    {{ $customerType['customer_type_name'] }}</option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                    @error('customer_type')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="row mb-3 justify-content-center">
+                                <div class="col-5">
+                                    <label class="col-form-label">Gender <span style="color: red">*</span></label>
+                                </div>
+                                <div class="col-5">
+                                    <select class="form-select @error('gender') is-invalid @enderror" id="gender"
+                                        name="gender">
+                                        <option value="0">Select-</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select>
+                                    @error('gender')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="row align-items-center mb-3 justify-content-center">
+                                <div class="col-5">
+                                    <label class="col-form-label">DOB</label>
+                                </div>
+                                <div class="col-5">
+                                    <input class="form-control" type="date" id="date_of_birth" name="date_of_birth"
+                                        value="{{ old('date_of_birth') }}">
+                                </div>
+                            </div>
+                            <div class="row mb-3 justify-content-center">
+                                <div class="col-5">
+                                    <label class="col-form-label">Phone Number <span style="color: red">*</span></label>
+                                </div>
+                                <div class="col-5">
+                                    <input class="form-control @error('phone_number') is-invalid @enderror" type="text"
+                                        id="phone_number" name="phone_number" value="{{ old('phone_number') }}">
+                                    @error('phone_number')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="row align-items-center justify-content-center">
+                                <div class="col-5">
+                                    <label class="col-form-label">Email Address</label>
+                                </div>
+                                <div class="col-5">
+                                    <input class="form-control @error('email') is-invalid @enderror" type="text"
+                                        id="email" name="email" value="{{ old('email') }}">
+                                    @error('email')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                        <div class="customer-right-info col-6 pt-4 pb-4">
+                            <div class="row mb-3 justify-content-center">
+                                <div class="col-5">
+                                    <label class="col-form-label">City <span style="color: red">*</span></label>
+                                </div>
+                                <div class="col-5">
+                                    <select class="form-select @error('city') is-invalid @enderror" name="city"
+                                        id="city">
+                                        <option value="0">Select-</option>
+                                        @if (count($cities) != 0)
+                                            @foreach ($cities as $city)
+                                                <option value={{ $city['city_id'] }}>
+                                                    {{ $city['city_name'] }}</option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                    @error('city')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="row mb-3 justify-content-center">
+                                <div class="col-5">
+                                    <label class="col-form-label">Township <span style="color: red">*</span></label>
+                                </div>
+                                <div class="col-5">
+                                    <select class="form-select @error('township') is-invalid @enderror" id="township"
+                                        name="township">
+                                        <!-- Options will be populated based on the selected main category using JavaScript -->
+                                    </select>
+                                    @error('township')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="row mb-3 justify-content-center">
+                                <div class="col-5">
+                                    <label class="col-form-label">Address <span style="color: red">*</span></label>
+                                </div>
+                                <div class="col-5">
+                                    <textarea class="form-control @error('address') is-invalid @enderror" rows="2" id="address" name="address">{{ old('address') }}</textarea>
+                                    @error('address')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="row align-items-center mb-3 justify-content-center">
+                                <div class="col-5">
+                                    <label class="col-form-label">Remark</label>
+                                </div>
+                                <div class="col-5">
+                                    <textarea class="form-control" rows="2" id="remark" name="remark">{{ old('remark') }}</textarea>
+                                </div>
+                            </div>
+                            <div class="row align-items-center justify-content-center">
+                                <div class="col-5">
+                                    <label class="col-form-label">Discontinued</label>
+                                </div>
+                                <div class="col-5">
+                                    <input class="form-check-input" type="checkbox" name="is_discontinued"
+                                        id="is_discontinued">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div id="customer_list_label" class="row align-items-center bg-white">
+                <div class="col-6">
+                    <label><i class="fa-solid fa-table-list" style="padding-left:5px; padding-right: 16px"></i>Customer
+                        Lists</label>
+                </div>
+                <div class="col-6" style="text-align: right">
+                    <i class="bx bxs-chevron-down arrow"></i>
+                </div>
+            </div>
+            <div class="customer_list_container shadow-sm">
+                <table id="customer_list" class="customer_list table table-striped nowrap" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Customer Name</th>
+                            <th>Other Name</th>
+                            <th>Customer Code</th>
+                            <th>Customer Type</th>
+                            <th>Gender</th>
+                            <th>DOB</th>
+                            <th>Phone Number</th>
+                            <th>Email Address</th>
+                            <th>City</th>
+                            <th>Township</th>
+                            <th>Address</th>
+                            <th>Remark</th>
+                            <th>Discontinued</th>
+                            <th>Edit</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (count($customers) != 0)
+                            @php
+                                $count = 1;
+                            @endphp
+                            @foreach ($customers as $customer)
+                                <tr>
+                                    <td style="text-align: center">{{ $count }}</td>
+                                    <td>{{ $customer['customer_name'] }}</td>
+                                    <td>{{ $customer['customer_other_name'] }}</td>
+                                    <td>{{ $customer['customer_code'] }}</td>
+                                    <td>{{ $customer['customer_type_name'] }}</td>
+                                    <td>{{ $customer['gender'] }}</td>
+                                    @if ($customer['date_of_birth'] != null)
+                                        <td>{{ date('d-M-Y', strtotime($customer['date_of_birth'])) }}</td>
+                                    @else
+                                        <td></td>
+                                    @endif
+                                    <td>{{ $customer['phone_number'] }}</td>
+                                    <td>{{ $customer['email'] }}</td>
+                                    <td>{{ $customer['city_name'] }}</td>
+                                    <td style="word-wrap: break-word; white-space:normal;">
+                                        {{ $customer['township_name'] }}</td>
+                                    <td style="word-wrap: break-word; white-space:normal;">{{ $customer['address'] }}</td>
+                                    <td style="word-wrap: break-word; white-space:normal;">{{ $customer['remark'] }}</td>
+                                    @if ($customer['customer_is_discontinued'] == 0)
+                                        <td><input class="form-check-input" type="checkbox" onclick="return false;"></td>
+                                    @elseif ($customer['customer_is_discontinued'] == 1)
+                                        <td><input class="form-check-input" type="checkbox" checked
+                                                onclick="return false;">
+                                        </td>
+                                    @endif
+                                    <td><a href="{{ route('customer#updatePage', $customer['customer_id']) }}"><i
+                                                class="fa-solid fa-pen" style="color: blue; cursor: pointer;"></i></a>
+                                    </td>
+                                    <td><a data-customer_id="{{ $customer['customer_id'] }}"
+                                            data-customer_name="{{ $customer['customer_name'] }}" data-bs-toggle="modal"
+                                            data-bs-target="#delete_customer_modal"
+                                            class="delete_customer_modal_dialog"><i class="fa-regular fa-trash-can"
+                                                style="color: red;cursor: pointer;"></i></a>
+                                    </td>
+                                </tr>
+                                @php
+                                    $count++;
+                                @endphp
+                            @endforeach
+                        @endif
+                    </tbody>
+                </table>
+                <!--Delete Customer Modal -->
+                <div class="modal fade" id="delete_customer_modal" data-bs-backdrop="static" data-bs-keyboard="false"
+                    tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        {{-- <div class="modal-content">
+                            <div class="modal-header text-center" style="background-color: #512DA8">
+                                <h1 class="modal-title fs-5 w-100" id="delete_modal_header" style="color: white">
+                                </h1>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body" style="margin-left: 20px; margin-right:20px">
+                                <form action="{{ route('customer#delete') }}" method="POST" id="customerFormDelete">
+                                    @csrf
+                                    <input type="text" name="delete_customer_id" id="delete_customer_id" hidden>
+                                    <div class="row align-items-center mb-3 mt-3">
+                                        <div>
+                                            <label class="form-label">Are you sure want to delete?</label>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer" style="margin-right: 20px">
+                                <input type="submit" form="customerFormDelete" class="btn btn-danger" value="Delete">
+                            </div>
+                        </div> --}}
+                        <div class="success-card" style="padding-bottom: 1.5rem;">      
+                            <button class="btn-cross-custom" data-bs-dismiss="modal">
+                                <i class="fa-solid fa-x"></i>
+                            </button>
+                            
+                            <div class="icon-wrapper">
+                                <div class="error-icon-circle">
+                                    <i class="fa-solid fa-exclamation-triangle"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="text-content">
+                                <h2 id="delete_modal_header" class="success-title">
+                                    Submission Failed
+                                </h2>
+                                <p class="success-desc">
+                                    Are you sure you want to delete?
+                                </p>
+                            </div>
+
+                            <form action="{{ route('customer#delete') }}" method="POST" id="customerFormDelete">
+                                @csrf
+                                <input type="text" name="delete_customer_id" id="delete_customer_id" hidden>
+                                <div class="d-flex justify-content-center mt-3">
+                                    <button type="submit" class="btn btn-danger px-4">Delete</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="{{ asset('script/links_js/jquery.3.6.4.min.js') }}"></script>
+    <script src="{{ asset('script/links_js/jquery.validate.1.19.5.js') }}"></script>
+    <script src="{{ asset('script/links_js/jquery.dataTables.1.13.7.min.js') }}"></script>
+    <script src="{{ asset('script/links_js/dataTables.bootstrap5_1.13.7.min.js') }}"></script>
+    <script src="{{ asset('script/customer_script.js') }}"></script>
+
+@endsection

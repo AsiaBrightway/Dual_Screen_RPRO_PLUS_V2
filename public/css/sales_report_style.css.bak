@@ -1,0 +1,55 @@
+.sales_report_container {
+    height: calc(100vh - 140px);
+    margin: 0;
+}
+
+.total_div {
+    background-color: #fff;
+    border-radius: 10px;
+    margin: 0;
+    margin-top: 10px;
+    height: 100px;
+}
+
+.sales_filter {
+    background-color: #fff;
+    border-radius: 10px;
+}
+
+.sales_table {
+    background-color: #fff;
+    height: calc(100vh - 245px);
+    border-radius: 10px;
+    overflow-y: auto;
+}
+
+#btn_sales_search {
+    color: #fff !important;
+    background-color: #512da8 !important;
+    position: fixed;
+    bottom: 25px;
+}
+
+
+/* @media print {
+    .dataTables_scrollBody {
+        overflow: visible !important;
+    }
+    .dataTables_wrapper {
+        width: 100% !important;
+    }
+    table {
+        width: 100% !important;
+        table-layout: fixed;
+    }
+    th,
+    td {
+        word-wrap: break-word;
+        text-align: left;
+        padding: 4px;
+        font-size: 10px;
+    }
+    .dataTables_scroll {
+        width: 100% !important;
+    }
+} */

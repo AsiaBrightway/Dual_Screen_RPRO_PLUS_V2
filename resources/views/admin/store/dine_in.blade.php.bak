@@ -1,0 +1,625 @@
+@extends('layouts.admin.master')
+@section('title', 'Dine-In')
+
+@section('content')
+    <style>
+        .table_div::-webkit-scrollbar,
+        .order_div::-webkit-scrollbar {
+            display: none;
+        }
+
+        .table_div,
+        .order_div {
+            -ms-overflow-style: none;
+            /* IE and Edge */
+            scrollbar-width: none;
+            /* Firefox */
+        }
+
+        .table-button.selected {
+            color: #512DA8 !important;
+            border-color: #512DA8;
+        }
+
+        .btn-group {
+            white-space: nowrap;
+        }
+
+        .btn-custom {
+            --bs-btn-color: #fff;
+            --bs-btn-bg: #6f44d1;
+            --bs-btn-border-color: #6f44d1;
+            --bs-btn-hover-color: #fff;
+            --bs-btn-hover-bg: #6f44d1;
+            --bs-btn-hover-border-color: #512DA8;
+            --bs-btn-focus-shadow-rgb: 49, 132, 253;
+            --bs-btn-active-color: #fff;
+            --bs-btn-active-bg: #512DA8;
+            --bs-btn-active-border-color: #512DA8;
+            --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+            --bs-btn-disabled-color: #fff;
+            --bs-btn-disabled-bg: #6f44d1;
+            --bs-btn-disabled-border-color: #6f44d1;
+        }
+
+        .custom-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .custom-text {
+            margin-left: 0px;
+            /* Adjust margin as needed */
+        }
+
+        .custom-label {
+            margin-left: auto;
+            margin-right: 25px;
+        }
+
+        .button-link {
+            background: none;
+            border: none;
+            /* Set the desired link color */
+            text-decoration: none;
+            /* cursor: pointer; */
+            color: #512DA8
+        }
+
+        .button-link:hover {
+            text-decoration: none;
+            /* Remove underline on hover if desired */
+        }
+
+        /* Existing styles */
+        .visually-hidden {
+            position: absolute;
+            overflow: hidden;
+            clip: rect(0 0 0 0);
+            height: 1px;
+            width: 1px;
+            margin: -1px;
+            padding: 0;
+            border: 0;
+        }
+
+        /* Additional styles for gift icon */
+        .gift-icon {
+            color: whitesmoke;
+            /* Default color */
+        }
+
+        .gift-checkbox:checked+label .gift-icon {
+            color: #512DA8;
+            /* Change color when checkbox is checked */
+        }
+
+        .table-button {
+            pointer-events: auto;
+            cursor: pointer;
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+    </style>
+    <section class="home-section">
+        <div class="home-title custom-title">
+            <i class='bx bx-menu'></i>
+            <span class="text custom-text">Dine-In</span>
+            <label class="custom-label" style="color:#512DA8; font-weight:bold"><i class="fa-solid fa-calendar-days"
+                    style="padding-right: 5px"></i>
+                {{ now()->format('l, F j, Y') }}</label>
+        </div>
+        <div class="home-content">
+            {{-- <div class="row pb-3 align-items-center" style="color:#512DA8; font-weight:bold">
+                <div class="col">
+                    <label><i class="fa-solid fa-calendar-days" style="padding-right: 5px"></i>
+                        {{ now()->format('l, F j, Y') }}</label>
+                </div>
+            </div> --}}
+
+            @if (session('success'))
+                <script>
+                    var successMsg = "Success"
+                </script>
+            @endif
+            @if (session('failed'))
+                <script>
+                    var failedMessage = "Failed";
+                </script>
+            @endif
+            <!--Table Merge Success Modal -->
+            <div class="modal fade" id="table_Merge_success_modal" data-bs-backdrop="static" data-bs-keyboard="false"
+                tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header text-center" style="background-color: #512DA8">
+                            <h1 class="modal-title fs-5 w-100" id="staticBackdropLabel" style="color: white">
+                                Table Merge
+                            </h1>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body" style="margin-left: 20px; margin-right:20px">
+                            <label style="color: green"><i class="fa-solid fa-circle-check"></i> Table Merge completed
+                                successfully.</label>
+                        </div>
+                        <div class="modal-footer" style="margin-right: 20px">
+                            <button type="button" class="btn custom_btn" data-bs-dismiss="modal"
+                                style="background-color: green">Ok</button>
+                            {{-- <input type="submit" class="btn custom_btn" value="Add"
+                                form="addOrderItemRemarkForm"> --}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--Table Merge Failed Modal -->
+            <div class="modal fade" id="table_Merge_failed_modal" data-bs-backdrop="static" data-bs-keyboard="false"
+                tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header text-center" style="background-color: #512DA8">
+                            <h1 class="modal-title fs-5 w-100" id="staticBackdropLabel" style="color: white">
+                                Table Merge
+                            </h1>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body" style="margin-left: 20px; margin-right:20px">
+                            <label style="color: red"><i class="fa-solid fa-circle-xmark"></i> Table Merge was failed.
+                                Please try again!</label>
+                        </div>
+                        <div class="modal-footer" style="margin-right: 20px">
+                            <button type="button" class="btn custom_btn" data-bs-dismiss="modal"
+                                style="background-color: red">Ok</button>
+                            {{-- <input type="submit" class="btn custom_btn" value="Add"
+                                form="addOrderItemRemarkForm"> --}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row justify-content-between mt-2">
+                <div class="col-6 left_div">
+                    <input type="text" id="user_role_id" name="user_role_id" value="{{ Auth::user()->user_role_id }}"
+                        hidden>
+                    <div class="row justify-content-between pt-3 pb-3 table_status"
+                        style="background: white; border-radius:10px; margin-right:5px; margin-left:0px">
+                        <div class="col" style="text-align:center; color:rgb(54, 50, 50)">
+                            <label id="availableLabel" style="font-weight: bold; "></label>
+                        </div>
+                        <div class="col" style="text-align:center; color:orange">
+                            <label id="reservationLabel" style="font-weight: bold"></label>
+                        </div>
+                        <div class="col" style="text-align:center; color:red">
+                            <label id="occupiedLabel" style="font-weight: bold"></label>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="table_div justify-content-around"
+                            style="height:75vh;overflow-y: auto; padding-left:10px;">
+                            @php
+                                $totalTableCount = 0;
+                                $availableTableCount = 0;
+                                $reservationTableCount = 0;
+                                $occupiedTableCount = 0;
+                            @endphp
+                            @if (count($tables) != 0)
+                                @foreach ($tables as $table)
+                                    @php
+                                        $totalTableCount++;
+                                        $occupied = false;
+                                        $reserved = false;
+                                        foreach ($occupiedTables as $occupiedTable) {
+                                            if ($table['table_id'] == $occupiedTable['table_id']) {
+                                                $occupied = true;
+                                                $occupiedTableCount++;
+                                                break;
+                                            }
+                                        }
+                                        foreach ($reservationTables as $reservationTable) {
+                                            if ($table['table_id'] == $reservationTable['table_id']) {
+                                                $reserved = true;
+                                                $reservationTableCount++;
+                                                break;
+                                            }
+                                        }
+                                        $backgroundColor = $occupied ? 'red' : ($reserved ? 'orange' : 'white');
+                                        $textColor = $occupied ? 'white' : ($reserved ? 'white' : 'black');
+                                    @endphp
+                                    <button class="btn m-2 table-button"
+                                        style="width: 105px; height: 105px; border-radius: 20px; background: {{ $backgroundColor }}; color: {{ $textColor }}"
+                                        data-table-value="{{ $table['table_name'] }}"
+                                        data-table_id ="{{ $table['table_id'] }}" data-floor_id ="{{ $table['floor_id'] }}"
+                                        data-floor_name ="{{ $table['floor_name'] }}">
+                                        {{ $table['table_name'] }}
+                                    </button>
+                                @endforeach
+                                @php
+                                    $availableTableCount =
+                                        $totalTableCount - ($occupiedTableCount + $reservationTableCount);
+                                @endphp
+                            @endif
+                            {{-- @for ($i = 1; $i <= 40; $i++)
+                                @if ($i == 2)
+                                    <button class="btn m-2"
+                                        style="width:105px; height:105px; border-radius:20px; background:orange; color:white">T-{{ $i }}</button>
+                                @elseif ($i == 9)
+                                    <button class="btn m-2"
+                                        style="width:105px; height:105px; border-radius:20px; background: red; color:white">T-{{ $i }}</button>
+                                @else
+                                    <button class="btn m-2"
+                                        style="width:105px; height:105px; border-radius:20px; background:white">T-{{ $i }}</button>
+                                @endif
+                            @endfor --}}
+
+                        </div>
+                    </div>
+                    {{-- <div class="row mt-3">
+                        <div class="btn-group " role="group" style="height: 45px;">
+                            <button type="button" class="btn" style="background: #512DA8; color:white">First
+                                Floor</button>
+                            <button type="button" class="btn" style="background: #512DA8; color:white">Second
+                                Floor</button>
+                            <button type="button" class="btn" style="background: #512DA8; color:white">Third
+                                Floor</button>
+                        </div>
+                    </div> --}}
+                    <div class="row mt-3" style="position: relative; bottom:0">
+                        <div class="btn-group" role="group" style="height: 40px; overflow-x:auto">
+                            @if (count($floors) != 0)
+                                @foreach ($floors as $floor)
+                                    @if ($floor['floor_id'] == 10)
+                                        <input type="radio" class="btn-check" name="btnradio"
+                                            id="{{ $floor['floor_id'] }}" autocomplete="off"
+                                            value="{{ $floor['floor_id'] }}" checked>
+                                        <label class="btn btn-custom"
+                                            for="{{ $floor['floor_id'] }}">{{ $floor['floor_name'] }}</label>
+                                    @else
+                                        <input type="radio" class="btn-check" name="btnradio"
+                                            id="{{ $floor['floor_id'] }}" autocomplete="off"
+                                            value="{{ $floor['floor_id'] }}">
+                                        <label class="btn btn-custom"
+                                            for="{{ $floor['floor_id'] }}">{{ $floor['floor_name'] }}</label>
+                                    @endif
+                                @endforeach
+                            @endif
+
+                            {{-- <input type="radio" class="btn-check" name="btnradio" id="firstFloor" autocomplete="off"
+                                checked>
+                            <label class="btn btn-outline-custom" for="firstFloor">First Floor</label>
+
+                            <input type="radio" class="btn-check" name="btnradio" id="secondFloor" autocomplete="off">
+                            <label class="btn btn-outline-custom" for="secondFloor">Second Floor</label>
+
+                            <input type="radio" class="btn-check" name="btnradio" id="thirdFloor" autocomplete="off">
+                            <label class="btn btn-outline-custom" for="thirdFloor">Third Floor</label> --}}
+
+
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="col right_div" style="margin-left:50px;margin-right: 15px">
+                    <div class="row justify-content-between pt-3 pb-3" style="background: white; border-radius:10px;">
+                        <div class="col" style="text-align:center;">
+                            <form action="{{ route('store#orderPage') }}" method="POST" id="addOrderForm">
+                                @csrf
+                                <label id="orderTable" style="font-weight: bold">Table (),</label>
+                                <input type="text" id="tableID" name="tableID" hidden>
+                                <input type="text" id="tableName" name="tableName" hidden>
+                                <label style="font-weight: bold">Order-</label>
+                                <select name="tableOrderValue" id="tableOrderValue"
+                                    style="border-radius: 5px; width:40px; text-align:center;">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                </select>
+                            </form>
+
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="container" style="height: 100%; background:white; border-radius:20px; padding:30px">
+                            <div style="display: flex; justify-content:space-between">
+                                <button type="submit" class="button-link" id="addOrderLink" form="addOrderForm"
+                                    disabled>+
+                                    Add
+                                    Order</button>
+                                <input type="text" id="floorID_merge" name="floorID_merge" hidden>
+                                <input type="text" id="floorName_merge" name="floorName_merge" hidden>
+                                <button class="button-link" id="tableMergeLink" data-bs-toggle="modal"
+                                    data-bs-target="#table_Merge_modal" disabled>
+                                    + Table Merge
+                                </button>
+                            </div>
+                            <!--Table Merge Modal -->
+                            <div class="modal fade" id="table_Merge_modal" data-bs-backdrop="static"
+                                data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header text-center" style="background-color: #512DA8">
+                                            <h1 class="modal-title fs-5 w-100" id="staticBackdropLabel"
+                                                style="color: white">
+                                                Table Merge
+                                            </h1>
+                                            <button type="button" class="btn-close btn-close-white"
+                                                data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body" style="margin-left: 20px; margin-right:20px">
+                                            <form action="{{ route('table#merge') }}" method="POST"
+                                                id="tableMergeForm">
+                                                @csrf
+                                                <input type="text" id="from_floor_ID" name="from_floor_ID" hidden>
+                                                <input type="text" id="from_table_ID" name="from_table_ID" hidden>
+                                                <div class="row mb-3 mt-3">
+                                                    <div class="col-5">
+                                                        <label class="form-label">From Floor</label>
+                                                    </div>
+                                                    <div class="col">
+                                                        <input class="form-control muted" type="text"
+                                                            name="from_floor" id="from_floor" readonly>
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3 mt-3">
+                                                    <div class="col-5">
+                                                        <label class="form-label">From Table</label>
+                                                    </div>
+                                                    <div class="col">
+                                                        <input class="form-control muted" type="text"
+                                                            name="from_table" id="from_table" readonly>
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3 mt-3">
+                                                    <div class="col-5">
+                                                        <label class="form-label">From Table Order</label>
+                                                    </div>
+                                                    <div class="col">
+                                                        <input class="form-control muted" type="text"
+                                                            name="from_table_order" id="from_table_order" readonly>
+                                                    </div>
+                                                </div>
+                                                <hr>
+                                                <div class="row mb-3 mt-3">
+                                                    <div class="col-5">
+                                                        <label class="form-label">To Floor</label>
+                                                    </div>
+                                                    <div class="col">
+                                                        <select class="form-select" id="to_floor_id" name="to_floor_id">
+                                                            <option value="0">Select-</option>
+                                                            @if (count($floors) != 0)
+                                                                @foreach ($floors as $floor)
+                                                                    <option value={{ $floor['floor_id'] }}>
+                                                                        {{ $floor['floor_name'] }}</option>
+                                                                @endforeach
+                                                            @endif
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3 mt-3">
+                                                    <div class="col-5">
+                                                        <label class="form-label">To Table</label>
+                                                    </div>
+                                                    <div class="col">
+                                                        <select class="form-select" name="to_table_id" id="to_table_id">
+
+                                                        </select>
+
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3 mt-3">
+                                                    <div class="col-5">
+                                                        <label class="form-label">To Table Order</label>
+                                                    </div>
+                                                    <div class="col">
+                                                        <select class="form-select" name="to_table_order_id"
+                                                            id="to_table_order_id">
+                                                            <option value="1">1</option>
+                                                            <option value="2">2</option>
+                                                            <option value="3">3</option>
+                                                            <option value="4">4</option>
+                                                            <option value="5">5</option>
+                                                        </select>
+
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer" style="margin-right: 20px">
+                                            <button type="submit" class="btn custom_btn" form="tableMergeForm">Move /
+                                                Merge</button>
+                                            {{-- <input type="submit" class="btn custom_btn" value="Add"
+                                                form="addOrderItemRemarkForm"> --}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr style="margin:10px 0 10px 0">
+                            <div class="order_div container" style="height: 60vh; border-radius:20px; overflow-y:auto">
+                                {{-- @for ($i = 0; $i < 8; $i++)
+                                    <div class="row" style="align-items: center">
+                                        <div class="col-2 ">
+                                            <input class="form-control" type="number" value="1">
+                                        </div>
+                                        <div class="col-3">
+                                            <img src="{{ asset('img/pizza.jpeg') }}" alt=""
+                                                style="width: 80px; height:80px; border-radius: 10px">
+                                        </div>
+                                        <div class="col-4" style="color:#512DA8">
+                                            <label>Classic Pan</label>
+                                            <label>Medium Pizza</label>
+                                        </div>
+                                        <div class="col-3">
+                                            <label>30,000 MMK</label>
+                                        </div>
+
+                                    </div>
+                                    <hr>
+                                @endfor --}}
+
+                            </div>
+                            <hr style="margin:10px 0 10px 0">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col total_amt_lbl" style="font-size: 20px">
+                                        Total
+                                    </div>
+                                    <div class="col orderTotalAmount_div" style="font-size:20px ;text-align: end">
+                                        0 MMK</div>
+                                </div>
+                                <div class="row mt-3">
+                                    <button type="submit" class="btn"
+                                        style="background: #512DA8; color:white;font-weight:bold; height:45px"
+                                        form="checkOutForm" id="checkOutBtn" disabled>Check
+                                        Out</button>
+                                    <form action="{{ route('sale#orderInvoice') }}" method="POST" id="checkOutForm">
+                                        @csrf
+                                        <input type="text" id="orderTableID" name="orderTableID" hidden>
+
+                                        <input type="text" name="orderTableOrderNumber" id="orderTableOrderNumber"
+                                            hidden>
+                                    </form>
+                                </div>
+                            </div>
+                            <!--Add Order Item Preview Remark Modal -->
+                            <div class="modal fade" id="add_order_item_preview_remark_modal" data-bs-backdrop="static"
+                                data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header text-center" style="background-color: #512DA8">
+                                            <h1 class="modal-title fs-5 w-100" id="staticBackdropLabel"
+                                                style="color: white">
+                                                Remark
+                                            </h1>
+                                            <button type="button" class="btn-close btn-close-white"
+                                                data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body" style="margin-left: 20px; margin-right:20px">
+                                            <form method="POST" id="addOrderItemRemarkForm">
+                                                @csrf
+                                                <input type="text" name="order_item_id" id="order_item_id" hidden>
+                                                <input type="text" name="tableID" id="tableID" hidden>
+                                                <input type="text" name="tableOrderValue" id="tableOrderValue" hidden>
+                                                <div class="row mb-3 mt-3">
+                                                    <div class="col-5">
+                                                        <label class="form-label">Item Name</label>
+                                                    </div>
+                                                    <div class="col">
+                                                        <input class="form-control muted" type="text" name="item_name"
+                                                            id="item_name" readonly>
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3 mt-3">
+                                                    <div class="col-5">
+                                                        <label class="form-label">Remark<span
+                                                                style="color: red">*</span></label>
+                                                    </div>
+                                                    <div class="col">
+                                                        <textarea class="form-control" name="review_remark" id="review_remark" rows="3" readonly></textarea>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer" style="margin-right: 20px">
+                                            <button class="btn custom_btn" data-bs-dismiss="modal">Ok</button>
+                                            {{-- <input type="submit" class="btn custom_btn" value="Add"
+                                                form="addOrderItemRemarkForm"> --}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--Delete Item Modal -->
+                            <!-- <div class="modal fade" id="delete_item_modal" data-bs-backdrop="static"
+                                data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header text-center" style="background-color: #512DA8">
+                                            <h1 class="modal-title fs-5 w-100" id="delete_modal_header"
+                                                style="color: white">
+                                            </h1>
+                                            <button type="button" class="btn-close btn-close-white"
+                                                data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body" style="margin-left: 20px; margin-right:20px">
+                                            <form method="POST" id="itemDeleteModalForm">
+                                                @csrf
+                                                <input type="text" id="order_detail_id" name="order_detail_id" hidden>
+                                                <input type="text" id="order_item_index" name="order_item_index"
+                                                    hidden>
+                                                <input type="text" name="item_id" id="item_id" hidden>
+                                                <div class="row align-items-center mb-3 mt-3">
+                                                    <div>
+                                                        <label class="form-label">Are you sure want to delete?</label>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer" style="margin-right: 20px">
+                                            <input type="button" class="btn btn-danger delete-item"
+                                                data-bs-dismiss="modal" value="Delete">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> -->
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script src="{{ asset('script/links_js/jquery.3.6.4.min.js') }}"></script>
+    <script src="{{ asset('script/links_js/jquery.validate.1.19.5.js') }}"></script>
+    <script src="{{ asset('script/links_js/jquery.dataTables.1.13.7.min.js') }}"></script>
+    <script src="{{ asset('script/links_js/dataTables.bootstrap5_1.13.7.min.js') }}"></script>
+    <script src="{{ asset('script/dine_in_script.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+            // if (typeof successMessage !== 'undefined') {
+            //     $('#table_Merge_success_modal').modal('show');
+            // }
+            // if (typeof failedMessage !== 'undefined') {
+            //     $('#table_Merge_failed_modal').modal('show');
+            // }
+            $('#availableLabel').text("Available - " + {{ $availableTableCount }});
+            $('#reservationLabel').text("Reservation - " + {{ $reservationTableCount }});
+            $('#occupiedLabel').text("Occupied - " + {{ $occupiedTableCount }});
+
+            if (typeof successMsg !== 'undefined') {
+                $('#table_Merge_success_modal').modal('show');
+            }
+
+            if (typeof failedMessage !== 'undefined') {
+                $('#table_Merge_failed_modal').modal('show');
+            }
+
+            $(document).on("click", ".add_order_item_remark_preview_modal_dialog", function() {
+                var order_item_id = $(this).data('order_item_id');
+                var order_item_name = $(this).data('order_item_name');
+                var order_item_remark = $(this).data('order_item_remark');
+
+                var tableID = $('#table_id').val();
+                var tableOrderNumber = $('#table_order_number').val();
+
+                $(".modal-body #order_item_id").val(order_item_id);
+                $(".modal-body #tableID").val(tableID);
+                $(".modal-body #tableOrderValue").val(tableOrderNumber);
+                $(".modal-body #item_name").val(order_item_name);
+                $(".modal-body #review_remark").val(order_item_remark);
+
+            });
+
+
+        });
+    </script>
+
+@endsection

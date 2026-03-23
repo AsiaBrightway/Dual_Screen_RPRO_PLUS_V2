@@ -1,0 +1,96 @@
+let floor_list = document.querySelector(".floor-list");
+if (localStorage.getItem('showMenu')) {
+    // category_list.classList.add("showMenu");
+    floor_list.parentElement.parentElement.classList.add("showMenu");
+}
+
+let floor_info_container = document.querySelector('.floor_info_container');
+if (localStorage.getItem('showFloorInfoContainer')) {
+    floor_info_container.classList.add("show_container");
+}
+
+let floor_list_container = document.querySelector('.floor_list_container');
+if (localStorage.getItem('showFloorListContainer')) {
+    floor_list_container.classList.add("show_container");
+}
+
+let floor_info_label = document.querySelector('#floor_info_label');
+floor_info_label.addEventListener("click", (e) => {
+    floor_info_label.classList.toggle('show');
+    let floor_info_container = document.querySelector('.floor_info_container');
+    floor_info_container.classList.toggle('show_container');
+    if (floor_info_container.classList.contains('show_container')) {
+        localStorage.setItem('showFloorInfoContainer', 'true');
+    } else {
+        localStorage.removeItem('showFloorInfoContainer');
+    }
+});
+
+let floor_list_label = document.querySelector('#floor_list_label');
+floor_list_label.addEventListener("click", (e) => {
+    floor_list_label.classList.toggle('show');
+    let floor_list_container = document.querySelector('.floor_list_container');
+    floor_list_container.classList.toggle('show_container');
+    if (floor_list_container.classList.contains('show_container')) {
+        localStorage.setItem('showFloorListContainer', 'true');
+    } else {
+        localStorage.removeItem('showFloorListContainer');
+    }
+});
+
+new DataTable('#floor_list', {
+    scrollX: true
+});
+
+$("#clear").click(function() {
+    $("#floor_name").val('');
+    $('#other_name').val('');
+    $("#floor_code").val('');
+    $('#is_discontinued').prop('checked', false);
+
+});
+
+$(document).on("click", ".edit_floor_modal_dialog", function() {
+    var floor_id = $(this).data('floor_id');
+    var floor_name = $(this).data('floor_name');
+    var other_name = $(this).data('other_name');
+    var floor_code = $(this).data('floor_code');
+    var is_discontinued = $(this).data('is_discontinued');
+    $(".modal-body #edit_floor_id").val(floor_id);
+    $(".modal-body #edit_floor_name").val(floor_name);
+    $(".modal-body #edit_other_name").val(other_name);
+    $(".modal-body #edit_floor_code").val(floor_code);
+    if (is_discontinued == 1) {
+        document.getElementById("edit_is_discontinued").checked = true;
+    } else {
+        document.getElementById("edit_is_discontinued").checked = false;
+    }
+});
+$(document).on("click", ".delete_floor_modal_dialog", function() {
+    var floor_id = $(this).data('floor_id');
+    var floor_name = $(this).data('floor_name');
+    $("#delete_modal_header").text("Delete '" + floor_name + "'")
+    $("#delete_floor_id").val(floor_id);
+});
+
+$(function() {
+    $("#floorEditModalForm").validate({
+        rules: {
+            edit_floor_name: {
+                required: true,
+            },
+            edit_floor_code: {
+                required: true,
+            },
+        },
+        messages: {
+            edit_floor_name: {
+                required: "Floor Name ဖြည့်ရန်လိုအပ်ပါသည်",
+            },
+            edit_floor_code: {
+                required: "Floor Code ဖြည့်ရန်လိုအပ်ပါသည်",
+            },
+        }
+    });
+
+});

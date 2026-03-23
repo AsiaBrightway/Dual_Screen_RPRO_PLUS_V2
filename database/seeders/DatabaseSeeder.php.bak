@@ -1,0 +1,517 @@
+<?php
+
+namespace Database\Seeders;
+
+// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+
+use App\Models\CustomerType;
+use App\Models\User;
+use App\Models\Floor;
+use App\Models\FormMenu;
+use App\Models\ItemType;
+use App\Models\UserRole;
+use App\Models\PaymentType;
+use App\Models\MainCategory;
+use Illuminate\Database\Seeder;
+use App\Models\EmployeePosition;
+use Illuminate\Support\Facades\Hash;
+
+class DatabaseSeeder extends Seeder
+{
+    /**
+     * Seed the application's database.
+     */
+    public function run(): void
+    {
+        UserRole::create([
+            'user_role_name' => 'System_Administrator',
+            'other_name' => 'sysadmin',
+            'location_id' => 1,
+            'is_discontinued' => false,
+            'modified_by' => 1,
+        ]);
+        UserRole::create([
+            'user_role_name' => 'Manager',
+            'other_name' => 'Manager',
+            'location_id' => 1,
+            'is_discontinued' => false,
+            'modified_by' => 1,
+        ]);
+        UserRole::create([
+            'user_role_name' => 'Cashier',
+            'other_name' => 'Cahsier',
+            'location_id' => 1,
+            'is_discontinued' => false,
+            'modified_by' => 1,
+        ]);
+        UserRole::create([
+            'user_role_name' => 'Waiter',
+            'other_name' => 'Waiter',
+            'location_id' => 1,
+            'is_discontinued' => false,
+            'modified_by' => 1,
+        ]);
+        User::create([
+            'name' => 'System Administrator',
+            'username' => 'sysadmin',
+            'user_role_id' => 1,
+            'employee_id' => 0,
+            'login_status' => true,
+            'location_id' => 1,
+            'is_discontinued' => false,
+            'modified_by' => 1,
+            'password' => Hash::make('admin@abw@P@ssw0rd')
+        ]);
+        MainCategory::create([
+            'main_category_name' => 'Bar',
+            'store_location_id' => 1,
+            'is_discontinued' => false,
+            'is_deleted' => false,
+            'modified_by' => 1,
+        ]);
+        MainCategory::create([
+            'main_category_name' => 'Kitchen',
+            'store_location_id' => 1,
+            'is_discontinued' => false,
+            'is_deleted' => false,
+            'modified_by' => 1,
+        ]);
+        MainCategory::create([
+            'main_category_name' => 'Refrigerator',
+            'store_location_id' => 1,
+            'is_discontinued' => false,
+            'is_deleted' => false,
+            'modified_by' => 1,
+        ]);
+        MainCategory::create([
+            'main_category_name' => 'Service',
+            'store_location_id' => 1,
+            'is_discontinued' => false,
+            'is_deleted' => false,
+            'modified_by' => 1,
+        ]);
+        ItemType::create([
+            'item_type_name' => 'Menu Item',
+            'other_name' => 'Menu Item',
+            'is_discontinued' => false,
+            'is_deleted' => false,
+            'location_id' => 1,
+            'is_updated' => false,
+            'modified_by' => 1,
+        ]);
+        ItemType::create([
+            'item_type_name' => 'Stock Item',
+            'other_name' => 'Stock Item',
+            'is_discontinued' => false,
+            'is_deleted' => false,
+            'location_id' => 1,
+            'is_updated' => false,
+            'modified_by' => 1,
+        ]);
+        ItemType::create([
+            'item_type_name' => 'Menu & Stock',
+            'other_name' => 'Menu & Stock',
+            'is_discontinued' => false,
+            'is_deleted' => false,
+            'location_id' => 1,
+            'is_updated' => false,
+            'modified_by' => 1,
+        ]);
+        EmployeePosition::create([
+            'position_name' => 'Cashier',
+            'other_name' => 'Cashier',
+            'is_discontinued' => false,
+            'location_id' => 1,
+            'is_updated' => false,
+            'modified_by' => 1,
+        ]);
+        EmployeePosition::create([
+            'position_name' => 'Waiter',
+            'other_name' => 'Waiter',
+            'is_discontinued' => false,
+            'location_id' => 1,
+            'is_updated' => false,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Dashboard',
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Store',
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Dine-In',
+            'parent_form_menu_id' => 2,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Sale-Lists',
+            'parent_form_menu_id' => 2,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Reservation',
+            'parent_form_menu_id' => 2,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Customers',
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Customer',
+            'parent_form_menu_id' => 6,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Customer Type',
+            'parent_form_menu_id' => 6,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Stock Control',
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Stock Receive',
+            'parent_form_menu_id' => 9,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Receive',
+            'parent_form_menu_id' => 10,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Receive Lists',
+            'parent_form_menu_id' => 10,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Stock Issue',
+            'parent_form_menu_id' => 9,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Issue',
+            'parent_form_menu_id' => 13,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Issue Lists',
+            'parent_form_menu_id' => 13,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Issue Type',
+            'parent_form_menu_id' => 9,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Stock Purchase',
+            'parent_form_menu_id' => 9,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Purchase',
+            'parent_form_menu_id' => 17,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Purchase Lists',
+            'parent_form_menu_id' => 17,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Card',
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Coupon Card',
+            'parent_form_menu_id' => 20,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Member Card',
+            'parent_form_menu_id' => 20,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Card',
+            'parent_form_menu_id' => 22,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Card Type',
+            'parent_form_menu_id' => 22,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Users',
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Employee',
+            'parent_form_menu_id' => 25,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Employee',
+            'parent_form_menu_id' => 26,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Employee Position',
+            'parent_form_menu_id' => 26,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Users',
+            'parent_form_menu_id' => 25,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'User',
+            'parent_form_menu_id' => 29,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'User Role',
+            'parent_form_menu_id' => 29,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Suppliers',
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Supplier',
+            'parent_form_menu_id' => 32,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Supplier Lists',
+            'parent_form_menu_id' => 32,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Configuration',
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Item',
+            'parent_form_menu_id' => 35,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Category',
+            'parent_form_menu_id' => 36,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Item',
+            'parent_form_menu_id' => 36,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Unit',
+            'parent_form_menu_id' => 36,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Discount',
+            'parent_form_menu_id' => 36,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Price Control',
+            'parent_form_menu_id' => 36,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Floor',
+            'parent_form_menu_id' => 35,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Table',
+            'parent_form_menu_id' => 35,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Location',
+            'parent_form_menu_id' => 35,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Delivery',
+            'parent_form_menu_id' => 35,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Reports',
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Stock-In',
+            'parent_form_menu_id' => 45,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Stock-Out',
+            'parent_form_menu_id' => 45,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Purchase',
+            'parent_form_menu_id' => 45,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Sales',
+            'parent_form_menu_id' => 45,
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        FormMenu::create([
+            'form_name' => 'Setting',
+            'is_active' => 1,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        PaymentType::create([
+            'payment_type_name' => '---',
+            'is_discontinued' => 0,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        PaymentType::create([
+            'payment_type_name' => 'KBZPay',
+            'is_discontinued' => 0,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        PaymentType::create([
+            'payment_type_name' => 'AYAPay',
+            'is_discontinued' => 0,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        PaymentType::create([
+            'payment_type_name' => 'CBPay',
+            'is_discontinued' => 0,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+        Floor::create([
+            'floor_name' => '1st Floor',
+            'floor_code' => 'F001',
+            'is_discontinued' => 0,
+            'is_deleted' => 0,
+            'location_id' => 0,
+            'is_updated' => 0,
+            'modified_by' => 1,
+        ]);
+    }
+}

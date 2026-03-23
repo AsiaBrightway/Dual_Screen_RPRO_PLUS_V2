@@ -1,0 +1,163 @@
+.supplier_info_container,
+.supplier_list_container {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    background-color: #fff;
+}
+
+
+/* transition: max-height 0.5s ease-out, opacity 0.5s ease-out; */
+
+.supplier_info_container.show_container,
+.supplier_list_container.show_container {
+    padding: 30px;
+    max-height: 800px;
+    opacity: 1;
+    background-color: #fff;
+    border-radius: 5px 5px 10px 10px;
+    margin: -20px 1px 20px 1px;
+    transition: max-height 0.5s ease-out, opacity 0.5s ease-out;
+}
+
+.custom_btn {
+    color: #fff;
+    background-color: #512DA8;
+}
+
+.custom_btn:hover {
+    color: #fff;
+    background-color: #6f44d1;
+}
+
+.page-item.active .page-link {
+    background-color: #6f44d1 !important;
+    border: 1px solid black;
+    color: #fff !important;
+    font-size: 13px;
+}
+
+.page-link {
+    color: black !important;
+    font-size: 13px;
+}
+
+.dataTables_wrapper .row {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+#supplier_info_label,
+#supplier_list_label {
+    height: 40px;
+    border-radius: 10px;
+    margin-left: 1px;
+    margin-right: 1px;
+    margin-bottom: 10px
+}
+
+i {
+    transition: all 0.3s ease;
+}
+
+#supplier_info_label.show i.arrow,
+#supplier_list_label.show i.arrow {
+    transform: rotate(-180deg);
+}
+
+@media (max-width: 1200px) {
+    .sidebar.close {
+        display: none;
+    }
+    .sidebar.close~.home-section {
+        left: 0;
+        width: 100%;
+    }
+    .sidebar .nav-links {
+        height: 66%;
+        padding-top: 30px;
+        overflow: auto;
+        margin-left: -32px;
+    }
+    .left_div {
+        width: 100% !important;
+    }
+    .table-button {
+        width: 98px !important;
+        height: 98px !important;
+        margin: 5px !important;
+    }
+    .table_status {
+        font-size: 10px !important;
+    }
+    .right_div {
+        margin-top: 20px;
+        margin-left: 15px !important;
+    }
+    .button-link {
+        font-size: 13px !important;
+    }
+    /* Order Page */
+    .item_search_div {
+        width: 69%;
+    }
+    .item_search_input {
+        margin-left: 50% !important;
+        margin-right: 10px !important;
+    }
+    .left-arrow {
+        width: 15px !important;
+    }
+    .right-arrow {
+        width: 15px !important;
+        right: -3px !important;
+    }
+    .item-button {
+        width: 140px !important;
+    }
+}
+
+@media only screen and (orientation: portrait) {
+    .custom-text {
+        font-size: 13px !important;
+    }
+    .custom-label {
+        font-size: 11px !important;
+        font-weight: normal !important;
+        margin-left: 40px !important;
+    }
+    .item_qty_input {
+        width: 45px;
+        padding: 0px;
+        margin-left: 3px;
+    }
+    .item_img {
+        width: 55px !important;
+        height: 55px !important;
+    }
+    .dine_in_item_description_div {
+        margin-left: 27px;
+    }
+    .item_name_lbl {
+        font-size: 13px;
+    }
+    .remark_lbl {
+        font-size: 11px;
+    }
+    .gift_check_div {
+        width: 58%;
+        text-align: end;
+        margin-top: 10px;
+    }
+    .price_div {
+        margin-left: 26px;
+        font-size: 13px;
+        padding: 0px;
+        width: 52px;
+        margin-top: 10px;
+    }
+    .orderTotalAmount_div,
+    .total_amt_lbl {
+        font-size: 17px !important;
+    }
+}

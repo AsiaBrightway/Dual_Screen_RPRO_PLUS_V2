@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <link href="{{ asset('css/links_css/bootstrap.5.3.3.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/links_css/twitter_bootstrap.5.3.0.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/links_css/dataTable.2.0.8.css') }}">
+    <title>Order Slip</title>
+</head>
+
+<body>
+    <form action="">
+
+       <div style
+        <div style="display: flex; justify-content: center; width: 100% ; margin-bottom:5px ">
+            <span style="font-size: 14px; font-weight:bold">BEER PUB & BBQ</span>
+        </div>
+        <hr style="margin: 0 0 5px 0; border: 1px solid black;">
+        <div class="row" style="font-size: 12px; font-weight:bold; margin-top:10px;">
+            <div class="col-6">
+                <label class="form-label">Invoice: {{ $invoiceNumber }}</label>
+            </div>
+            <div class="col-6">
+                <div class="row">
+                    <label class="form-label" style="margin-left: 50px">{{ now()->format('Y-m-d') }}</label>
+                </div>
+                <div class="row">
+                    <label class="form-label" style="margin-left: 60px">{{ now()->format('h:i A') }}</label>
+                </div>
+
+            </div>
+        </div>
+        <table
+            style="font-size: 12px; font-weight:bold; width:100%; margin-left:-8px; margin-right:8px; margin-bottom: 0; margin-top:0"
+            class="table table-borderless">
+            <thead>
+                <tr>
+                    <th style="width: 120px">Name</th>
+                    <th style="width: 60px">Price</th>
+                    <th>Qty</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                @php
+                    $totalamount = 0;
+                    $totalSaleAmount = 0;
+                    $totalSaleQty = 0;
+                    $totalPromotionAmount = 0;
+                    $totalPromotionQty = 0;
+                @endphp
+                @if (count($orderDetails) != 0)
+                    @foreach ($orderDetails as $orderDetail)
+                        <tr>
+                            <td style="width: 120px">{{ $orderDetail['item_name'] }}</td>
+                            <td style="width: 60px">{{ number_format($orderDetail['item_price']) }} </td>
+                            <td>{{ $orderDetail['quantity'] }}</td>
+                            <td  style="text-align:left;">
+                                @if ($orderDetail['is_foc'] == 1)
+                                    FOC
+                                @elseif($orderDetail['is_foc'] == 0)
+                                    {{ number_format($orderDetail['item_price'] * $orderDetail['quantity']) }}
+                                @endif
+                            </td>
+                        </tr>
+                        @php
+                            if ($orderDetail['is_foc'] == 0) {
+                                $totalSaleAmount += $orderDetail['item_price'] * $orderDetail['quantity'];
+                            }
+                            $totalSaleQty += $orderDetail['quantity'];
+                        @endphp
+                    @endforeach
+                @endif
+            </tbody>
+        </table>
+        <hr style="margin: 0 0 5px 0; border: 1px solid black;">
+        @if (count($promotionOrderDetails) != 0)
+            <label class="form-label" style="font-size: .7em; font-weight:bold">Promotions: </label>
+            <table
+                style="font-size: 12px;font-weight:bold; width:100%; margin-left:-8px; margin-right:0px; margin-bottom: 0; margin-top:0"
+                class="table table-borderless">
+                <tbody>
+                    @foreach ($promotionOrderDetails as $promotionOrderDetail)
+                        <tr>
+                            <td style="width: 115px">{{ $promotionOrderDetail['item_name'] }}</td>
+                            <td style="width: 60px">{{ number_format($promotionOrderDetail['promotion_price']) }} </td>
+                            <td>{{ $promotionOrderDetail['quantity'] }}</td>
+                            <td >
+                                @if ($promotionOrderDetail['is_foc'] == 1)
+                                    0
+                                @elseif($promotionOrderDetail['is_foc'] == 0)
+                                    {{ number_format($promotionOrderDetail['promotion_price'] * $promotionOrderDetail['quantity']) }}
+                                @endif
+                            </td>
+                        </tr>
+                        @php
+                            if ($promotionOrderDetail['is_foc'] == 0) {
+                                $totalPromotionAmount +=
+                                    $promotionOrderDetail['promotion_price'] * $promotionOrderDetail['quantity'];
+                            }
+                            $totalPromotionQty += $promotionOrderDetail['quantity'];
+                        @endphp
+                    @endforeach
+                </tbody>
+            </table>
+        @endif
+        <hr style="margin: 0 0 5px 0; border: 1px solid black;">
+        <div class="row" style="font-size: 12px; font-weight:bold">
+ 
+            <div class="col-4">
+                <label class="form-label">Total</label>
+            </div>
+            <div class="col-3" style="text-align:right;">
+                <label class="form-label" style="margin-left: 27px">{{ $totalSaleQty + $totalPromotionQty }}</label>
+            </div>
+            <div class="col-3" style="text-align:center;">
+                <label class="form-label"
+                    >{{ number_format($totalSaleAmount + $totalPromotionAmount) }} </label>
+            </div>
+        </div>
+
+        <hr style="margin: 0 0 5px 0;border: 1px solid black;">
+        <div style="display: flex; justify-content: center; width: 100%; margin-top:10px">
+            <h7>Thank You</h7>
+        </div>
+    </form>
+
+</body>
+<script src="{{ asset('script/links_js/jquery.3.6.4.min.js') }}"></script>
+<script src="{{ asset('script/links_js/bootstrap.bundle.5.3.3.min.js') }}"></script>
+<script src="{{ asset('script/links_js/twitter_bootstrap_bundle.5.3.0.min.js') }}"></script>
+<script src="{{ asset('script/links_js/dataTable.2.0.8.js') }}"></script>
+<script src="{{ asset('script/links_js/dataTables.bootstrap5_2.0.8.js') }}"></script>
+<script>
+    window.onload = function() {
+        // Trigger the print dialog
+        window.print();
+
+        // Close or redirect after a short delay
+        setTimeout(function() {
+            window.location.href = "/admin/dineInPage";
+        }, 10000);
+
+    };
+</script>
+
+</html>

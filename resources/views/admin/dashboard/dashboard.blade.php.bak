@@ -1,0 +1,408 @@
+@extends('layouts.admin.master')
+@section('title', 'Dashboard')
+
+@section('content')
+
+    <section class="home-section">
+        <div class="home-title">
+            <i class='bx bx-menu'></i>
+            <span class="text">Dashboard</span>
+        </div>
+        <div class="home-content">
+            <section class="content-section" style="padding-top:20px;margin-left:10px">
+                <div class="row pie_chart_row">
+                    <div class="col-md-4 col-sm-12">
+                        <div class="chart">
+                            <div class="chart_title">
+                                <label>Products</label>
+                            </div>
+                            <div class="chart_content">
+                                <canvas id="productDoughnutChart" class="doughnut-style"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-12">
+                        <div class="chart">
+                            <div class="chart_title">
+                                <label>Categories</label>
+                            </div>
+                            <div class="chart_content">
+                                <canvas id="categoryDoughnutChart" class="doughnut-style"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-12">
+                        <div class="chart">
+                            <div class="chart_title">
+                                <label>Members</label>
+                            </div>
+                            <div class="chart_content">
+                                <canvas id="customerDoughnutChart" class="doughnut-style"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row line_chart_row">
+                    <div class="col-lg-6 col-md-12 col-sm-12">
+                        <div class="chart">
+                            <div class="chart_title">
+                                <label>Sales Quantity</label>
+                            </div>
+                            <canvas id="salesQtyBarChart" class="chart-style"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-12 col-sm-12">
+                        <div class="chart">
+                            <div class="chart_title">
+                                <label>Sales And Purchases</label>
+                            </div>
+                            <canvas id="salesNpurchaseLineChart" class="chart-style"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </section>
+    <script src="{{ asset('script/links_js/chart.3.8.0.min.js') }}"></script>
+    <script>
+        var menuItems = @json($menuItems);
+        var menuCategories = @json($menuCategories);
+        var customers = @json($customers);
+
+        var saleWeek = @json($saleWeek);
+        var purchaseWeek = @json($purchaseWeek);
+        var saleItemWeek = @json($saleItemWeek);
+        var saleItemWeekList = @json($saleItemWeekList);
+        console.log(saleItemWeekList);
+
+        /********Product doughnut chart*********** */
+        const expValue = menuItems.length;
+        const product_ctx = document
+            .getElementById("productDoughnutChart")
+            .getContext("2d");
+        const productChart = new Chart(product_ctx, {
+            type: "doughnut",
+            data: {
+                labels: ["Total Products", "Expected Products"],
+                datasets: [{
+                    label: "# of votes",
+                    data: [menuItems.length, expValue - menuItems.length],
+                    backgroundColor: ["#6f44d1", "rgba(170, 170, 170,1)"],
+                    hoverBackgroundColor: ["#512DA8", "rgba(170, 170, 170,0.2)"],
+                    hoverBorderColor: [
+                        "rgba(255, 99, 132,0.2)",
+                        "rgba(170, 170, 170,0.2)",
+                    ],
+                    borderWidth: 1,
+                }, ],
+            },
+            options: {
+                aspectRatio: 1.2,
+                plugins: {
+                    legend: {
+                        position: "bottom",
+                        align: "start",
+                    },
+                },
+                scales: {
+                    x: {
+                        display: false,
+                    },
+                    y: {
+                        beginAtZero: true,
+                        display: false,
+                    },
+                },
+                // cutoutPercentage: 80
+            },
+        });
+        /********Category doughnut Chart*********** */
+        const category_ctx = document
+            .getElementById("categoryDoughnutChart")
+            .getContext("2d");
+        const categoryChart = new Chart(category_ctx, {
+            type: "doughnut",
+            data: {
+                labels: ["Total Categories", "Expected Categories"],
+                datasets: [{
+                    label: "# of votes",
+                    data: [menuCategories.length, 0],
+                    backgroundColor: ["#6f44d1", "rgba(170, 170, 170,1)"],
+                    hoverBackgroundColor: ["#512DA8", "rgba(170, 170, 170,0.2)"],
+                    hoverBorderColor: [
+                        "rgba(255, 99, 132,0.2)",
+                        "rgba(170, 170, 170,0.2)",
+                    ],
+                    borderWidth: 1,
+                }, ],
+            },
+            options: {
+                aspectRatio: 1.2,
+                plugins: {
+                    legend: {
+                        position: "bottom",
+                        align: "start",
+                    },
+                },
+                scales: {
+                    x: {
+                        display: false,
+                    },
+                    y: {
+                        beginAtZero: true,
+                        display: false,
+                    },
+                },
+                // cutoutPercentage: 80
+            },
+        });
+
+        /********Customer doughnut Chart*********** */
+        const customer_ctx = document
+            .getElementById("customerDoughnutChart")
+            .getContext("2d");
+        const customerChart = new Chart(customer_ctx, {
+            type: "doughnut",
+            data: {
+                labels: ["Total Members", "Expected Members"],
+                datasets: [{
+                    label: "# of votes",
+                    data: [customers.length, "100"],
+                    backgroundColor: ["#6f44d1", "rgba(170, 170, 170,1)"],
+                    hoverBackgroundColor: ["#512DA8", "rgba(170, 170, 170,0.2)"],
+                    hoverBorderColor: [
+                        "rgba(255, 99, 132,0.2)",
+                        "rgba(170, 170, 170,0.2)",
+                    ],
+                    borderWidth: 1,
+                }, ],
+            },
+            options: {
+                aspectRatio: 1.2,
+                plugins: {
+                    legend: {
+                        position: "bottom",
+                        align: "start",
+                    },
+                },
+                scales: {
+                    x: {
+                        display: false,
+                    },
+                    y: {
+                        beginAtZero: true,
+                        display: false,
+                    },
+                },
+                // cutoutPercentage: 80
+            },
+        });
+
+        /********Sales Quantity Bar Chart*********** */
+
+
+        var saleItemForMonday = saleItemWeek['saleItemForMonday'];
+        var saleItemForTuesday = saleItemWeek['saleItemForTuesday'];
+        var saleItemForWednesday = saleItemWeek['saleItemForWednesday'];
+        var saleItemForTursday = saleItemWeek['saleItemForTursday'];
+        var saleItemForFriday = saleItemWeek['saleItemForFriday'];
+        var saleItemForSaturday = saleItemWeek['saleItemForSaturday'];
+        var saleItemForSunday = saleItemWeek['saleItemForSunday'];
+
+        var topOneItemForMonday = 0;
+        var topTwoItemForMonday = 0;
+        var topThreeItemForMonday = 0;
+
+        var topOneItemForTuesday = 0;
+        var topTwoItemForTuesday = 0;
+        var topThreeItemForTuesday = 0;
+
+        var topOneItemForWednesday = 0;
+        var topTwoItemForWednesday = 0;
+        var topThreeItemForWednesday = 0;
+
+        var topOneItemForTursday = 0;
+        var topTwoItemForTursday = 0;
+        var topThreeItemForTursday = 0;
+
+        var topOneItemForFriday = 0;
+        var topTwoItemForFriday = 0;
+        var topThreeItemForFriday = 0;
+
+        var topOneItemForSaturday = 0;
+        var topTwoItemForSaturday = 0;
+        var topThreeItemForSaturday = 0;
+
+        var topOneItemForSunday = 0;
+        var topTwoItemForSunday = 0;
+        var topThreeItemForSunday = 0;
+
+        if (saleItemForMonday.length != 0) {
+            topOneItemForMonday = saleItemForMonday[0]['total_quantity'];
+            topTwoItemForMonday = saleItemForMonday[1]['total_quantity'];
+            topThreeItemForMonday = saleItemForMonday[2]['total_quantity'];
+        }
+
+        if (saleItemForTuesday.length != 0) {
+            topOneItemForTuesday = saleItemForTuesday[0]['total_quantity'];
+            topTwoItemForTuesday = saleItemForTuesday[1]['total_quantity'];
+            topThreeItemForTuesday = saleItemForTuesday[2]['total_quantity'];
+        }
+        if (saleItemForWednesday.length != 0) {
+            topOneItemForWednesday = saleItemForWednesday[0]['total_quantity'];
+            topTwoItemForWednesday = saleItemForWednesday[1]['total_quantity'];
+            topThreeItemForWednesday = saleItemForWednesday[2]['total_quantity'];
+        }
+        if (saleItemForTursday.length != 0) {
+            topOneItemForTursday = saleItemForTursday[0]['total_quantity'];
+            topTwoItemForTursday = saleItemForTursday[1]['total_quantity'];
+            topThreeItemForTursday = saleItemForTursday[2]['total_quantity'];
+        }
+        if (saleItemForFriday.length != 0) {
+            topOneItemForFriday = saleItemForFriday[0]['total_quantity'];
+            topTwoItemForFriday = saleItemForFriday[1]['total_quantity'];
+            topThreeItemForFriday = saleItemForFriday[2]['total_quantity'];
+        }
+        if (saleItemForSaturday.length != 0) {
+            topOneItemForSaturday = saleItemForSaturday[0]['total_quantity'];
+            topTwoItemForSaturday = saleItemForSaturday[1]['total_quantity'];
+            topThreeItemForSaturday = saleItemForSaturday[2]['total_quantity'];
+        }
+        if (saleItemForSunday.length != 0) {
+            topOneItemForSunday = saleItemForSunday[0]['total_quantity'];
+            topTwoItemForSunday = saleItemForSunday[1]['total_quantity'];
+            topThreeItemForSunday = saleItemForSunday[2]['total_quantity'];
+        }
+
+        var salesQty_ctx = document.getElementById("salesQtyBarChart").getContext("2d");
+        if (saleItemWeekList.length == 0) {
+            saleItemWeekList.push({
+                'item_name': 'Item-1'
+            });
+            saleItemWeekList.push({
+                'item_name': 'Item-2'
+            });
+            saleItemWeekList.push({
+                'item_name': 'Item-3'
+            });
+        }
+        var salesQty_myChart = new Chart(salesQty_ctx, {
+            type: "bar",
+            data: {
+                labels: ["Mon", "Tue", "Wed", "Thur", "Fri", "Sat", "Sun"],
+                datasets: [{
+                        label: saleItemWeekList[0]['item_name'],
+                        data: [topOneItemForMonday, topOneItemForTuesday, topOneItemForWednesday,
+                            topOneItemForTursday, topOneItemForFriday, topOneItemForSaturday,
+                            topOneItemForSunday
+                        ],
+                        backgroundColor: "#6f44d1",
+                        stack: "Stack 0",
+                    },
+                    {
+                        label: saleItemWeekList[1]['item_name'],
+                        data: [topTwoItemForMonday, topTwoItemForTuesday, topTwoItemForWednesday,
+                            topTwoItemForTursday, topTwoItemForFriday, topTwoItemForSaturday,
+                            topTwoItemForSunday
+                        ],
+                        backgroundColor: "#e86813",
+                        stack: "Stack 1",
+                    },
+                    {
+                        label: saleItemWeekList[2]['item_name'],
+                        data: [topThreeItemForMonday, topThreeItemForTuesday, topThreeItemForWednesday,
+                            topThreeItemForTursday, topThreeItemForFriday, topThreeItemForSaturday,
+                            topThreeItemForSunday
+                        ],
+                        backgroundColor: "#785374",
+                        stack: "Stack 2",
+                    },
+                ],
+            },
+            options: {
+                aspectRatio: 1.7,
+                plugins: {
+                    legend: {
+                        position: "bottom",
+                        align: "start",
+                    },
+                },
+                responsive: true,
+                interaction: {
+                    intersect: true,
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false,
+                            drawBorder: false,
+                        },
+                    },
+                    y: {
+                        grid: {
+                            display: false,
+                            drawBorder: false,
+                        },
+                        stacked: false,
+                    },
+                },
+            },
+        });
+
+        /********Sales_N_Purchase line Chart*********** */
+
+        // setup
+        const data = {
+            labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+            datasets: [{
+                    label: "Sales",
+                    data: [saleWeek['forMondayAmount'], saleWeek['forTuesdayAmount'], saleWeek[
+                            'forWednesdayAmount'], saleWeek['forTursdayAmount'], saleWeek['forFridayAmount'],
+                        saleWeek['forSaturdayAmount'], saleWeek['forSundayAmount']
+                    ],
+                    backgroundColor: ["#512DA8"],
+                    borderColor: ["#6f44d1"],
+                    tension: 0.4,
+                },
+                {
+                    label: "Purchases",
+                    data: [purchaseWeek['forPurchaseMondayAmount'], purchaseWeek['forPurchaseTuesdayAmount'],
+                        purchaseWeek['forPurchaseWednesdayAmount'], purchaseWeek['forPurchaseTursdayAmount'],
+                        purchaseWeek['forPurchaseFridayAmount'], purchaseWeek['forPurchaseSaturdayAmount'],
+                        purchaseWeek['forPurchaseSundayAmount']
+                    ],
+                    backgroundColor: ["rgb(255, 26, 104,1)"],
+                    borderColor: ["rgb(255, 26, 104,1)"],
+                    tension: 0.4,
+                },
+            ],
+        };
+
+        //config
+        const config = {
+            type: "line",
+            data: data,
+            options: {
+                aspectRatio: 1.7,
+                plugins: {
+                    legend: {
+                        position: "bottom",
+                        align: "start",
+                    },
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                    },
+                },
+            },
+        };
+
+        // render init block
+        const myChart = new Chart(
+            document.getElementById("salesNpurchaseLineChart"),
+            config
+        );
+    </script>
+@endsection

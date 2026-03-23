@@ -1,0 +1,105 @@
+let unit_list = document.querySelector(".unit-list");
+if (localStorage.getItem('showMenu')) {
+    // category_list.classList.add("showMenu");
+    unit_list.parentElement.parentElement.classList.add("showMenu");
+    unit_list.parentElement.parentElement.parentElement.parentElement.classList.add("showMenu");
+}
+
+let unit_info_container = document.querySelector('.unit_info_container');
+if (localStorage.getItem('showUnitInfoContainer')) {
+    unit_info_container.classList.add("show_container");
+}
+
+let unit_list_container = document.querySelector('.unit_list_container');
+if (localStorage.getItem('showListInfoContainer')) {
+    unit_list_container.classList.add("show_container");
+}
+
+let unit_info_label = document.querySelector('#unit_info_label');
+unit_info_label.addEventListener("click", (e) => {
+    unit_info_label.classList.toggle('show');
+    let unit_info_container = document.querySelector('.unit_info_container');
+    unit_info_container.classList.toggle('show_container');
+    if (unit_info_container.classList.contains('show_container')) {
+        localStorage.setItem('showUnitInfoContainer', 'true');
+    } else {
+        localStorage.removeItem('showUnitInfoContainer');
+    }
+});
+
+let unit_list_label = document.querySelector('#unit_list_label');
+unit_list_label.addEventListener("click", (e) => {
+    unit_list_label.classList.toggle('show');
+    let unit_list_container = document.querySelector('.unit_list_container');
+    unit_list_container.classList.toggle('show_container');
+    if (unit_list_container.classList.contains('show_container')) {
+        localStorage.setItem('showListInfoContainer', 'true');
+    } else {
+        localStorage.removeItem('showListInfoContainer');
+    }
+});
+
+new DataTable('#unit_list', {
+    scrollX: true,
+});
+
+$("#clear").click(function() {
+    $("#unit_name").val('');
+    $('#other_name').val('');
+    $("#is_discontinued").prop('checked', false);
+
+});
+
+//Unit
+$(document).on("click", ".edit_unit_modal_dialog", function() {
+    var unit_id = $(this).data('unit_id');
+    var unit_name = $(this).data('unit_name');
+    var other_name = $(this).data('other_name');
+    var is_discontinued = $(this).data('is_discontinued');
+    $(".modal-body #edit_unit_id").val(unit_id);
+    $(".modal-body #edit_unit_name").val(unit_name);
+    $(".modal-body #edit_other_name").val(other_name);
+    if (is_discontinued == 1) {
+        document.getElementById("edit_is_discontinued").checked = true;
+    } else {
+        document.getElementById("edit_is_discontinued").checked = false;
+    }
+});
+$(document).on("click", ".delete_unit_modal_dialog", function() {
+    var unit_id = $(this).data('unit_id');
+    var unit_name = $(this).data('unit_name');
+    var hasItems = $(this).data('has-items');
+    
+    if (hasItems == 1) {
+        $('#confirmFormDelete').hide();
+        $('#deleteMessage').text('This Unit is being used by menu items.')
+        $('#delete_modal_header').text(unit_name + " can't be deleted");
+    } else {
+        $('#confirmFormDelete').show();
+        $('#deleteMessage').text('Are you sure you want to delete?')
+        $("#delete_modal_header").text("Delete '" + unit_name + "' unit");
+        $("#delete_unit_id").val(unit_id);
+    }
+});
+
+$(function() {
+    $("#unitEditModalForm").validate({
+        rules: {
+            edit_unit_name: {
+                required: true,
+            },
+            edit_other_name: {
+                required: true,
+            },
+        },
+        messages: {
+            edit_unit_name: {
+                required: "Unit Name ဖြည့်ရန်လိုအပ်ပါသည်",
+            },
+            edit_other_name: {
+                required: "Other Name ဖြည့်ရန်လိုအပ်ပါသည်",
+            },
+        }
+    });
+
+});

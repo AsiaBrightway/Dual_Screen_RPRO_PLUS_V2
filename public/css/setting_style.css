@@ -1,0 +1,39 @@
+.home-title {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.user_role_permissions_container {
+    height: calc(100vh - 155px);
+    margin: 0;
+    background-color: #fff;
+    border-radius: 10px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+@media (max-width: 720px) {
+    .user-role-permission-container {
+        margin-left: -10px !important;
+    }
+    .setting-label {
+        flex: 0 0 40%;
+        /* Same as col-6 */
+        max-width: 40%;
+        /* Same as col-6 */
+    }
+    .setting-text {
+        width: 45%;
+    }
+}
+
+@media (max-width: 560px) {
+    .customBtn-clear {
+        width: 100px;
+    }
+    .customBtn-save {
+        width: 100px;
+        margin-top: 10px;
+    }
+}

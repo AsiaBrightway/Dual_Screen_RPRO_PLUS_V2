@@ -1,0 +1,213 @@
+@extends('layouts.admin.master')
+@section('title', 'Stock-Out Reports')
+<link rel="stylesheet" href="{{ asset('css/links_css/dataTable.2.0.8.css') }}">
+<link rel="stylesheet" href="{{ asset('css/links_css/buttons.dataTables.3.0.2.css') }}">
+<link rel="stylesheet" href="{{ asset('css/links_css/select2.min.css') }}">
+
+@section('content')
+    <style>
+        .select2-container .select2-dropdown {
+            margin-top: -6px !important;
+            padding-top: 0 !important;
+        }
+
+        .select2-results {
+            padding-top: 0 !important;
+        }
+
+        .select2-search--dropdown {
+            display: block !important;
+        }
+
+        .select2-container--open .select2-dropdown--below {
+            top: 0 !important;
+            margin-top: 0 !important;
+        }
+
+        .select2-container--open .select2-dropdown--above {
+            top: 100% !important;
+        }
+
+        /* FIX DROPDOWN HEIGHT */
+        .select2-selection--single {
+            height: 38px !important;
+        }
+
+        .select2-selection__rendered {
+            line-height: 34px !important;
+        }
+
+        .select2-selection__arrow {
+            height: 34px !important;
+        }
+    </style>
+    <section class="home-section">
+        <div class="home-title">
+            <i class='bx bx-menu'></i>
+            <span class="text">Stock-Out Reports</span>
+        </div>
+        <div class="home-content" style="margin-left: 20px">
+            <div class="table_buttons_container mb-3"
+                style="display: flex; justify-content:end; gap:5px; margin-right:11px">
+                <button class="btn btn-primary" id="btn_itemSummary_print"><i class="fa-solid fa-print"></i> Print</button>
+                <button class="btn btn-success" id="btn_itemSummary_excel"><i class="fa-solid fa-file-excel"></i>
+                    Excel</button>
+                <button class="btn btn-danger" id="btn_itemSummary_pdf"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+            </div>
+            <div class="stock_out_report_container row">
+                <div class="col-3 stock_out_filter stock-out-report-left">
+                    <div class="border border-1 p-3 rounded-2 mt-3">
+                        <label class="mb-3" style="color: #512da8">Search By Date:</label>
+                        <div class="mb-3 ms-3">
+                            <label class="form-label">Start Date</label>
+                            <input type="date" class="form-control" id="startDate" name="startDate">
+                        </div>
+                        <div class="mb-3 ms-3">
+                            <label class="form-label">End Date</label>
+                            <input type="date" class="form-control" id="endDate" name="endDate">
+                        </div>
+                    </div>
+                    <div class="border border-1 p-3 mt-3 rounded-2">
+                        <label class="mb-3" style="color: #512da8">Search By Item Summary:</label>
+                        <div class="form-check mb-3 mx-3">
+                            <input class="form-check-input" type="checkbox" id="byItemSummaryCheck"
+                                name="byItemSummaryCheck">
+                            <label class="form-check-label" for="byItemSummaryCheck">By Item Summary</label>
+                        </div>
+                        <div class="searchCategoryCheck_div form-check mb-3 ms-5 d-none">
+                            <input class="form-check-input" type="checkbox" name="bySearchCategory" id="bySearchCategory">
+                            <label class="form-check-label" for="bySearchCategory">By Category</label>
+                        </div>
+                        <div class="searchItemCheck_div form-check mb-3 ms-5 d-none">
+                            <input class="form-check-input" type="checkbox" name="bySearchStockItem" id="bySearchStockItem">
+                            <label class="form-check-label" for="bySearchStockItem">By Stock Item</label>
+                        </div>
+                        <div class="searchIssueTypeCheck_div form-check mb-3 ms-5 d-none">
+                            <input class="form-check-input" type="checkbox" name="bySearchIssueType" id="bySearchIssueType">
+                            <label class="form-check-label" for="bySearchIssueType">By Stock Issue Type</label>
+                        </div>
+                        <div class="selectCategory_div mx-3 d-none">
+                            <select class="form-select form-select-sm" id="categoryList" name="categoryList">
+                                {{-- <option value="0">--Select Category</option> --}}
+                            </select>
+                        </div>
+                        <div class="selectItem_div mx-3 d-none">
+                            <select class="form-select form-select-sm" id="stockItemList" name="stockItemList">
+                                {{-- <option value="0">--Select Item</option> --}}
+                            </select>
+                        </div>
+                        <div class="selectIssueType_div mx-3 d-none">
+                            <select class="form-select form-select-sm" id="issueTypeList" name="issueTypeList">
+                                {{-- <option value="0">--Select Item</option> --}}
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content:end">
+                        <button class="btn custom_btn" id="btn_stock_out_search" name="btn_stock_out_search">Search</button>
+                    </div>
+                </div>
+                <div class="col-9 stock-out-report-right">
+                    <div class="stock_out_table p-3">
+                        {{-- <div class="table_buttons_container mb-3" style="display: flex; justify-content:end; gap:5px;">
+                            <button class="btn btn-primary" id="btn_itemSummary_print"><i class="fa-solid fa-print"></i> Print</button>
+                            <button class="btn btn-success" id="btn_itemSummary_export"><i class="fa-solid fa-file-excel"></i> Excel</button>
+                            <button class="btn btn-danger" id="btn_itemSummary_pdf"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+                        </div> --}}
+                        <div class="report_by_default_container">
+                            <table id="stock_out_report_list_by_default"
+                                class="stock_out_report_list_by_default display nowrap" style="width:100%;">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Issue Date</th>
+                                        <th>Issue Voucher</th>
+                                        <th>Issue Type</th>
+                                        <th>Total Quantity</th>
+                                        <th>Remark</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @php
+                                        $totalQuantity = 0;
+                                    @endphp
+                                    @if (count($stock_issue_list) != 0)
+                                        @php
+                                            $count = 1;
+                                        @endphp
+                                        @foreach ($stock_issue_list as $stock_issue)
+                                            <tr>
+                                                <td style="text-align: center">{{ $count }}</td>
+                                                <td>{{ date('d-M-y', strtotime($stock_issue['issue_date'])) }}</td>
+                                                <td>{{ $stock_issue['issue_voucher_number'] }}</td>
+                                                <td>{{ $stock_issue['issue_type'] }}</td>
+                                                <td>{{ number_format($stock_issue['total_qty']) }}</td>
+                                                <td style="word-wrap: break-word; white-space:normal;">
+                                                    {{ $stock_issue['remark'] }}</td>
+                                            </tr>
+                                            @php
+                                                $count++;
+                                                $totalQuantity += $stock_issue['total_qty'];
+                                            @endphp
+                                        @endforeach
+                                    @endif
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="report_by_search_container d-none">
+                            <table id="stock_out_report_list_by_search" class="display nowrap" style="width:100%;">
+                                <thead class="table_header">
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Issue Date</th>
+                                        <th>Issue Voucher</th>
+                                        <th>Item Name</th>
+                                        <th>Category Name</th>
+                                        <th>Issue Type</th>
+                                        <th>Unit</th>
+                                        <th>Qty</th>
+                                        <th>Unit Cost</th>
+                                        <th>Amount</th>
+                                        <th>Expire Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="body_data">
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="total_div d-flex">
+                        <label class="form-label total-qty-lbl">Total Quantity:</label>
+                        <input class="form-control muted text-end total-qty-text" type="text" id="total_amount"
+                            name="total_amount" value="{{ number_format($totalQuantity) }}" readonly>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="{{ asset('script/links_js/jquery.3.6.4.min.js') }}"></script>
+    <script src="{{ asset('script/links_js/jquery.validate.1.19.5.js') }}"></script>
+    <script src="{{ asset('script/links_js/jquery.dataTables.1.13.7.min.js') }}"></script>
+    <script src="{{ asset('script/links_js/dataTables.bootstrap5_1.13.7.min.js') }}"></script>
+
+    <script src="{{ asset('script/links_js/jquery.table2excel.1.1.0.min.js') }}"></script>
+    <script src="{{ asset('script/links_js/jspdf.umd.min.js') }}"></script>
+    <script src="{{ asset('script/links_js/tableExport.1.30.0.min.js') }}"></script>
+    <script src="{{ asset('script/links_js/select2.min.js') }}"></script>
+    <script src="{{ asset('script/printThis.js') }}"></script>
+
+    <script src="{{ asset('script/stock_out_report_script.js') }}"></script>
+@endsection

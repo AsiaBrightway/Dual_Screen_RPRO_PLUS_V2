@@ -1,0 +1,13 @@
+.home-title {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.user_role_permissions_container {
+    height: calc(100vh - 155px);
+    margin: 0;
+    background-color: #fff;
+    border-radius: 10px;
+    overflow-y: auto;
+}

@@ -1,0 +1,116 @@
+/* ====== Google Fonts Import - Poppins ====== */
+
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+* {
+    font-family: "Poppins", sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+:root {
+    --sidebar-main-color: #512da8;
+    --sidebar-secondary-color: #6f44d1;
+    --bg-color: #e4e9f7;
+    --home-bg-color: #ffffff;
+    --text-color: #fff;
+    --header-text-color: #512da8;
+    --tran-02: all 0.2s ease;
+    --tran-03: all 0.3s ease;
+    --tran-04: all 0.4s ease;
+    --tran-05: all 0.5s ease;
+}
+
+body {
+    background: var(--home-bg-color);
+    /* background: linear-gradient(to right, #e2e2e2, #c9d6ff); */
+}
+
+.home-section {
+    position: relative;
+    height: 100vh;
+    background: #e4e9f7;
+    transition: var(--tran-05);
+    overflow: hidden;
+}
+
+.button-link {
+    background: none;
+    border: none;
+    text-decoration: none;
+    /* cursor: pointer; */
+    color: #512DA8
+}
+
+.button-link:hover {
+    text-decoration: none;
+    /* Remove underline on hover if desired */
+}
+
+.home-section .home-title {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    background: #ffffff;
+}
+
+.home-section .home-title .bx-menu,
+.home-section .home-title .text {
+    color: var(--header-text-color);
+    font-size: 35px;
+}
+
+.home-section .home-title .bx-menu {
+    margin: 0 15px;
+    cursor: pointer;
+}
+
+.home-section .home-title .text {
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.home-section .home-content {
+    height: calc(100vh - 80px) !important;
+    margin-left: 65px;
+    margin-right: 65px;
+    margin-top: 15px;
+    overflow: auto;
+    overflow-x: hidden;
+}
+
+label.error {
+    font-size: 12px;
+}
+
+.dataTables_scrollHeadInner {
+    width: 100% !important;
+}
+
+.dataTable {
+    width: 100% !important;
+}
+
+@media (max-width: 680px) {
+    .home-section .home-content {
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+    .home-section .home-title .text {
+        font-size: 20px;
+        font-weight: 600;
+    }
+}
+
+@media (max-width: 540px) {
+    .home-section .home-content {
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+    .home-section .home-title .text {
+        font-size: 20px;
+        font-weight: 600;
+    }
+}

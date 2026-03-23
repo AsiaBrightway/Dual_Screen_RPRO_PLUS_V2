@@ -1,0 +1,273 @@
+    /* ===============================
+   Purchase Order Details Collapse
+   =============================== */
+
+    .purchase_details_info_container,
+    .purchase_details_list_container,
+    .purchase_details_summary_container {
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        background-color: #fff;
+    }
+
+    /* ===== Custom Page Title ===== */
+
+    .custom-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .custom-label {
+        margin-left: auto;
+        margin-right: 25px;
+    }
+
+    .custom-text {
+        margin-left: 0px;
+    }
+
+    /* ===============================
+   Buttons
+   =============================== */
+
+    .custom_btn {
+        color: #fff;
+        background-color: #512da8;
+    }
+
+    .custom_btn:hover {
+        color: #fff;
+        background-color: #6f44d1;
+    }
+
+    /* ===============================
+   DataTable Pagination
+   =============================== */
+
+    .page-item.active .page-link {
+        background-color: #6f44d1 !important;
+        border: 1px solid black;
+        color: #fff !important;
+        font-size: 13px;
+    }
+
+    .page-link {
+        color: black !important;
+        font-size: 13px;
+    }
+
+    .dataTables_wrapper .row {
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+
+    #purchase_details_info_label,
+    #purchase_details_list_label,
+    #purchase_details_summary_label {
+        height: 40px;
+        border-radius: 10px;
+        margin-left: 1px;
+        margin-right: 1px;
+        margin-bottom: 10px;
+        cursor: pointer;
+    }
+
+    .purchase_details_info_container.show_container,
+    .purchase_details_list_container.show_container,
+    .purchase_details_summary_container.show_container {
+        padding: 30px;
+        max-height: 800px;
+        opacity: 1;
+        background-color: #fff;
+        border-radius: 5px 5px 10px 10px;
+        margin: -20px 1px 20px 1px;
+        transition: max-height 0.5s ease-out, opacity 0.5s ease-out;
+    }
+
+    /* ===============================
+   Arrow Animation
+   =============================== */
+
+    i {
+        transition: all .3s ease;
+    }
+
+    #purchase_details_info_label.show i.arrow,
+    #purchase_details_list_label.show i.arrow,
+    #purchase_details_summary_label.show i.arrow {
+        transform: rotate(-180deg);
+    }
+
+    /* ===============================
+   DataTable Header
+   =============================== */
+
+    table.dataTable thead tr th,
+    table.dataTable tfoot tr th {
+        color: #512da8;
+    }
+
+    /* ===============================
+   Input Alignment
+   =============================== */
+
+    #purchaseOrderForm input {
+        text-align: end;
+    }
+
+    @media (max-width: 1200px) {
+        .purchase-details-left {
+            width: 100%;
+            border: none !important;
+        }
+
+        .purchase-details-mid {
+            width: 100%;
+            border: none !important;
+        }
+
+        .purchase-details-right {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 768px) {
+
+        /* ===== Info Section Columns ===== */
+        .purchase-details-info-left,
+        .purchase-details-info-right {
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+
+        .dataTables_wrapper .row:first-child {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 8px;
+        }
+
+        .dataTables_length,
+        .dataTables_filter {
+            width: 100%;
+            text-align: left !important;
+        }
+
+        .dataTables_length label,
+        .dataTables_filter label {
+            display: flex;
+            justify-content: flex-start !important;
+            align-items: center;
+            width: auto;
+            gap: 8px;
+            white-space: nowrap;
+            font-size: 13px;
+        }
+
+        .dataTables_length select {
+            margin-left: 13px;
+        }
+
+        .dataTables_length select {
+            width: auto;
+            min-width: 70px;
+        }
+
+        .dataTables_filter {
+            flex: 1 1 100%;
+            text-align: left !important;
+            width: 100%;
+        }
+
+        .dataTables_filter label {
+            width: 100%;
+        }
+
+        .dataTables_filter input {
+            flex: 1;
+            min-width: 220px;
+            /* tablet safe */
+            width: auto !important;
+            margin-left: 0 !important;
+        }
+    }
+
+    @media (max-width: 720px) {
+        .purchase-details-info-left {
+            width: 100%;
+            border: none !important;
+        }
+
+        .purchase-details-info-right {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .dataTables_wrapper .row:first-child {
+            flex-direction: column !important;
+            align-items: stretch;
+            gap: 8px;
+        }
+
+        /* wrapper full width */
+        .dataTables_filter,
+        .dataTables_length {
+            width: 100%;
+        }
+
+        /* label alignment */
+        .dataTables_filter label,
+        .dataTables_length label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            font-size: 12.5px;
+        }
+
+        .dataTables_length select {
+            width: auto !important;
+            min-width: 70px;
+            max-width: 90px;
+        }
+
+        /* Search input stays full width */
+        .dataTables_filter input {
+            width: 100% !important;
+        }
+    }
+
+    @media (max-width: 360px) {
+        body {
+            overflow-x: hidden;
+        }
+
+        /* main page wrapper */
+        .container,
+        .container-fluid,
+        .content-wrapper,
+        .main-content,
+        .purchase_details_info_container,
+        .purchase_details_list_container,
+        .purchase_details_summary_container {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
+
+        .dataTables_filter label {
+            width: auto !important;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .dataTables_filter input.form-control {
+            min-width: 150px !important;
+            max-width: 180px;
+            box-sizing: border-box;
+        }
+    }

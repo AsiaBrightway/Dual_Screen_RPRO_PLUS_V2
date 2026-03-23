@@ -1,0 +1,91 @@
+let user_role_list = document.querySelector(".user-role-list");
+if (localStorage.getItem('showMenu')) {
+    // category_list.classList.add("showMenu");
+    user_role_list.parentElement.parentElement.classList.add("showMenu");
+    user_role_list.parentElement.parentElement.parentElement.parentElement.classList.add("showMenu");
+}
+
+let user_role_info_container = document.querySelector('.user_role_info_container');
+if (localStorage.getItem('showUserRoleInfoContainer')) {
+    user_role_info_container.classList.add("show_container");
+}
+
+let user_role_list_container = document.querySelector('.user_role_list_container');
+if (localStorage.getItem('showUserRoleListContainer')) {
+    user_role_list_container.classList.add("show_container");
+}
+
+let user_role_info_label = document.querySelector('#user_role_info_label');
+user_role_info_label.addEventListener("click", (e) => {
+    user_role_info_label.classList.toggle('show');
+    let user_role_info_container = document.querySelector('.user_role_info_container');
+    user_role_info_container.classList.toggle('show_container');
+    if (user_role_info_container.classList.contains('show_container')) {
+        localStorage.setItem('showUserRoleInfoContainer', 'true');
+    } else {
+        localStorage.removeItem('showUserRoleInfoContainer');
+    }
+});
+
+let user_role_list_label = document.querySelector('#user_role_list_label');
+user_role_list_label.addEventListener("click", (e) => {
+    user_role_list_label.classList.toggle('show');
+    let user_role_list_container = document.querySelector('.user_role_list_container');
+    user_role_list_container.classList.toggle('show_container');
+    if (user_role_list_container.classList.contains('show_container')) {
+        localStorage.setItem('showUserRoleListContainer', 'true');
+    } else {
+        localStorage.removeItem('showUserRoleListContainer');
+    }
+});
+new DataTable('#user_role_list');
+
+$("#clear").click(function() {
+    $("#user_role_name").val('');
+    $('#other_name').val('');
+    $("#is_discontinued").prop('checked', false);
+});
+
+$(document).on("click", ".edit_userRole_modal_dialog", function() {
+    var user_role_id = $(this).data('user_role_id');
+    var user_role_name = $(this).data('user_role_name');
+    var other_name = $(this).data('other_name');
+    var is_discontinued = $(this).data('is_discontinued');
+
+
+    $(".modal-body #edit_user_role_id").val(user_role_id);
+    $(".modal-body #edit_user_role_name").val(user_role_name);
+    $(".modal-body #edit_other_name").val(other_name);
+
+
+    if (is_discontinued == 1) {
+        document.getElementById("edit_is_discontinued").checked = true;
+    } else {
+        document.getElementById("edit_is_discontinued").checked = false;
+    }
+
+    $(function() {
+        $("#userRoleEditModalForm").validate({
+            rules: {
+                edit_user_role_name: {
+                    required: true
+                },
+
+            },
+            messages: {
+                edit_user_role_name: {
+                    required: "User Role Name ဖြည့်ရန်လိုအပ်ပါသည်",
+                },
+
+            }
+        });
+
+    });
+});
+
+$(document).on("click", ".delete_userRole_modal_dialog", function() {
+    var user_role_id = $(this).data('user_role_id');
+    var user_role_name = $(this).data('user_role_name');
+    $(".modal-header #delete_modal_header").text("Delete '" + user_role_name + "'")
+    $(".modal-body #delete_user_role_id").val(user_role_id);
+});

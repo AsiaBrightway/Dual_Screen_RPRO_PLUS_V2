@@ -1,0 +1,41 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('sales_details', function (Blueprint $table) {
+            $table->id('sale_detail_id');
+            $table->integer('sale_id');
+            $table->integer('item_id');
+            $table->integer('batch_number');
+            $table->integer('quantity');
+            $table->decimal('unit_cost', 20, 2);
+            $table->decimal('sale_price', 20, 2);
+            $table->decimal('promotion_price', 20, 2)->nullable();
+            $table->integer('unit_id');
+            $table->string('remark', 191);
+            $table->dateTime('expire_date')->nullable();
+            $table->boolean('is_foc')->nullable();
+            $table->string('sale_type', 191)->nullable();
+            $table->integer('ordered_by')->nullable();
+            $table->dateTime('order_time');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('sales_details');
+    }
+};

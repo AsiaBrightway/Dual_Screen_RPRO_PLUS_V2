@@ -1,0 +1,119 @@
+.voucher_info_container,
+.item_details_info_container,
+.voucher_details_info_container {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    /* transition: max-height 0.5s ease-out, opacity 0.5s ease-out; */
+    background-color: #fff;
+}
+
+.voucher_info_container.show_container,
+.item_details_info_container.show_container,
+.voucher_details_info_container.show_container {
+    padding: 30px;
+    max-height: 850px;
+    opacity: 1;
+    background-color: #fff;
+    border-radius: 5px 5px 10px 10px;
+    margin: -20px 1px 20px 1px;
+    transition: max-height 0.5s ease-out, opacity 0.5s ease-out;
+}
+
+.custom_btn {
+    color: #fff;
+    background-color: #512DA8;
+}
+
+.custom_btn:hover {
+    color: #fff;
+    background-color: #6f44d1;
+}
+
+.page-receive.active .page-link {
+    background-color: #6f44d1 !important;
+    border: 1px solid black;
+    color: #fff !important;
+    font-size: 13px;
+}
+
+.page-link {
+    color: black !important;
+    font-size: 13px;
+}
+
+#voucher_info_label,
+#item_details_info_label,
+#voucher_details_info_label {
+    height: 40px;
+    border-radius: 10px;
+    margin-left: 1px;
+    margin-right: 1px;
+    margin-bottom: 10px
+}
+
+i {
+    transition: all 0.3s ease;
+}
+
+#voucher_info_label.show i.arrow,
+#item_details_info_label.show i.arrow,
+#voucher_details_info_label.show i.arrow {
+    transform: rotate(-180deg);
+}
+
+.table thead tr th {
+    color: #512DA8;
+}
+
+@media (max-width: 720px) {
+    .voucher_info_left {
+        width: 100%;
+        border: none !important;
+    }
+    .voucher_info_mid {
+        margin-left: 0 !important;
+        margin-top: 10px;
+        width: 100%;
+    }
+    .voucher_info_right {
+        margin-left: 0 !important;
+        margin-top: 10px;
+        width: 100%;
+    }
+    .item_detail_left {
+        width: 100%;
+        border: none !important;
+    }
+    .item_detail_right {
+        margin-left: 0 !important;
+        margin-top: 20px;
+        width: 100%;
+    }
+    .voucher_detail_info_left {
+        width: 100%;
+        border: none !important;
+    }
+    .voucher_detail_info_right {
+        margin-left: 0 !important;
+        margin-top: 10px;
+        width: 100%;
+    }
+}
+
+@media (max-width: 560px) {
+    .customBtn-clear {
+        width: 100px;
+    }
+    .customBtn-save {
+        width: 100px;
+        margin-top: 10px;
+    }
+    .customBtn-exit {
+        width: 120px;
+    }
+    .customBtn-update {
+        width: 120px;
+        margin-top: 10px;
+    }
+}

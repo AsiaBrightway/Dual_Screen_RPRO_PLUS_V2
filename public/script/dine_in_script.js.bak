@@ -1,0 +1,496 @@
+var dine_in = document.querySelector(".dine-in");
+if (localStorage.getItem("showMenu")) {
+    dine_in.parentElement.parentElement.classList.add("showMenu");
+}
+
+$('input[name="btnradio"]').on("change", function() {
+    var selectedFloorID = $('input[name="btnradio"]:checked').val();
+
+    $.ajax({
+        type: "GET",
+        url: "floor/getTable",
+        data: {
+            selectedFloorID: selectedFloorID,
+        },
+        success: function(data) {
+            $(".table_div").empty();
+            var availableCount = 0;
+            var reservedCount = 0;
+            var occupiedCount = 0;
+            $.each(data.tables, function(index, value) {
+                var occupied =
+                    $.inArray(value.table_id, data.occupiedTables) !== -1;
+                var reserved =
+                    $.inArray(value.table_id, data.reservationTables) !== -1;
+
+                if (occupied) {
+                    occupiedCount++;
+                } else if (reserved) {
+                    reservedCount++;
+                } else {
+                    availableCount++;
+                }
+
+                var disabled = occupied ? "disabled" : "";
+                var backgroundColor = occupied ?
+                    "red" :
+                    reserved ?
+                    "orange" :
+                    "white";
+                var textColor = occupied ?
+                    "white" :
+                    reserved ?
+                    "white" :
+                    "black";
+                $(".table_div").append(
+                    '<button class="btn m-2 table-button" style="width: 105px; height: 105px; border-radius: 20px; background: ' +
+                    backgroundColor +
+                    "; color: " +
+                    textColor +
+                    ';" data-table-value="' +
+                    value.table_name +
+                    '" data-table_id = "' +
+                    value.table_id +
+                    '" data-floor_id ="' +
+                    value.floor_id +
+                    '" data-floor_name="' +
+                    value.floor_name +
+                    '">' +
+                    value.table_name +
+                    "</button>"
+                );
+            });
+            $('#availableLabel').text("Available - " + availableCount);
+            $('#reservationLabel').text("Reservation - " + reservedCount);
+            $('#occupiedLabel').text("Occupied - " + occupiedCount);
+        }, // Move the closing parenthesis to here
+    });
+});
+
+
+
+$(document).on("click", ".table-button", function() {
+    var buttonValue = $(this).data("table-value");
+    var tableID = $(this).data("table_id");
+
+    $("button").removeClass("selected");
+    $(this).addClass("selected");
+
+    $("#orderTableID").val(tableID);
+    $("#orderTableOrderNumber").val(1);
+
+    $("#floorID_merge").val($(this).data("floor_id"));
+    $("#floorName_merge").val($(this).data("floor_name"));
+
+    $("#orderTable").text("Table (" + buttonValue + "), ");
+    $("#tableID").val(tableID);
+    $("#tableName").val(buttonValue);
+    $("#tableOrderValue").val(1);
+    $("#addOrderLink").prop("disabled", false);
+    $("#addOrderLink").css("cursor", "pointer");
+
+    $.ajax({
+        type: "GET",
+        url: "table/getOrder",
+        data: {
+            tableID: tableID,
+            tableOrderNumber: 1,
+        },
+        success: function(data) {
+            orderDisplay(data);
+        }, // Move the closing parenthesis to here
+    });
+});
+
+function orderDisplay(data) {
+
+    var orderTotalAmount = 0;
+    var userRoleID = $("#user_role_id").val();
+    //userRoleID = 4 is "waiter"
+    $(".order_div").empty();
+
+    if (data.length != 0) {
+        if (userRoleID != 4) {
+            $("#checkOutBtn").prop("disabled", false);
+
+        } else {
+            $("#checkOutBtn").prop("disabled", true);
+        }
+
+        $("#tableMergeLink").prop("disabled", false);
+        $("#tableMergeLink").css("cursor", "pointer");
+    } else {
+        $("#checkOutBtn").prop("disabled", true);
+        $("#tableMergeLink").prop("disabled", true);
+        $("#tableMergeLink").css("cursor", "default");
+    }
+
+    for (var i = 0; i < data.length; i++) {
+
+        let deleteButtonHtml = '';
+        let quantityButtonHtml;
+        if (userRoleID != 4) {
+            deleteButtonHtml =
+                '<a href="#" class="delete_item_modal_dialog" data-toggle="tooltip" data-placement="top" title="Delete Item" data-bs-toggle="modal" data-bs-target="#delete_item_modal" data-order_item_index="' +
+                i +
+                '" data-order_detail_id="' +
+                data[i].order_detail_id +
+                '" data-item_name ="' +
+                data[i].item_name +
+                '" data-item_id="' +
+                data[i].item_id +
+                '"><i class="fa-solid fa-circle-xmark" style="color:#512DA8"></i></a>';
+            quantityButtonHtml =
+                '<input class="form-control quantity-input muted" type="number" value="' +
+                data[i]["quantity"] +
+                '" min="1" data-order_item_index="' +
+                i +
+                '" data-item-id="' +
+                data[i]["item_id"] +
+                '" readonly>' +
+                '<div style="display:flex; justify-content:end; margin-top:5px">' + '<button class="button-link" id="qtyEdit" style="font-size:12px">Edit</button>' + '</div>';
+        } else {
+            quantityButtonHtml =
+                '<input class="form-control quantity-input muted" type="number" value="' +
+                data[i]["quantity"] +
+                '" min="1" data-order_item_index="' +
+                i +
+                '" data-item-id="' +
+                data[i]["item_id"] +
+                '" readonly>';
+        }
+
+        var imageUrl = data[i]["item_image"] == null ?
+            "/404_image.png" :
+            "/storage/Images/" + data[i]["item_image"];
+        $(".order_div").append(
+            '<div class="row" style="align-items: center">' +
+            '<div class="col-2 item_qty_input">' +
+            quantityButtonHtml +
+            "</div>" +
+            '<div class="col-2">' +
+            '<img class="item_img"  src="' +
+            imageUrl +
+            '" alt="" style="width: 65px; height:65px; border-radius: 10px">' +
+            "</div>" +
+            '<div class="col-3 dine_in_item_description_div " style="color:#512DA8">' +
+            '<div class="row">' +
+            "<label class='item_name_lbl'>" +
+            data[i]["item_name"] +
+            "</label>" +
+            "</div>" +
+            '<div class="row">' +
+            '<a class="remark_lbl add_order_item_remark_preview_modal_dialog" style="text-decoration: none; cursor: pointer;" data-order_item_id="' +
+            data[i]["item_id"] +
+            '" data-order_item_name="' +
+            data[i]["item_name"] +
+            '" data-order_item_remark="' +
+            data[i]["remark"] +
+            '" data-bs-toggle="modal" data-bs-target="#add_order_item_preview_remark_modal"><span class="remark_lbl" style="font-size: 13px; color:red">+remark</span></a>' +
+            "</div>" +
+            "</div>" +
+            '<div class="col-1 gift_check_div ">' +
+            '<input id="giftCheckbox' +
+            i +
+            '" class="form-check-input visually-hidden gift-checkbox" type="checkbox" value="' +
+            data[i].order_detail_id +
+            "|" +
+            i +
+            '" ' +
+            (data[i].is_foc == 1 || data[i].is_foc == "1" ?
+                "checked" :
+                "") +
+            ">" +
+            '<label for="giftCheckbox' +
+            i +
+            '"><i class="fas fa-gift gift-icon" style="cursor: pointer;"></i></label>' +
+            "</div>" +
+            '<div class="col-3 price_div">' +
+            '<label class="item-price">' +
+            (data[i].is_foc == 1 || data[i].is_foc == "1" ?
+                "0" :
+                (
+                    data[i].item_price * data[i].quantity
+                ).toLocaleString()) +
+            " MMK</label>" +
+            "</div>" +
+            '<div class="col-1">' +
+            deleteButtonHtml +
+            "</div>" +
+            "</div>" +
+            "<hr>"
+        );
+        orderTotalAmount +=
+            data[i].is_foc == 1 || data[i].is_foc == "1" ?
+            0 :
+            data[i].item_price * data[i].quantity;
+        // orderTotalAmount += data[i]['item_price'] * data[i]['quantity'];
+    }
+    $(document).on('click', '#qtyEdit', function() {
+        const quantityInput = $(this).closest('.item_qty_input').find('.quantity-input');
+
+        quantityInput.removeAttr('readonly').removeClass('muted').focus();
+        $(this).attr('id', 'qtySave').text('Save');
+    });
+    $(document).on('click', '#qtySave', function() {
+        const quantityInput = $(this).closest('.item_qty_input').find('.quantity-input');
+
+        const updatedQuantity = quantityInput.val();
+        const orderDetailId = $(this)
+            .closest('.row')
+            .find('.delete_item_modal_dialog')
+            .data('order_detail_id');
+
+        if (updatedQuantity != 0) {
+            $.ajax({
+                type: "GET",
+                url: "dineIn/updateOrderItemQty",
+                data: {
+                    orderDetailID: orderDetailId,
+                    updatedQuantity: updatedQuantity,
+                },
+                success: function(data) {
+                    orderDisplay(data);
+                },
+                error: function(error) {
+                    console.error("Failed to update quantity:", error);
+                    alert("Failed to update the quantity. Please try again.");
+                }
+            });
+            // Save changes
+            quantityInput.attr('readonly', true).addClass('muted');
+            $(this).attr('id', 'qtyEdit').text('Edit');
+        } else {
+            quantityInput.focus();
+        }
+
+    });
+
+    $(".orderTotalAmount_div")
+        .empty()
+        .append(orderTotalAmount.toLocaleString() + " MMK");
+    $(".gift-checkbox").on("click", function(event) {
+        var value = $(this).val();
+        var values = value.split("|");
+        var orderDetailID = values[0];
+        var orderIndex = values[1];
+
+        if ($(this).is(":checked")) {
+            $.ajax({
+                type: "GET",
+                url: "dineIn/updateOrderItem",
+                data: {
+                    orderDetailID: orderDetailID,
+                    foc: "checked",
+                },
+                success: function(data) {
+                    orderDisplay(data);
+                },
+            });
+        } else {
+            $.ajax({
+                type: "GET",
+                url: "dineIn/updateOrderItem",
+                data: {
+                    orderDetailID: orderDetailID,
+                    foc: "unchecked",
+                },
+                success: function(data) {
+                    orderDisplay(data);
+                },
+            });
+        }
+    });
+}
+
+$(document).on("click", ".delete_item_modal_dialog", function() {
+    var orderDetailID = $(this).data("order_detail_id");
+    var orderItemIndex = $(this).data("order_item_index");
+    var itemID = $(this).data("item_id");
+    var itemName = $(this).data("item_name");
+
+    $(".modal-body #order_detail_id").val(orderDetailID);
+    $(".modal-body #order_item_index").val(orderItemIndex);
+    $(".modal-body #item_id").val(itemID);
+
+    $(".modal-header #delete_modal_header").text("Delete '" + itemName + "'");
+
+    $(".delete-item").on("click", function(event) {
+        $.ajax({
+            type: "GET",
+            url: "dineIn/deleteOrderItem",
+            data: {
+                orderDetailID: orderDetailID,
+            },
+            success: function(data) {
+                console.log(data);
+                if (data.length != 0) {
+                    orderDisplay(data);
+                    $("#delete_item_modal").modal("hide");
+                } else {
+                    location.reload();
+                }
+
+            },
+        });
+    });
+});
+
+$("#tableOrderValue").change(function() {
+    var tableID = $("#tableID").val();
+    var tableOrderNumber = $(this).val();
+    $("#orderTableID").val(tableID);
+    $("#orderTableOrderNumber").val(tableOrderNumber);
+    $.ajax({
+        type: "GET",
+        url: "table/getOrder",
+        data: {
+            tableID: tableID,
+            tableOrderNumber: tableOrderNumber,
+        },
+        success: function(data) {
+            orderDisplay(data);
+        }, // Move the closing parenthesis to here
+    });
+});
+
+$(document).on("click", "#tableMergeLink", function() {
+    var fromFloorID = $("#floorID_merge").val();
+    var fromFloorName = $("#floorName_merge").val();
+    var fromTableID = $("#tableID").val();
+    var fromTableName = $("#tableName").val();
+    var fromTableOrder = $("#tableOrderValue").val();
+
+    $(".modal-body #from_floor_ID").val(fromFloorID);
+    $(".modal-body #from_table_ID").val(fromTableID);
+
+    $(".modal-body #from_floor").val(fromFloorName);
+    $(".modal-body #from_table").val(fromTableName);
+    $(".modal-body #from_table_order").val(fromTableOrder);
+
+    $("#to_floor_id").change(function() {
+        var floorID = $(this).val();
+        $.ajax({
+            type: "GET",
+            url: "floor/getTableOnly",
+            data: {
+                floorID: floorID,
+            },
+            success: function(data) {
+                $("#to_table_id").empty();
+                $.each(data, function(key, value) {
+                    $("#to_table_id").append(
+                        '<option value="' +
+                        value.table_id +
+                        '">' +
+                        value.table_name +
+                        "</option>"
+                    );
+                });
+            }, // Move the closing parenthesis to here
+        });
+    });
+
+    $(function() {
+        $.validator.addMethod(
+            "notZeroFloor",
+            function(value, element) {
+                return value != 0;
+            },
+            "To Floor ရွေးရန်လိုအပ်ပါသည်"
+        );
+
+        $.validator.addMethod(
+            "notZeroTable",
+            function(value, element) {
+                return value != 0;
+            },
+            "To Table ရွေးရန်လိုအပ်ပါသည်"
+        );
+
+        $.validator.addMethod(
+            "notZeroTableOrder",
+            function(value, element) {
+                return value != 0;
+            },
+            "To Table Order ရွေးရန်လိုအပ်ပါသည်"
+        );
+
+        $("#tableMergeForm").validate({
+            rules: {
+                to_floor_id: {
+                    required: true,
+                    notZeroFloor: true,
+                },
+                to_table_id: {
+                    required: true,
+                    notZeroTable: true,
+                },
+                to_table_order_id: {
+                    required: true,
+                    notZeroTableOrder: true,
+                },
+            },
+            messages: {
+                to_floor_id: {
+                    required: "To Floor ရွေးရန်လိုအပ်ပါသည်",
+                },
+                to_table_id: {
+                    required: "To Table ရွေးရန်လိုအပ်ပါသည်",
+                },
+                to_table_order_id: {
+                    required: "To Table Order ရွေးရန်လိုအပ်ပါသည်",
+                },
+            },
+        });
+    });
+    // $(function() {
+    //     $("#tableMergeForm").validate({
+    //         rules: {
+    //             to_floor_id: {
+    //                 required: true,
+    //                 not_in: 0
+    //             },
+    //             to_table_id: {
+    //                 required: true,
+    //                 not_in: 0
+    //             },
+    //             to_table_order_id: {
+    //                 required: true,
+    //                 not_in: 0
+    //             },
+
+    //         },
+    //         messages: {
+    //             to_floor_id: {
+    //                 required: "To Floor ဖြည့်ရန်လိုအပ်ပါသည်",
+    //                 not_in: "To Floor ဖြည့်ရန်လိုအပ်ပါသည်"
+
+    //             },
+    //             to_table_id: {
+    //                 required: "To Table ဖြည့်ရန်လိုအပ်ပါသည်",
+    //                 not_in: "To Table ဖြည့်ရန်လိုအပ်ပါသည်"
+    //             },
+    //             to_table_order_id: {
+    //                 required: "To Table Order ဖြည့်ရန်လိုအပ်ပါသည်",
+    //                 not_in: "To Table Order ဖြည့်ရန်လိုအပ်ပါသည်"
+    //             },
+    //         }
+    //     });
+
+    // });
+});
+
+//  let supplier_info_label = document.querySelector('#supplier_info_label');
+//  supplier_info_label.addEventListener("click", (e) => {
+//      supplier_info_label.classList.toggle('show');
+//      let supplier_info_container = document.querySelector('.supplier_info_container');
+//      supplier_info_container.classList.toggle('show_container');
+//  });
+
+//  let supplier_list_label = document.querySelector('#supplier_list_label');
+//  supplier_list_label.addEventListener("click", (e) => {
+//      supplier_list_label.classList.toggle('show');
+//      let supplier_list_container = document.querySelector('.supplier_list_container');
+//      supplier_list_container.classList.toggle('show_container');
+//  });

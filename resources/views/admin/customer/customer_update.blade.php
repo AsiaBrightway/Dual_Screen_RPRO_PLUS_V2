@@ -1,0 +1,287 @@
+@extends('layouts.admin.master')
+@section('title', 'Customer')
+
+@section('content')
+    <section class="home-section">
+        <div class="home-title">
+            <i class='bx bx-menu'></i>
+            <span class="text">Customer</span>
+        </div>
+        <div class="home-content">
+            <div class="row pb-3 align-items-center" style="color:#512DA8; font-weight:bold">
+                <div class="col-7">
+                    <label>Update Customer</label>
+                </div>
+                <div class="col" style="text-align: right">
+                    {{-- <button class="btn btn-danger"><i class="fa-solid fa-eraser"
+                            style="padding-right: 5px"></i>Clear</button> --}}
+                    <button type="submit" form="customerFormUpdate" class="btn btn-primary"><i
+                            class="fa-regular fa-floppy-disk" style="padding-right: 5px"></i>Update</button>
+                </div>
+            </div>
+            <div id="customer_info_label" class="row align-items-center bg-white show_container">
+                <div class="col-10">
+                    <label><i class="fa-solid fa-user-pen" style="padding-left:5px; padding-right: 12px"></i>Customer
+                        Info</label>
+                </div>
+                <div class="col-2" style="text-align: right">
+                    <i class="bx bxs-chevron-down arrow"></i>
+                </div>
+            </div>
+            <div class="customer_info_container shadow-sm show_container">
+                <form action="{{ route('customer#update') }}" method="POST" id="customerFormUpdate">
+                    @csrf
+                    <div class="row border border-4 border-gray-800" style="border-radius: 10px">
+                        <div class="customer-left-info col-6 pt-4 pb-4 border-end border-4 border-gray-800">
+                            <input class="form-control" type="text" id="edit_customer_id" name="edit_customer_id" hidden>
+                            <div class="row mb-3 justify-content-center">
+                                <div class="col-5">
+                                    <label class="col-form-label">Customer Name <span style="color: red">*</span></label>
+                                </div>
+                                <div class="col-5">
+                                    <input class="form-control @error('edit_customer_name') is-invalid @enderror"
+                                        type="text" id="edit_customer_name" name="edit_customer_name">
+                                    @error('edit_customer_name')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="row align-items-center mb-3 justify-content-center">
+                                <div class="col-5">
+                                    <label class="col-form-label">Other Name</label>
+                                </div>
+                                <div class="col-5">
+                                    <input class="form-control" type="text" id="edit_other_name" name="edit_other_name">
+                                </div>
+                            </div>
+                            <div class="row mb-3 justify-content-center">
+                                <div class="col-5">
+                                    <label class="col-form-label">Customer Code <span style="color: red">*</span></label>
+                                </div>
+                                <div class="col-5">
+                                    <input class="form-control @error('edit_customer_code') is-invalid @enderror"
+                                        type="text" id="edit_customer_code" name="edit_customer_code">
+                                    @error('edit_customer_code')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="row mb-3 justify-content-center">
+                                <div class="col-5">
+                                    <label class="col-form-label">Customer Type <span style="color: red">*</span></label>
+                                </div>
+                                <div class="col-5">
+                                    <select class="form-select @error('edit_customer_type') is-invalid @enderror"
+                                        id="edit_customer_type" name="edit_customer_type">
+                                        @if (count($customerTypes) != 0)
+                                            @foreach ($customerTypes as $customerType)
+                                                <option value={{ $customerType['customer_type_id'] }}>
+                                                    {{ $customerType['customer_type_name'] }}</option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                    @error('edit_customer_type')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="row mb-3 justify-content-center">
+                                <div class="col-5">
+                                    <label class="col-form-label">Gender <span style="color: red">*</span></label>
+                                </div>
+                                <div class="col-5">
+                                    <select class="form-select @error('edit_gender') is-invalid @enderror" id="edit_gender"
+                                        name="edit_gender">
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select>
+                                    @error('edit_gender')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="row align-items-center mb-3 justify-content-center">
+                                <div class="col-5">
+                                    <label class="col-form-label">DOB</label>
+                                </div>
+                                <div class="col-5">
+                                    <input class="form-control" type="date" id="edit_date_of_birth"
+                                        name="edit_date_of_birth">
+                                </div>
+                            </div>
+                            <div class="row mb-3 justify-content-center">
+                                <div class="col-5">
+                                    <label class="col-form-label">Phone Number <span style="color: red">*</span></label>
+                                </div>
+                                <div class="col-5">
+                                    <input class="form-control @error('edit_phone_number') is-invalid @enderror"
+                                        type="text" id="edit_phone_number" name="edit_phone_number">
+                                    @error('edit_phone_number')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="row align-items-center justify-content-center">
+                                <div class="col-5">
+                                    <label class="col-form-label">Email Address</label>
+                                </div>
+                                <div class="col-5">
+                                    <input class="form-control  @error('edit_email') is-invalid @enderror" type="text"
+                                        id="edit_email" name="edit_email">
+                                    @error('edit_email')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                        <div class="customer-right-info col-6 pt-4 pb-4">
+                            <div class="row mb-3 justify-content-center">
+                                <div class="col-5">
+                                    <label class="col-form-label">City <span style="color: red">*</span></label>
+                                </div>
+                                <div class="col-5">
+                                    <select class="form-select @error('edit_city') is-invalid @enderror" name="edit_city"
+                                        id="edit_city">
+                                        @if (count($cities) != 0)
+                                            @foreach ($cities as $city)
+                                                <option value={{ $city['city_id'] }}>
+                                                    {{ $city['city_name'] }}</option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                    @error('edit_city')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="row mb-3 justify-content-center">
+                                <div class="col-5">
+                                    <label class="col-form-label">Township <span style="color: red">*</span></label>
+                                </div>
+                                <div class="col-5">
+                                    <select class="form-select @error('edit_township') is-invalid @enderror"
+                                        id="edit_township" name="edit_township">
+                                        <!-- Options will be populated based on the selected main category using JavaScript -->
+                                    </select>
+                                    @error('edit_township')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="row mb-3 justify-content-center">
+                                <div class="col-5">
+                                    <label class="col-form-label">Address <span style="color: red">*</span></label>
+                                </div>
+                                <div class="col-5">
+                                    <textarea class="form-control @error('edit_address') is-invalid @enderror" rows="2" id="edit_address"
+                                        name="edit_address"></textarea>
+                                    @error('edit_address')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="row align-items-center mb-3 justify-content-center">
+                                <div class="col-5">
+                                    <label class="col-form-label">Remark</label>
+                                </div>
+                                <div class="col-5">
+                                    <textarea class="form-control" rows="2" id="edit_remark" name="edit_remark"></textarea>
+                                </div>
+                            </div>
+                            <div class="row align-items-center justify-content-center">
+                                <div class="col-5">
+                                    <label class="col-form-label">Discontinued</label>
+                                </div>
+                                <div class="col-5">
+                                    <input class="form-check-input" type="checkbox" name="edit_customer_is_discontinued"
+                                        id="edit_customer_is_discontinued">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <script src="{{ asset('script/links_js/jquery.3.6.4.min.js') }}"></script>
+    <script src="{{ asset('script/links_js/jquery.validate.1.19.5.js') }}"></script>
+    <script src="{{ asset('script/links_js/jquery.dataTables.1.13.7.min.js') }}"></script>
+    <script src="{{ asset('script/links_js/dataTables.bootstrap5_1.13.7.min.js') }}"></script>
+    <script src="{{ asset('script/customer_update_script.js') }}"></script>
+    <script>
+        var compactData = @json($customers);
+        console.log(compactData);
+        $('#edit_customer_id').val(compactData[0]['customer_id']);
+        $('#edit_customer_name').val(compactData[0]['customer_name']);
+        $('#edit_other_name').val(compactData[0]['customer_other_name']);
+        $('#edit_customer_code').val(compactData[0]['customer_code']);
+        $('#edit_customer_type').val(compactData[0]['customer_type_id']);
+        $('#edit_gender').val(compactData[0]['gender']);
+        $('#edit_date_of_birth').val(convertDataFormat(compactData[0]['date_of_birth']));
+        $('#edit_phone_number').val(compactData[0]['phone_number']);
+        $('#edit_email').val(compactData[0]['email']);
+        $('#edit_phone_number').val(compactData[0]['phone_number']);
+        $.ajax({
+            type: 'GET',
+            url: "/admin/city/getTownship",
+            data: {
+                'cityID': compactData[0]['city_id']
+            },
+            success: function(data) {
+                $('#edit_township').empty();
+                $.each(data, function(key, value) {
+
+                    $('#edit_township').append(
+                        '<option value="' +
+                        value.township_id + '" ' +
+                        (value.township_id == compactData[0]['township_id'] ? 'selected' :
+                            '') +
+                        '>' +
+                        value.township_name + '</option>');
+                });
+            }
+        });
+        $('#edit_address').val(compactData[0]['address']);
+        $('#edit_remark').val(compactData[0]['remark']);
+
+        if (compactData[0]['customer_is_discontinued'] == "1") {
+            $('#edit_customer_is_discontinued').prop('checked', true);
+        } else {
+            $('#edit_customer_is_discontinued').prop('checked', false);
+        }
+
+        function convertDataFormat(dateString) {
+            var inputDateString = dateString;
+            var inputDate = new Date(inputDateString);
+
+            // Extract year, month, and day components
+            var year = inputDate.getFullYear();
+            var month = (inputDate.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-based, so add 1
+            var day = inputDate.getDate().toString().padStart(2, '0');
+
+            // Format the date in "yyyy-MM-dd" format
+            var formattedDate = year + '-' + month + '-' + day;
+            return formattedDate;
+        }
+    </script>
+
+@endsection

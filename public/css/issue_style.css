@@ -1,0 +1,107 @@
+.issue_info_container,
+.issue_details_list_container {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    /* transition: max-height 0.5s ease-out, opacity 0.5s ease-out; */
+    background-color: #fff;
+}
+
+.issue_info_container.show_container,
+.issue_details_list_container.show_container {
+    padding: 30px;
+    max-height: 800px;
+    opacity: 1;
+    background-color: #fff;
+    border-radius: 5px 5px 10px 10px;
+    margin: -20px 1px 20px 1px;
+    transition: max-height 0.5s ease-out, opacity 0.5s ease-out;
+}
+
+.custom_btn {
+    color: #fff;
+    background-color: #512DA8;
+}
+
+.custom_btn:hover {
+    color: #fff;
+    background-color: #6f44d1;
+}
+
+.page-issue.active .page-link {
+    background-color: #6f44d1 !important;
+    border: 1px solid black;
+    color: #fff !important;
+    font-size: 13px;
+}
+
+.page-link {
+    color: black !important;
+    font-size: 13px;
+}
+
+.dataTables_wrapper .row {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+#issue_info_label,
+#issue_details_list_label {
+    height: 40px;
+    border-radius: 10px;
+    margin-left: 1px;
+    margin-right: 1px;
+    margin-bottom: 10px
+}
+
+i {
+    transition: all 0.3s ease;
+}
+
+#issue_info_label.show i.arrow,
+#issue_details_list_label.show i.arrow {
+    transform: rotate(-180deg);
+}
+
+table.dataTable thead tr th,
+table.dataTable tfoot tr th {
+    color: #512DA8;
+}
+
+@media (max-width: 720px) {
+    .issue_info_left {
+        width: 100%;
+        border: none !important;
+    }
+    .issue_info_right {
+        margin-left: 0 !important;
+        margin-top: 10px;
+        width: 100%;
+    }
+    .item_detail_left {
+        width: 100%;
+        border: none !important;
+    }
+    .item_detail_right {
+        margin-left: 0 !important;
+        margin-top: 20px;
+        width: 100%;
+    }
+}
+
+@media (max-width: 560px) {
+    .customBtn-clear {
+        width: 100px;
+    }
+    .customBtn-save {
+        width: 100px;
+        margin-top: 10px;
+    }
+    .customBtn-exit {
+        width: 120px;
+    }
+    .customBtn-update {
+        width: 120px;
+        margin-top: 10px;
+    }
+}

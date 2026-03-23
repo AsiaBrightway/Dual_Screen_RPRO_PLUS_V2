@@ -1,0 +1,198 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Order;
+use App\Models\Sales;
+use App\Models\MenuItem;
+use App\Models\SalesDetail;
+use App\Models\OrderDetails;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Mike42\Escpos\Printer;
+use Mike42\Escpos\PrintConnectors\FilePrintConnector;
+use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
+
+class PrintController extends Controller
+{
+    //
+    public function saleOrderPrint($sale_id)
+    {
+        $sale = Sales::select('sales.*', 'PT.payment_type_name as payment_type_name')
+            ->join('payment_types as PT', 'sales.payment_type_id', 'PT.payment_type_id')
+            ->where('sales.sale_id', $sale_id)->first();
+        $saleDetails = SalesDetail::selectRaw('IFNULL(SUM(sales_details.quantity), 0) as quantity')
+            ->selectRaw('items1.item_name,sales_details.is_foc, sales_details.item_id, sales_details.sale_price as item_price, items1.unit_id')
+            ->where('sale_id', $sale_id)
+            ->whereNull('promotion_price')
+            ->join('menu_items as items1', 'sales_details.item_id', '=', 'items1.item_id')
+            ->join('units', 'units.unit_id', '=', 'items1.unit_id')
+            ->join('users as U', 'sales_details.ordered_by', '=', 'U.id')
+            ->join('item_selling_prices as ISP', 'items1.item_id', '=', 'ISP.item_id')
+            ->groupBy(['items1.item_name', 'sales_details.is_foc', 'sales_details.sale_id', 'sales_details.item_id', 'sales_details.sale_price', 'items1.unit_id'])
+            ->get()
+            ->toArray();
+        $promotionSaleDetails = SalesDetail::select('*', 'ISP.item_selling_price as item_price')
+            ->where('sale_id', $sale_id)
+            ->where('promotion_price', '!=', null)
+            ->join('menu_items as items1', 'sales_details.item_id', '=', 'items1.item_id')
+            ->join('units', 'units.unit_id', '=', 'items1.unit_id')
+            ->join('users as U', 'sales_details.ordered_by', 'U.id')
+            ->join('item_selling_prices as ISP', 'items1.item_id', 'ISP.item_id')
+            ->get()
+            ->toArray();
+
+        return view('prints.sale.sale_order_print', compact('sale', 'saleDetails', 'promotionSaleDetails'));
+    }
+
+    public function preOrderPrint($order_id, $invoiceNumber)
+    {
+        $order = Order::select('orders.*')
+            ->where('orders.order_id', $order_id)->first();
+        $orderDetails = OrderDetails::selectRaw('IFNULL(SUM(order_details.quantity), 0) as quantity')
+            ->selectRaw('items1.item_name,order_details.is_foc, order_details.item_id, ISP.item_selling_price as item_price, items1.unit_id')
+            ->where('order_id', $order_id)
+            ->whereNull('promotion_price')
+            ->join('menu_items as items1', 'order_details.item_id', '=', 'items1.item_id')
+            ->join('units', 'units.unit_id', '=', 'items1.unit_id')
+            ->join('users as U', 'order_details.ordered_by', '=', 'U.id')
+            ->join('item_selling_prices as ISP', 'items1.item_id', '=', 'ISP.item_id')
+            ->groupBy(['items1.item_name', 'order_details.is_foc', 'order_details.order_id', 'order_details.item_id', 'ISP.item_selling_price', 'items1.unit_id'])
+            ->get()
+            ->toArray();
+        $promotionOrderDetails = OrderDetails::select('*', 'ISP.item_selling_price as item_price')
+            ->where('order_id', $order_id)
+            ->where('promotion_price', '!=', null)
+            ->join('menu_items as items1', 'order_details.item_id', '=', 'items1.item_id')
+            ->join('units', 'units.unit_id', '=', 'items1.unit_id')
+            ->join('users as U', 'order_details.ordered_by', 'U.id')
+            ->join('item_selling_prices as ISP', 'items1.item_id', 'ISP.item_id')
+            ->get()
+            ->toArray();
+
+        return view('prints.sale.pre_order_print', compact('order', 'orderDetails', 'promotionOrderDetails', 'invoiceNumber'));
+    }
+    public function checkOutPrint($table_id, $table_order_number)
+    {
+        $order = Order::where('table_id', $table_id)
+            ->where('table_order_number', $table_order_number)->first();
+        $orderID = $order['order_id'];
+
+
+         return view('prints.sale.sale_order_print', compact('sale', 'saleDetails'));
+    }
+
+    // public function orderPrint($orderID, $filteredOrderItemsEncoded)
+    // {
+    //     $orderItems = json_decode(urldecode($filteredOrderItemsEncoded), true);
+    //     $order_id = $orderID;
+    //     $orderPrintItems = [];
+    //     foreach ($orderItems as $key => $orderItem) {
+    //         $item_id = $orderItem['orderItemID'];
+    //         $item = MenuItem::select('*', 'U.unit_name as unit_name')
+    //             ->join('units as U', 'menu_items.unit_id', 'U.unit_id')
+    //             ->where('item_id', $item_id)
+    //             ->first();
+    //         $data = [
+    //             'item_name' => $item['item_name'],
+    //             'unit_name' => $item['unit_name'],
+    //             'quantity' => $orderItem['orderItemQuantity'],
+    //             'remark' => $orderItem['orderItemRemark'] ? $orderItem['orderItemRemark'] : '',
+    //         ];
+    //         array_push($orderPrintItems, $data);
+    //     }
+
+    //     $order = Order::select('*', 'tbl.table_name as table_name', 'fl.floor_name as floor_name')
+    //         ->join('tables as tbl', 'orders.table_id', 'tbl.table_id')
+    //         ->join('floors as fl', 'tbl.floor_id', 'fl.floor_id')
+    //         ->where('orders.order_id', $order_id)->first();
+
+    //     $user_id = Auth::user()->id;
+    //     $user = User::select('*')
+    //         ->where('id', $user_id)->first();
+    //     $orderedBy = $user['name'];
+    //     return view('prints.order.order_print', compact('order', 'orderPrintItems', 'orderedBy'));
+    // }
+
+    public function samplePrint(Request $request)
+    {
+        $orderItems = json_decode($request->input('filteredOrder'), true);
+        $order_id = $request->input('orderID');
+        $order = Order::select('*', 'tbl.table_name as table_name', 'fl.floor_name as floor_name')
+            ->join('tables as tbl', 'orders.table_id', 'tbl.table_id')
+            ->join('floors as fl', 'tbl.floor_id', 'fl.floor_id')
+            ->where('orders.order_id', $order_id)->first();
+
+        $user_id = Auth::user()->id;
+        $user = User::select('*')
+            ->where('id', $user_id)->first();
+        $orderedBy = $user['name'];
+
+        $kitchenOrderPrintItems = [];
+        $bbqOrderPrintItems = [];
+        $beerOrderPrintItems = [];
+        $otherOrderPrintItems = [];
+        $noodleOrderPrintItems=[];
+        $cuisineOrderPrintItems=[];
+
+        foreach ($orderItems as $key => $orderItem) {
+            $item_id = $orderItem['orderItemID'];
+            $item = MenuItem::select('*', 'U.unit_name as unit_name')
+                ->join('units as U', 'menu_items.unit_id', 'U.unit_id')
+                ->where('item_id', $item_id)
+                ->first();
+            if ($item['main_category_id'] == 1) {
+                $data = [
+                    'item_name' => $item['item_name'],
+                    'unit_name' => $item['unit_name'],
+                    'quantity' => $orderItem['orderItemQuantity'],
+                    'remark' => $orderItem['orderItemRemark'] ? $orderItem['orderItemRemark'] : '',
+                ];
+                array_push($kitchenOrderPrintItems, $data);
+            } else if ($item['main_category_id'] == 2) {
+                $data = [
+                    'item_name' => $item['item_name'],
+                    'unit_name' => $item['unit_name'],
+                    'quantity' => $orderItem['orderItemQuantity'],
+                    'remark' => $orderItem['orderItemRemark'] ? $orderItem['orderItemRemark'] : '',
+                ];
+                array_push($bbqOrderPrintItems, $data);
+            } else if ($item['main_category_id'] == 3) {
+                $data = [
+                    'item_name' => $item['item_name'],
+                    'unit_name' => $item['unit_name'],
+                    'quantity' => $orderItem['orderItemQuantity'],
+                    'remark' => $orderItem['orderItemRemark'] ? $orderItem['orderItemRemark'] : '',
+                ];
+                array_push($beerOrderPrintItems, $data);
+            } else if ($item['main_category_id'] == 4) {
+                $data = [
+                    'item_name' => $item['item_name'],
+                    'unit_name' => $item['unit_name'],
+                    'quantity' => $orderItem['orderItemQuantity'],
+                    'remark' => $orderItem['orderItemRemark'] ? $orderItem['orderItemRemark'] : '',
+                ];
+                array_push($otherOrderPrintItems, $data);
+            } else if ($item['main_category_id'] == 5) {
+                $data = [
+                    'item_name' => $item['item_name'],
+                    'unit_name' => $item['unit_name'],
+                    'quantity' => $orderItem['orderItemQuantity'],
+                    'remark' => $orderItem['orderItemRemark'] ? $orderItem['orderItemRemark'] : '',
+                ];
+                array_push($noodleOrderPrintItems, $data);
+            } else if ($item['main_category_id'] == 6) {
+                $data = [
+                    'item_name' => $item['item_name'],
+                    'unit_name' => $item['unit_name'],
+                    'quantity' => $orderItem['orderItemQuantity'],
+                    'remark' => $orderItem['orderItemRemark'] ? $orderItem['orderItemRemark'] : '',
+                ];
+                array_push($cuisineOrderPrintItems, $data);
+            }
+        }
+//ammh
+        return view('prints.order.order_print', compact('order', 'kitchenOrderPrintItems', 'bbqOrderPrintItems', 'beerOrderPrintItems', 'otherOrderPrintItems','noodleOrderPrintItems','cuisineOrderPrintItems', 'orderedBy'));
+    }
+}

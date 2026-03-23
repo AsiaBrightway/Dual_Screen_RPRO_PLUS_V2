@@ -1,0 +1,107 @@
+/* public/css/custom-modal.css */
+
+/* The White Card Container */
+.success-card {
+    pointer-events: auto; /* Fixes the click issue */
+    position: relative;
+    background: white;
+    border-radius: 1.5rem;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    width: 100%;
+    max-width: 24rem;
+    padding: 2rem;
+    text-align: center;
+    margin: 0 auto; /* Ensures it stays centered within the dialog */
+}
+
+/* Close Button */
+.btn-cross-custom {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    z-index: 10;
+    color: #9ca3af;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hover effect replaces onmouseover/onmouseout */
+.btn-cross-custom:hover {
+    color: #4b5563;
+}
+
+.btn-cross-custom i {
+    font-size: 20px;
+}
+
+/* Icon Section */
+.icon-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+.icon-circle {
+    width: 54px;
+    height: 54px;
+    background-color: #25c95c;
+    border-radius: 50%; /* 50% makes a perfect circle */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-circle i {
+    font-size: 28px;
+    color: white;
+}
+
+.error-icon-circle {
+    width: 54px;
+    height: 54px;
+    background-color: #dc2626;
+    border-radius: 50%; /* 50% makes a perfect circle */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.error-icon-circle i {
+    font-size: 28px;
+    color: white;
+}
+
+/* Text Section */
+.text-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.success-title {
+    font-size: 24px;
+    line-height: 2rem;
+    color: #111827;
+    letter-spacing: -0.025em;
+    margin: 0;
+}
+
+.success-desc {
+    color: #4b5563;
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.bg-success-custom {
+    background-color: #25c95c !important;
+}
+
+/* Red (Error) */
+.bg-error-custom {
+    background-color: #dc2626 !important; /* Tailwind red-600 */
+}

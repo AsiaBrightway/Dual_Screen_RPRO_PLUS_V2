@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    {{-- Bootstrap CSS --}}
+    <link href="{{ asset('css/links_css/bootstrap.min.css') }}" rel="stylesheet">
+
+    <!--  Data Table CSS -->
+    <link rel="stylesheet" href="{{ asset('css/links_css/twitter-bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/links_css/dataTables.bootstrap5.min.css') }}">
+
+    {{-- Custom Css --}}
+    <link rel="stylesheet" href="{{ asset('css/master_style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dashboard_style.css') }}">
+
+    <link rel="stylesheet" href="{{ asset('css/dine_in_style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/order_invoice_style.css') }}">
+
+    <link rel="stylesheet" href="{{ asset('css/sale_list_style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/sale_order_details_style.css') }}">
+
+    <link rel="stylesheet" href="{{ asset('css/table_reservation_style.css') }}">
+
+    <link rel="stylesheet" href="{{ asset('css/customer_style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/customer_type_style.css') }}">
+
+    <link rel="stylesheet" href="{{ asset('css/receive_style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/receive_list_style.css') }}">
+
+    <link rel="stylesheet" href="{{ asset('css/issue_style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/issue_list_style.css') }}">
+
+    <link rel="stylesheet" href="{{ asset('css/issue_type_style.css') }}">
+
+    <link rel="stylesheet" href="{{ asset('css/purchase_style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/purchase_list_style.css') }}">
+
+    <link rel="stylesheet" href="{{ asset('css/coupon_card_style.css') }}">
+
+    <link rel="stylesheet" href="{{ asset('css/member_card_style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/member_card_type_style.css') }}">
+
+    <link rel="stylesheet" href="{{ asset('css/employee_style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/employee_position_style.css') }}">
+
+    <link rel="stylesheet" href="{{ asset('css/user_style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/user_role_style.css') }}">
+
+    <link rel="stylesheet" href="{{ asset('css/supplier_style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/supplier_list_style.css') }}">
+
+    <link rel="stylesheet" href="{{ asset('css/category_style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/item_style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/unit_style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/discount_style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/price_control_style.css') }}">
+
+    <link rel="stylesheet" href="{{ asset('css/floor_style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/table_style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/location_style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/delivery_style.css') }}">
+
+    <link rel="stylesheet" href="{{ asset('css/stock_in_report_style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/stock_out_report_style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/purchase_report_style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/sales_report_style.css') }}">
+
+    <link rel="stylesheet" href="{{ asset('css/setting_style.css') }}">
+
+    <!-- Boxicons CSS -->
+    <link href='{{ asset('css/boxicons-master/css/boxicons.min.css') }}' rel='stylesheet'>
+
+    <!-- FontAwesome CSS -->
+    <link rel="stylesheet" href="{{ asset('css/fontawesome/css/all.min.css') }}">
+    {{-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" /> --}}
+
+    <!-- logo -->
+    <link rel="icon" href="{{ asset('img/rpro_nav_logo_p_big.png') }}" type="image/x-icon">
+    <link rel="apple-touch-icon" href="{{ asset('img/apple_touch_icon_180x180.png') }}">
+
+    {{-- <link rel="icon" href="{{ asset('img/rpro_logo.png') }}" type="image/png"> --}}
+    <title>@yield('title')</title>
+
+</head>
+
+<body>
+    <div class="sidebar">
+        <!-- <div class="logo-details">
+            <i class='bx bxl-c-plus-plus'></i>
+            <span class="logo_name">R-PRo</span>
+        </div> -->
+        <div class="logo-details">
+            <span class="image">
+                <img src="{{ asset('img/logo.png') }}" alt="logo">
+            </span>
+            <span class="logo_name">R-Pro<span style="vertical-align: super; font-size: smaller;">+</span></span>
+        </div>
+        <ul class="nav-links">
+            @php
+                $userRoleID = Auth::user()->user_role_id;
+                $userRolePermissions = session('userRolePermissions');
+                $forms = [
+                    'dashboard_form',
+                    'store_form',
+                    'store_dineIn_form',
+                    'store_saleLists_form',
+                    'store_reservation_form',
+                    'customers_form',
+                    'customers_customer_form',
+                    'customers_customerType_form',
+                    'stockControl_form',
+                    'stockControl_stockReceive_form',
+                    'stockControl_stockReceive_receive_form',
+                    'stockControl_stockReceive_receiveLists_form',
+                    'stockControl_stockIssue_form',
+                    'stockControl_stockIssue_issue_form',
+                    'stockControl_stockIssue_issueLists_form',
+                    'stockControl_issueType_form',
+                    'stockControl_stockPurchase_form',
+                    'stockControl_stockPurchase_purchase_form',
+                    'stockControl_stockPurchase_purchaseLists_form',
+                    'card_form',
+                    'card_couponCard_form',
+                    'card_memberCard_form',
+                    'card_memberCard_card_form',
+                    'card_memberCard_cardType_form',
+                    'users_form',
+                    'users_employee_form',
+                    'users_employee_employee_form',
+                    'users_employee_employeePosition_form',
+                    'users_users_form',
+                    'users_users_user_form',
+                    'users_users_userRole_form',
+                    'suppliers_form',
+                    'suppliers_supplier_form',
+                    'suppliers_supplierLists_form',
+                    'configuration_form',
+                    'configuration_item_form',
+                    'configuration_item_category_form',
+                    'configuration_item_item_form',
+                    'configuration_item_unit_form',
+                    'configuration_item_discount_form',
+                    'configuration_item_price_control_form',
+                    'configuration_floor_form',
+                    'configuration_table_form',
+                    'configuration_location_form',
+                    'configuration_delivery_form',
+                    'reports_form',
+                    'reports_stockIn_form',
+                    'reports_stockOut_form',
+                    'reports_purchase_form',
+                    'reports_sales_form',
+                    'setting_form',
+                ];
+
+                foreach ($forms as $form) {
+                    $$form = 'd-none';
+                }
+
+                // If user role ID is 1, set all forms to visible
+                if ($userRoleID == 1) {
+                    foreach ($forms as $form) {
+                        $$form = '';
+                    }
+                } else {
+                    // Create a mapping array for form_menu_id to form variables
+                    $formMapping = [
+                        1 => 'dashboard_form',
+                        2 => 'store_form',
+                        3 => 'store_dineIn_form',
+                        4 => 'store_saleLists_form',
+                        5 => 'store_reservation_form',
+                        6 => 'customers_form',
+                        7 => 'customers_customer_form',
+                        8 => 'customers_customerType_form',
+                        9 => 'stockControl_form',
+                        10 => 'stockControl_stockReceive_form',
+                        11 => 'stockControl_stockReceive_receive_form',
+                        12 => 'stockControl_stockReceive_receiveLists_form',
+                        13 => 'stockControl_stockIssue_form',
+                        14 => 'stockControl_stockIssue_issue_form',
+                        15 => 'stockControl_stockIssue_issueLists_form',
+                        16 => 'stockControl_issueType_form',
+                        17 => 'stockControl_stockPurchase_form',
+                        18 => 'stockControl_stockPurchase_purchase_form',
+                        19 => 'stockControl_stockPurchase_purchaseLists_form',
+                        20 => 'card_form',
+                        21 => 'card_couponCard_form',
+                        22 => 'card_memberCard_form',
+                        23 => 'card_memberCard_card_form',
+                        24 => 'card_memberCard_cardType_form',
+                        25 => 'users_form',
+                        26 => 'users_employee_form',
+                        27 => 'users_employee_employee_form',
+                        28 => 'users_employee_employeePosition_form',
+                        29 => 'users_users_form',
+                        30 => 'users_users_user_form',
+                        31 => 'users_users_userRole_form',
+                        32 => 'suppliers_form',
+                        33 => 'suppliers_supplier_form',
+                        34 => 'suppliers_supplierLists_form',
+                        35 => 'configuration_form',
+                        36 => 'configuration_item_form',
+                        37 => 'configuration_item_category_form',
+                        38 => 'configuration_item_item_form',
+                        39 => 'configuration_item_unit_form',
+                        40 => 'configuration_item_discount_form',
+                        41 => 'configuration_item_price_control_form',
+                        42 => 'configuration_floor_form',
+                        43 => 'configuration_table_form',
+                        44 => 'configuration_location_form',
+                        45 => 'configuration_delivery_form',
+                        46 => 'reports_form',
+                        47 => 'reports_stockIn_form',
+                        48 => 'reports_stockOut_form',
+                        49 => 'reports_purchase_form',
+                        50 => 'reports_sales_form',
+                        51 => 'setting_form',
+                    ];
+
+                    // Loop through the user role permissions and set the forms
+                    foreach ($userRolePermissions as $userRolePermission) {
+                        if (isset($formMapping[$userRolePermission['form_menu_id']])) {
+                            $form = $formMapping[$userRolePermission['form_menu_id']];
+                            $$form = '';
+                        }
+                    }
+                }
+
+            @endphp
+            <li class={{ $dashboard_form }}>
+                <a href="{{ route('auth#dashboardPage') }}">
+                    <i class='bx bx-home-alt'></i>
+                    <span class="link_name">Dashboard</span>
+                </a>
+                <ul class="sub-menu blank">
+                    <li><a href="{{ route('auth#dashboardPage') }}" class="link_name">Dashboard</a></li>
+                </ul>
+            </li>
+            <li class={{ $store_form }}>
+                <div class="icon-link">
+                    <a href="#">
+                        <i class='bx bx-store-alt'></i>
+                        <span class="link_name">My Store</span>
+                    </a>
+                    <i class="bx bxs-chevron-down arrow"></i>
+                </div>
+                <ul class="sub-menu">
+                    <li><a href="#" class="link_name">My Store</a></li>
+                    <li class="dine-in {{ $store_dineIn_form }}"><a href="{{ route('store#dineInPage') }}"
+                            class="plain_text">Dine-In</a>
+                    <li class="sale-lists {{ $store_saleLists_form }}"><a href="{{ route('sale#saleListPage') }}"
+                            class="plain_text">Sale-Lists</a>
+                    </li>
+                    <li class="reservation {{ $store_reservation_form }}"><a
+                            href="{{ route('store#reservationPage') }}" class="plain_text">Reservation</a>
+                        {{-- <li class="sub-sub-list">
+                        <div class="icon-link">
+                            <a href="#" class="sub-arrow">Order Delivery </a>
+                            <i class="bx bxs-chevron-down sub-arrow"></i>
+                        </div>
+                        <ul class="sub-sub-menu">
+                            <li><a href="#">Delivery</a></li>
+                            <li><a href="#">Delivery Lists</a></li>
+                        </ul>
+                    </li> --}}
+                        {{-- <li class="sub-sub-list">
+                        <div class="icon-link">
+                            <a href="#" class="sub-arrow">Reservation</a>
+                            <i class="bx bxs-chevron-down sub-arrow"></i>
+                        </div>
+                        <ul class="sub-sub-menu">
+                            <li class="reservation"><a href="{{ route('store#reservationPage') }}">Table Reservation</a></li>
+                        </ul>
+                    </li> --}}
+                </ul>
+            </li>
+            <li class="customer-list {{ $customers_form }}">
+                <div class="icon-link">
+                    <a href="#">
+                        <i class='bx bxs-user'></i>
+                        <span class="link_name">Customers</span>
+                    </a>
+                    <i class="bx bxs-chevron-down arrow"></i>
+                </div>
+                <ul class="sub-menu">
+                    <li><a href="#" class="link_name">Customers</a></li>
+                    <li class="{{ $customers_customer_form }}"><a href="{{ route('customer#customerPage') }}"
+                            class="plain_text">Customer</a></li>
+                    <li class="{{ $customers_customerType_form }}"><a
+                            href="{{ route('customer#customerTypePage') }}" class="plain_text">Customer Type</a></li>
+
+                </ul>
+            </li>
+            <li class="{{ $card_form }}">
+                <div class="icon-link">
+                    <a href="#">
+                        <i class='bx bxs-credit-card'></i>
+                        <span class="link_name">Card</span>
+                    </a>
+                    <i class="bx bxs-chevron-down arrow"></i>
+                </div>
+                <ul class="sub-menu">
+                    <li><a href="#" class="link_name">Card</a></li>
+                    <li class="coupon-card-list {{ $card_couponCard_form }}"><a
+                            href="{{ route('card#couponCardPage') }}" class="plain_text">Coupon Card</a></li>
+                    <li class="sub-sub-list {{ $card_memberCard_form }}">
+                        <div class="icon-link">
+                            <a href="#" class="sub-arrow">Member Card</a>
+                            <i class="bx bxs-chevron-down sub-arrow"></i>
+                        </div>
+                        <ul class="sub-sub-menu">
+                            <li class="card-list {{ $card_memberCard_card_form }}"><a
+                                    href="{{ route('card#memberCard#memberCardPage') }}">Card</a>
+                            </li>
+                            <li class="card-type-list {{ $card_memberCard_cardType_form }}"><a
+                                    href="{{ route('card#memberCard#memberCardTypePage') }}">Card Type</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li class="supplier-list {{ $suppliers_form }}">
+                <div class="icon-link">
+                    <a href="#">
+                        <i class='bx bxs-truck'></i>
+                        <span class="link_name">Suppliers</span>
+                    </a>
+                    <i class="bx bxs-chevron-down arrow"></i>
+                </div>
+                <ul class="sub-menu">
+                    <li><a href="#" class="link_name">Suppliers</a></li>
+                    <li class="{{ $suppliers_supplier_form }}"><a href="{{ route('supplier#supplierPage') }}"
+                            class="plain_text">Supplier</a></li>
+                    <li class="{{ $suppliers_supplierLists_form }}"><a
+                            href="{{ route('supplier#supplierListPage') }}" class="plain_text">Supplier Lists</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="{{ $stockControl_form }}">
+                <div class="icon-link">
+                    <a href="#">
+                        <i class="bx bx-bar-chart-alt-2"></i>
+                        <span class="link_name">Stock Control</span>
+                    </a>
+                    <i class="bx bxs-chevron-down arrow"></i>
+                </div>
+                <ul class="sub-menu">
+                    <li><a href="#" class="link_name">Stock Control</a></li>
+                    <li class="sub-sub-list">
+                        <div class="icon-link {{ $stockControl_stockReceive_form }}">
+                            <a href="#" class="sub-arrow">Stock Receive</a>
+                            <i class="bx bxs-chevron-down sub-arrow"></i>
+                        </div>
+                        <ul class="sub-sub-menu">
+                            <li class="receive {{ $stockControl_stockReceive_receive_form }}"><a
+                                    href="{{ route('stockControl#stock_receive#receivePage') }}">Receive</a></li>
+                            <li class="receive-list {{ $stockControl_stockReceive_receiveLists_form }}"><a
+                                    href="{{ route('stockControl#stock_receive#receiveListPage') }}">Receive Lists</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="sub-sub-list {{ $stockControl_stockIssue_form }}">
+                        <div class="icon-link">
+                            <a href="#" class="sub-arrow">Stock Issue</a>
+                            <i class="bx bxs-chevron-down sub-arrow"></i>
+                        </div>
+                        <ul class="sub-sub-menu">
+                            <li class="issue {{ $stockControl_stockIssue_issue_form }}"><a
+                                    href="{{ route('stockControl#stock_issue#issuePage') }}">Issue</a>
+                            </li>
+                            <li class="issue-list {{ $stockControl_stockIssue_issueLists_form }}"><a
+                                    href="{{ route('stockControl#stock_issue#issueListPage') }}">Issue Lists</a></li>
+                        </ul>
+                    </li>
+                    <li class="issue-type {{ $stockControl_issueType_form }}"><a
+                            href="{{ route('stockControl#issue_type') }}" class="plain_text">Issue
+                            Type</a></li>
+                    <li class="sub-sub-list {{ $stockControl_stockPurchase_form }}">
+                        <div class="icon-link">
+                            <a href="#" class="sub-arrow">Stock Purchase</a>
+                            <i class="bx bxs-chevron-down sub-arrow"></i>
+                        </div>
+                        <ul class="sub-sub-menu">
+                            <li class="purchase {{ $stockControl_stockPurchase_purchase_form }}"><a
+                                    href="{{ route('stockControl#stock_purchase#purchasePage') }}">Purchase</a>
+                            </li>
+                            <li class="purchase-list {{ $stockControl_stockPurchase_purchaseLists_form }}"><a
+                                    href="{{ route('stockControl#stock_purchase#purchaseListPage') }}">Purchase
+                                    Lists</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li class="{{ $configuration_form }}">
+                <div class="icon-link">
+                    <a href="#">
+                        <i class='bx bx-customize'></i>
+                        <span class="link_name">Configuration</span>
+                    </a>
+                    <i class="bx bxs-chevron-down arrow"></i>
+                </div>
+                <ul class="sub-menu">
+                    <li><a href="#" class="link_name">Configuration</a></li>
+                    <li class="sub-sub-list {{ $configuration_item_form }}">
+                        <div class="icon-link">
+                            <a href="#" class="sub-arrow">Item</a>
+                            <i class="bx bxs-chevron-down sub-arrow"></i>
+                        </div>
+                        <ul class="sub-sub-menu">
+                            <li class="category-list {{ $configuration_item_category_form }}"><a
+                                    href="{{ route('config#item#categoryPage') }}">Category</a>
+                            </li>
+                            <li class="item-list {{ $configuration_item_item_form }}"><a
+                                    href="{{ route('config#item#itemPage') }}" class="plain_text">Item</a></li>
+                            <li class="unit-list {{ $configuration_item_unit_form }}"><a
+                                    href="{{ route('config#item#unitPage') }}" class="plain_text">Unit</a></li>
+                            <li class="discount-list {{ $configuration_item_discount_form }}"><a
+                                    href="{{ route('config#item#discountPage') }}" class="plain_text">Discount</a>
+                            </li>
+                            <li class="priceControl-list {{ $configuration_item_price_control_form }}"><a
+                                    href="{{ route('config#item#priceControlPage') }}" class="plain_text">Price
+                                    Control</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="floor-list {{ $configuration_floor_form }}"><a
+                            href="{{ route('config#floorPage') }}" class="plain_text">Floor</a>
+                    </li>
+                    <li class="table-list {{ $configuration_table_form }}"><a
+                            href="{{ route('config#tablePage') }}" class="plain_text">Table</a>
+                    </li>
+                    <li class="location-list {{ $configuration_location_form }}"><a
+                            href="{{ route('config#locationPage') }}" class="plain_text">Location</a></li>
+                    <li class="delivery-list {{ $configuration_delivery_form }}"><a
+                            href="{{ route('config#deliveryPage') }}" class="plain_text">Delivery</a></li>
+                </ul>
+            </li>
+            <li class="reports-list {{ $reports_form }}">
+                <div class="icon-link">
+                    <a href="#">
+                        <i class='bx bxs-report icon'></i>
+                        <span class="link_name">Reports</span>
+                    </a>
+                    <i class="bx bxs-chevron-down arrow"></i>
+                </div>
+                <ul class="sub-menu">
+                    <li><a href="#" class="link_name">Reports</a></li>
+                    <li class="sub-sub-list {{ $reports_stockIn_form }}">
+                        <div class="icon-link">
+                            <a href="{{ route('reports#stock_in') }}">Stock-In</a>
+                        </div>
+                    </li>
+                    <li class="sub-sub-list {{ $reports_stockOut_form }}">
+                        <div class="icon-link">
+                            <a href="{{ route('reports#stock_out') }}">Stock-Out</a>
+                        </div>
+                    </li>
+                    <li class="sub-sub-list {{ $reports_purchase_form }}">
+                        <div class="icon-link">
+                            <a href="{{ route('reports#purchase') }}">Purchase</a>
+                        </div>
+                    </li>
+                    <li class="sub-sub-list {{ $reports_sales_form }}">
+                        <div class="icon-link">
+                            <a href="{{ route('reports#sales') }}">Sales</a>
+                        </div>
+                    </li>
+                </ul>
+            </li>
+            <li class="{{ $users_form }}">
+                <div class="icon-link">
+                    <a href="#">
+                        <i class='bx bxs-user-account'></i>
+                        <span class="link_name">Users</span>
+                    </a>
+                    <i class="bx bxs-chevron-down arrow"></i>
+                </div>
+                <ul class="sub-menu">
+                    <li><a href="#" class="link_name">Users</a></li>
+                    <li class="sub-sub-list {{ $users_employee_form }}">
+                        <div class="icon-link">
+                            <a href="#" class="sub-arrow">Employee</a>
+                            <i class="bx bxs-chevron-down sub-arrow"></i>
+                        </div>
+                        <ul class="sub-sub-menu">
+                            <li class="employee-list {{ $users_employee_employee_form }}"><a
+                                    href="{{ route('user#employee#employeePage') }}">Employee</a></li>
+                            <li class="employee-position-list {{ $users_employee_employeePosition_form }}"><a
+                                    href="{{ route('user#employee#employeePositionPage') }}">Employee Position</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="sub-sub-list {{ $users_users_form }}">
+                        <div class="icon-link">
+                            <a href="#" class="sub-arrow">Users</a>
+                            <i class="bx bxs-chevron-down sub-arrow"></i>
+                        </div>
+                        <ul class="sub-sub-menu">
+                            <li class="user-list {{ $users_users_user_form }}"><a
+                                    href="{{ route('user#users#userPage') }}">User</a></li>
+                            <li class="user-role-list {{ $users_users_userRole_form }}"><a
+                                    href="{{ route('user#users#userRolePage') }}">User Role</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li class="{{ $setting_form }}">
+                <a href="{{ route('setting#settingPage') }}">
+                    <i class='bx bx-cog'></i>
+                    <span class="link_name">Setting</span>
+                </a>
+                <ul class="sub-menu blank">
+                    <li><a href="{{ route('setting#settingPage') }}" class="link_name">Setting</a></li>
+                </ul>
+            </li>
+            <li>
+                <div class="profile-details">
+                    <div class="profile-content">
+                        <img src="{{ asset('img/logo.png') }}" alt="profile" class="profile_img"
+                            style="cursor: pointer">
+                    </div>
+                    <div class="name-job">
+                        <div class="profile_name">{{ Auth::user()->username }}</div>
+                        <div class="job">{{ Auth::user()->name }}</div>
+                    </div>
+                    {{-- <a href="{{ route('logout') }}" type="submit"><i class='bx bx-log-out'></i></a> --}}
+                    <form class="logout-form" action="{{ route('logout') }}" method="post">
+                        @csrf
+                        <button type="submit"><i class='bx bx-log-out'></i></button>
+                    </form>
+                    {{-- <form class="logout-form" action="{{ route('logout') }}" method="post">
+                        @csrf
+                        <button type="submit"><i class='bx bx-log-out'></i></button> --}}
+                    {{-- <a href="{{ route('logout') }}" type="submit"><i class='bx bx-log-out'></i></a> --}}
+                    {{-- </form> --}}
+                </div>
+            </li>
+        </ul>
+    </div>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    @yield('content')
+</body>
+<script src="{{ asset('script/script.js') }}"></script>
+<script src="{{ asset('script/links_js/bootstrap.bundle.5.3.2.min.js') }}"></script>
+<script src="{{ asset('script/links_js/boxicons.min.js') }}"></script>
+
+</html>

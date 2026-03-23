@@ -1,0 +1,327 @@
+let category_list = document.querySelector(".category-list");
+if (localStorage.getItem("showMenu")) {
+    // category_list.classList.add("showMenu");
+    category_list.parentElement.parentElement.classList.add("showMenu");
+    category_list.parentElement.parentElement.parentElement.parentElement.classList.add(
+        "showMenu"
+    );
+}
+let bar_container = document.querySelector(".bar_container");
+if (localStorage.getItem("showTable1")) {
+    bar_container.classList.add("show_container");
+}
+
+let kitchen_container = document.querySelector(".kitchen_container");
+if (localStorage.getItem("showTable2")) {
+    kitchen_container.classList.add("show_container");
+}
+
+let refrigerator_container = document.querySelector(".refrigerator_container");
+if (localStorage.getItem("showTable3")) {
+    refrigerator_container.classList.add("show_container");
+}
+
+let service_container = document.querySelector(".service_container");
+if (localStorage.getItem("showTable4")) {
+    service_container.classList.add("show_container");
+}
+
+let bar_label = document.querySelector("#bar_label");
+bar_label.addEventListener("click", (e) => {
+    bar_label.classList.toggle("show");
+    let bar_container = document.querySelector(".bar_container");
+    bar_container.classList.toggle("show_container");
+    if (bar_container.classList.contains("show_container")) {
+        localStorage.setItem("showTable1", "true");
+    } else {
+        localStorage.removeItem("showTable1");
+    }
+});
+
+let kitchen_label = document.querySelector("#kitchen_label");
+kitchen_label.addEventListener("click", (e) => {
+    kitchen_label.classList.toggle("show");
+    let kitchen_container = document.querySelector(".kitchen_container");
+    kitchen_container.classList.toggle("show_container");
+    if (kitchen_container.classList.contains("show_container")) {
+        localStorage.setItem("showTable2", "true");
+    } else {
+        localStorage.removeItem("showTable2");
+    }
+});
+
+let refrigerator_label = document.querySelector("#refrigerator_label");
+refrigerator_label.addEventListener("click", (e) => {
+    refrigerator_label.classList.toggle("show");
+    let refrigerator_container = document.querySelector(
+        ".refrigerator_container"
+    );
+    refrigerator_container.classList.toggle("show_container");
+    if (refrigerator_container.classList.contains("show_container")) {
+        localStorage.setItem("showTable3", "true");
+    } else {
+        localStorage.removeItem("showTable3");
+    }
+});
+
+let service_label = document.querySelector("#service_label");
+service_label.addEventListener("click", (e) => {
+    service_label.classList.toggle("show");
+    let service_container = document.querySelector(".service_container");
+    service_container.classList.toggle("show_container");
+    if (service_container.classList.contains("show_container")) {
+        localStorage.setItem("showTable4", "true");
+    } else {
+        localStorage.removeItem("showTable4");
+    }
+});
+
+new DataTable("#bar");
+new DataTable("#kitchen");
+new DataTable("#refrigerator");
+new DataTable("#service");
+
+//Bar
+$(document).on("click", ".edit_bar_modal_dialog", function() {
+    var bar_category_id = $(this).data("bar_category_id");
+    var bar_category_name = $(this).data("bar_category_name");
+    var bar_is_discontinued = $(this).data("bar_is_discontinued");
+    $(".modal-body #edit_bar_category_id").val(bar_category_id);
+    $(".modal-body #edit_bar_category_name").val(bar_category_name);
+    if (bar_is_discontinued == 1) {
+        document.getElementById("edit_bar_is_discontinued").checked = true;
+    } else {
+        document.getElementById("edit_bar_is_discontinued").checked = false;
+    }
+});
+$(document).on("click", ".delete_bar_modal_dialog", function() {
+    var bar_category_name = $(this).data("bar_category_name");
+    var bar_category_id = $(this).data("bar_category_id");
+    $(".modal-header #delete_modal_header").text(
+        "Delete '" + bar_category_name + "' Category"
+    );
+    $(".modal-body #delete_bar_category_id").val(bar_category_id);
+});
+
+//Kitchen
+$(document).on("click", ".edit_kitchen_modal_dialog", function() {
+    var kitchen_category_id = $(this).data("kitchen_category_id");
+    var kitchen_category_name = $(this).data("kitchen_category_name");
+    var kitchen_is_discontinued = $(this).data("kitchen_is_discontinued");
+    $(".modal-body #edit_kitchen_category_id").val(kitchen_category_id);
+    $(".modal-body #edit_kitchen_category_name").val(kitchen_category_name);
+    if (kitchen_is_discontinued == 1) {
+        document.getElementById("edit_kitchen_is_discontinued").checked = true;
+    } else {
+        document.getElementById("edit_kitchen_is_discontinued").checked = false;
+    }
+});
+$(document).on("click", ".delete_kitchen_modal_dialog", function() {
+    var kitchen_category_name = $(this).data("kitchen_category_name");
+    var kitchen_category_id = $(this).data("kitchen_category_id");
+    $(".modal-header #delete_modal_header").text(
+        "Delete '" + kitchen_category_name + "' Category"
+    );
+    $(".modal-body #delete_kitchen_category_id").val(kitchen_category_id);
+});
+
+//Refrigerator
+$(document).on("click", ".edit_refrigerator_modal_dialog", function() {
+    var refrigerator_category_id = $(this).data("refrigerator_category_id");
+    var refrigerator_category_name = $(this).data("refrigerator_category_name");
+    var refrigerator_is_discontinued = $(this).data("refrigerator_is_discontinued");
+    $(".modal-body #edit_refrigerator_category_id").val(refrigerator_category_id);
+    $(".modal-body #edit_refrigerator_category_name").val(refrigerator_category_name);
+    if (refrigerator_is_discontinued == 1) {
+        document.getElementById("edit_refrigerator_is_discontinued").checked = true;
+    } else {
+        document.getElementById("edit_refrigerator_is_discontinued").checked = false;
+    }
+});
+$(document).on("click", ".delete_refrigerator_modal_dialog", function() {
+    var refrigerator_category_name = $(this).data("refrigerator_category_name");
+    var refrigerator_category_id = $(this).data("refrigerator_category_id");
+    $(".modal-header #delete_modal_header").text(
+        "Delete '" + refrigerator_category_name + "' Category"
+    );
+    $(".modal-body #delete_refrigerator_category_id").val(refrigerator_category_id);
+});
+
+//Service
+$(document).on("click", ".edit_service_modal_dialog", function() {
+    var service_category_id = $(this).data("service_category_id");
+    var service_category_name = $(this).data("service_category_name");
+    var service_is_discontinued = $(this).data("service_is_discontinued");
+    $(".modal-body #edit_service_category_id").val(service_category_id);
+    $(".modal-body #edit_service_category_name").val(service_category_name);
+    if (service_is_discontinued == 1) {
+        document.getElementById("edit_service_is_discontinued").checked = true;
+    } else {
+        document.getElementById("edit_service_is_discontinued").checked = false;
+    }
+});
+$(document).on("click", ".delete_service_modal_dialog", function() {
+    var service_category_name = $(this).data("service_category_name");
+    var service_category_id = $(this).data("service_category_id");
+    $(".modal-header #delete_modal_header").text(
+        "Delete '" + service_category_name + "' Category"
+    );
+    $(".modal-body #delete_service_category_id").val(service_category_id);
+});
+
+$(function() {
+    $.validator.addMethod(
+        "checkFileExtension",
+        function(value, element) {
+            // Check if the file is empty
+            if (value.length === 0) {
+                return true; // Skip validation if the file is not provided
+            }
+
+            // Get the file extension
+            var extension = value.split(".").pop().toLowerCase();
+
+            // Check if the file extension is one of 'jpg', 'jpeg', or 'png'
+            return ["jpg", "jpeg", "png"].includes(extension);
+        },
+        "Image သည် JPG, JPEG, PNG Format သာဖြစ်ရပါမည်"
+    );
+
+    $("#barAddModalForm").validate({
+        rules: {
+            bar_category_name: {
+                required: true,
+                minlength: 3,
+            },
+            bar_menu_category_image: {
+                checkFileExtension: true,
+            },
+        },
+        messages: {
+            bar_category_name: {
+                required: "Category Name ဖြည့်ရန်လိုအပ်ပါသည်",
+                minlength: "အနည်းဆုံး၃လုံးရှိရပါမည်",
+            },
+        },
+    });
+
+    $("#barEditModalForm").validate({
+        rules: {
+            edit_bar_category_name: {
+                required: true,
+                minlength: 3,
+            },
+            edit_bar_menu_category_image: {
+                checkFileExtension: true,
+            },
+        },
+        messages: {
+            edit_bar_category_name: {
+                required: "Category Name ဖြည့်ရန်လိုအပ်ပါသည်",
+                minlength: "အနည်းဆုံး၃လုံးရှိရပါမည်",
+            },
+        },
+    });
+    $("#kitchenAddModalForm").validate({
+        rules: {
+            kitchen_category_name: {
+                required: true,
+                minlength: 3,
+            },
+            kitchen_menu_category_image: {
+                checkFileExtension: true,
+            },
+        },
+        messages: {
+            kitchen_category_name: {
+                required: "Category Name ဖြည့်ရန်လိုအပ်ပါသည်",
+                minlength: "အနည်းဆုံး၃လုံးရှိရပါမည်",
+            },
+        },
+    });
+    $("#kitchenEditModalForm").validate({
+        rules: {
+            edit_kitchen_category_name: {
+                required: true,
+                minlength: 3,
+            },
+            edit_kitchen_menu_category_image: {
+                checkFileExtension: true,
+            },
+        },
+        messages: {
+            edit_kitchen_category_name: {
+                required: "Category Name ဖြည့်ရန်လိုအပ်ပါသည်",
+                minlength: "အနည်းဆုံး၃လုံးရှိရပါမည်",
+            },
+        },
+    });
+    $("#refrigeratorAddModalForm").validate({
+        rules: {
+            refrigerator_category_name: {
+                required: true,
+                minlength: 3,
+            },
+            refrigerator_menu_category_image: {
+                checkFileExtension: true,
+            },
+        },
+        messages: {
+            refrigerator_category_name: {
+                required: "Category Name ဖြည့်ရန်လိုအပ်ပါသည်",
+                minlength: "အနည်းဆုံး၃လုံးရှိရပါမည်",
+            },
+        },
+    });
+    $("#refrigeratorEditModalForm").validate({
+        rules: {
+            edit_refrigerator_category_name: {
+                required: true,
+                minlength: 3,
+            },
+            edit_refrigerator_menu_category_image: {
+                checkFileExtension: true,
+            },
+        },
+        messages: {
+            edit_refrigerator_category_name: {
+                required: "Category Name ဖြည့်ရန်လိုအပ်ပါသည်",
+                minlength: "အနည်းဆုံး၃လုံးရှိရပါမည်",
+            },
+        },
+    });
+    $("#serviceAddModalForm").validate({
+        rules: {
+            service_category_name: {
+                required: true,
+                minlength: 3,
+            },
+            service_menu_category_image: {
+                checkFileExtension: true,
+            },
+        },
+        messages: {
+            service_category_name: {
+                required: "Category Name ဖြည့်ရန်လိုအပ်ပါသည်",
+                minlength: "အနည်းဆုံး၃လုံးရှိရပါမည်",
+            },
+        },
+    });
+    $("#serviceEditModalForm").validate({
+        rules: {
+            edit_service_category_name: {
+                required: true,
+                minlength: 3,
+            },
+            edit_service_menu_category_image: {
+                checkFileExtension: true,
+            },
+        },
+        messages: {
+            edit_service_category_name: {
+                required: "Category Name ဖြည့်ရန်လိုအပ်ပါသည်",
+                minlength: "အနည်းဆုံး၃လုံးရှိရပါမည်",
+            },
+        },
+    });
+});

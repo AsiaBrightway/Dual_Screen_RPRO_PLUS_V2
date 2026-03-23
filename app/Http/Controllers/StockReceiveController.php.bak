@@ -1,0 +1,253 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Exception;
+use App\Models\Unit;
+use App\Models\ItemType;
+use App\Models\MenuItem;
+use App\Models\SalesDetail;
+use App\Models\MainCategory;
+use App\Models\StockReceive;
+use Illuminate\Http\Request;
+use App\Models\PurchaseDetail;
+use App\Models\StockReceiveDetail;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+
+class StockReceiveController extends Controller
+{
+    //direct stock receive page
+    public function receivePage()
+    {
+        $voucherNumber = 'RV-' . date('y') . '-' . StockReceive::whereYear('receive_date', date('Y'))->count() + 1;
+
+        // $menu_item = MenuItem::query()->where(['menu_items.is_discontinued' => 0, 'menu_items.is_deleted' => 0])
+        // ->whereIn('IT.item_type_id',[1,3])
+        // ->select('menu_items.*', 'U.unit_name', 'ISP.unit_cost')
+        // ->join('units as U', 'U.unit_id', '=', 'menu_items.unit_id')
+        // ->join('item_selling_prices as ISP', 'ISP.item_id', '=', 'menu_items.item_id')
+        // ->join('item_types as IT', 'IT.item_type_id', '=', 'menu_items.item_type_id')
+        // // ->where('IT.item_type_id', '!=', 1)
+        // ->get();
+
+        $menu_item = MenuItem::query()->where(['menu_items.is_discontinued' => 0, 'menu_items.is_deleted' => 0])
+            ->whereIn('I.item_type_id', [2, 3])
+            ->select('menu_items.*', 'unit_name')
+            ->join('units as U', 'U.unit_id', '=', 'menu_items.unit_id')
+            ->join('item_types as I', 'I.item_type_id', '=', 'menu_items.item_type_id')
+            ->get();
+
+        $mainCategories = MainCategory::get()->toArray();
+        $subCategories = [];
+        $itemTypes = ItemType::get()->toArray();
+        $units  = Unit::where('is_discontinued', 0)
+            ->get()->toArray();
+
+        return view('admin.stock_control.stock_receive.receive', compact('menu_item',  'voucherNumber', 'mainCategories', 'subCategories', 'itemTypes', 'units'));
+    }
+
+    //direct stock receive List page
+    public function receiveListPage()
+    {
+        $stock_receive_list = StockReceive::select('stock_receives.stock_receive_id', 'receive_voucher_number', 'receive_date', 'remark')
+            ->selectRaw('SUM(amount) as total_amount')
+            ->join('stock_receive_details as RD', 'RD.stock_receive_id', '=', 'stock_receives.stock_receive_id')
+            ->groupBy(['stock_receive_id', 'receive_voucher_number', 'receive_date', 'remark'])
+            ->where('stock_receives.is_delete', 0)
+            ->get();
+        // dd($stock_receive_list);
+        return view('admin.stock_control.stock_receive.receive_list', compact('stock_receive_list'));
+    }
+
+    //Create Item
+    public function createReceiveItem(Request $req)
+    {
+        $data = $this->addItemData($req);
+        try {
+            DB::beginTransaction();
+            if ($data['is_discontinued'] == null || $data['is_discontinued'] == "null") {
+                $data['is_discontinued'] = 0;
+            }
+            if ($data['is_discontinued'] == "on") {
+                $data['is_discontinued'] = 1;
+            }
+
+            if ($req->hasFile('create_item_image')) {
+                $fileName = uniqid() . '_' . $req->file('create_item_image')->getClientOriginalName();
+                $req->file('create_item_image')->storeAs('public/Images/', $fileName);
+                $data['item_image'] = $fileName;
+            }
+            MenuItem::create($data);
+
+            DB::commit();
+            return redirect()->route('stockControl#stock_receive#receivePage');
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['errors' => $e->getMessage()]);
+        }
+    }
+
+    //create
+    public function createStockReceive(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+            // store_receive_detaillist = $request->-> AJax request ထဲက Key Name ကိုယူ
+            $detailList = $request->detailList;
+            $voucherNumber = 'RV-' . date('y') . '-' . StockReceive::whereYear('receive_date', date('Y'))->count() + 1;
+            $master_data = $this->addStockReceiveMasterData($request, $voucherNumber);
+            $result =  StockReceive::create($master_data);
+            //dd($result);
+            foreach ($detailList as $detail) {
+                $receiveID = $result->id;
+                $detail_data = $this->addStockReceiveDetailData($detail, $receiveID);
+                $receiveDetail = StockReceiveDetail::create($detail_data);
+                if ((int)$detail['store_qty'] < 0) {
+                    $data = [
+                        'batch_number' => $receiveDetail->batch_number,
+                        'expire_date' => $receiveDetail->expire_date,
+                        'sale_type' => "Receive"
+                    ];
+                    SalesDetail::where('item_id', $receiveDetail->item_id)
+                        ->where('batch_number', 0)
+                        ->update($data);
+                }
+            }
+            DB::commit();
+            return response()->json(['success' => "Successful!"]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['errors' => $e->getMessage()]);
+        }
+    }
+
+    private function addStockReceiveMasterData($request, $voucherNumber)
+    {
+        $data = [
+            'receive_voucher_number' =>  $voucherNumber,
+            'receive_date' => $request->receiveDate,
+            'remark' => $request->remark,
+            'is_delete' => 0,
+            'is_updated' => false,
+            'modified_by' => $request->modifiedBy
+        ];
+        return $data;
+    }
+
+    private function addStockReceiveDetailData($detail, $receiveID)
+    {
+        $data = [
+            'stock_receive_id' => $receiveID,
+            'item_id' => $detail['item_id'],
+            'unit_id' => $detail['unit_id'],
+            'quantity' => $detail['quantity'],
+            'unit_cost' => $detail['unit_cost'],
+            'amount' => $detail['amount'],
+            'expire_date' => $detail['expire_date'],
+            'batch_number' => $receiveID,
+            'is_updated' => false,
+            'is_deleted' => 0
+        ];
+        return $data;
+    }
+
+    //update
+    public function updateStockReceivePage($id)
+    {
+
+        $menu_item = MenuItem::query()->where(['menu_items.is_discontinued' => 0, 'menu_items.is_deleted' => 0])
+            ->whereIn('I.item_type_id', [2, 3])
+            ->select('menu_items.*', 'unit_name')
+            ->join('units as U', 'U.unit_id', '=', 'menu_items.unit_id')
+            ->join('item_types as I', 'I.item_type_id', '=', 'menu_items.item_type_id')
+            ->get();
+
+        $selectedReceive = StockReceive::where('stock_receive_id', "=", $id)->get();
+        $selectedReceiveDetail = StockReceiveDetail::where('stock_receive_id', "=", $id)
+            ->select('stock_receive_details.item_id', 'stock_receive_details.unit_id', 'I.item_code', 'I.bar_code', 'I.item_name', 'U.unit_name', 'quantity', 'stock_receive_details.unit_cost', 'expire_date', 'amount')
+            ->join('units as U', 'U.unit_id', '=', 'stock_receive_details.unit_id')
+            ->join('menu_items as I', 'I.item_id', '=', 'stock_receive_details.item_id')
+            ->get();
+
+        return view('admin.stock_control.stock_receive.update_receive', compact('menu_item',  'selectedReceive', 'selectedReceiveDetail'));
+    }
+
+    public function updateStockReceive(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+            $receiveID = $request->receiveID;
+            $detailList = $request->detailList;
+            $master_data = $this->addStockReceiveMasterData($request, $request->voucherNo);
+            StockReceive::where('stock_receive_id', '=', $receiveID)->update($master_data);
+            StockReceiveDetail::where('stock_receive_id', '=', $receiveID)->delete();
+            foreach ($detailList as $detail) {
+                $detail_data = $this->addStockReceiveDetailData($detail, $receiveID);
+                $detail_data['is_updated'] = true;
+                StockReceiveDetail::create($detail_data);
+            }
+            DB::commit();
+            return response()->json(['success' => "Update successful!"]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['errors' => $e->getMessage()]);
+        }
+    }
+
+    public function deleteStoreReceive(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'delete_reason' => 'required'
+        ], [
+            'delete_reason' => 'Delete Reason ဖြည့်ရန်လိုအပ်ပါသည်!'
+        ]);
+        if ($validator->passes()) {
+            try {
+                DB::beginTransaction();
+                $receiveID = $request->stockReceive_deleteID;
+                StockReceive::where('stock_receive_id', $receiveID)->update([
+                    'is_delete' => true,
+                    'delete_reason' => $request->cancel_reason,
+                    'modified_by' => $request->loginUserID,
+                ]);
+                StockReceiveDetail::where('stock_receive_id', $receiveID)->update([
+                    'is_deleted' => true
+                ]);
+                DB::commit();
+                return response()->json(['success' => "Delete Successful!"]);
+                // return redirect()->route('stockControl#stock_receive#receiveListPage')->with(['deleteSuccess' => 'Delete Successfully!']);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return response()->json(['errors' => $e->getMessage()]);
+            }
+        } else {
+            return response()->json(['errors' => $validator->getMessageBag()->toArray()]);
+        }
+    }
+
+
+
+    //private
+    //Add Item Data
+    private function addItemData($req)
+    {
+        $data = [
+            'main_category_id' => $req->create_main_category,
+            'sub_category_id' => $req->create_sub_category,
+            'item_type_id' => $req->create_item_type,
+            'item_code' => $req->create_item_code,
+            'bar_code' => $req->create_bar_code,
+            'item_name' => $req->create_item_name,
+            'other_name' => $req->create_other_name,
+            'unit_id' => $req->create_item_unit,
+            'item_image' => $req->create_item_image,
+            'location_id' => "1",
+            'is_discontinued' => $req->create_is_discontinued,
+            'is_deleted' => "0",
+            'modified_by' => Auth::user()->id,
+        ];
+        return $data;
+    }
+}

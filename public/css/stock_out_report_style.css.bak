@@ -1,0 +1,69 @@
+.stock_out_report_container {
+    height: calc(100vh - 140px);
+    margin: 0;
+}
+
+.total_div {
+    background-color: #fff;
+    border-radius: 10px;
+    margin: 0;
+    margin-top: 10px;
+    height: 100px;
+}
+
+.stock_out_filter {
+    background-color: #fff;
+    border-radius: 10px;
+}
+
+.stock_out_table {
+    background-color: #fff;
+    height: calc(100% - 110px);
+    border-radius: 10px;
+}
+
+#btn_stock_out_search {
+    color: #fff !important;
+    background-color: #512da8 !important;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 820px) {
+    .stock-out-report-left {
+        width: 100%;
+        border: none !important;
+    }
+    .stock-out-report-right {
+        margin-left: 0 !important;
+        margin-top: 10px;
+        width: 100%;
+    }
+}
+
+@media (max-width: 520px) {
+    .total-qty-lbl {
+        width: 150px !important;
+        height: 40px;
+        margin-top: 20px;
+        margin-left: 20px;
+    }
+    .total-qty-text {
+        width: 150px !important;
+        height: 40px;
+        margin-top: 13px;
+    }
+}
+
+.total-qty-lbl {
+    width: 200px;
+    height: 40px;
+    margin-top: 20px;
+    margin-left: 20px;
+}
+
+.total-qty-text {
+    width: 200px;
+    height: 40px;
+    margin-top: 13px;
+}

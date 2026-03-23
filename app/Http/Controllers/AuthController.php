@@ -1,0 +1,314 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Carbon\Carbon;
+use App\Models\Sales;
+use App\Models\Customer;
+use App\Models\MenuItem;
+use App\Models\Purchase;
+use App\Models\CheckDevice;
+use App\Models\SalesDetail;
+use App\Models\MenuCategory;
+use Illuminate\Http\Request;
+use App\Models\UserRolePermission;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+
+class AuthController extends Controller
+{
+    // direct login page
+    public function loginPage()
+    {
+        return view('login');
+    }
+
+    public function homePage(Request $req)
+    {
+        $ipAddress = request()->ip();
+
+        // dd($ipAddress);
+        $this->validationCheck($req);
+        $credentials = $req->only('username', 'password');
+        if (Auth::attempt($credentials)) {
+            $userRoleID  = Auth::user()->user_role_id;
+            $userRolePermissions = UserRolePermission::where('role_id', $userRoleID)->get()->toArray();
+            session('userRoleID', $userRoleID);
+            session(['userRolePermissions' => $userRolePermissions]);
+            // return redirect()->route('auth#dashboardPage');
+            // return view('layouts.admin.master');
+            return redirect()->route('companyInfoPage');
+        } else {
+            return redirect()->route('auth#loginPage')->with('wrong_username_password', 'User Name or Password is not correct!');
+        }
+        // $macAddress = shell_exec('getmac');
+
+        // // Try to match MAC address pattern
+        // preg_match('/([A-F0-9]{2}[-]){5}[A-F0-9]{2}/i', $macAddress, $matches);
+
+        // if (isset($matches[0])) {
+        //     // dd($matches[0]);
+        //     $device = CheckDevice::where('mac_address', $matches[0])->first();
+        //     if ($device != null) {
+        //         $this->validationCheck($req);
+        //         $credentials = $req->only('username', 'password');
+        //         if (Auth::attempt($credentials)) {
+        //             $userRoleID  = Auth::user()->user_role_id;
+        //             $userRolePermissions = UserRolePermission::where('role_id', $userRoleID)->get()->toArray();
+        //             session('userRoleID', $userRoleID);
+        //             session(['userRolePermissions' => $userRolePermissions]);
+        //             // return redirect()->route('auth#dashboardPage');
+        //             // return view('layouts.admin.master');
+        //             return view('abw.company_info');
+        //         } else {
+        //             return redirect()->route('auth#loginPage')->with('wrong_username_password', 'User Name or Password is not correct!');
+        //         }
+        //     } else {
+        //         return redirect()->route('auth#loginPage')->with('not_registered', 'This Device is not registered!');
+        //     }
+        // } else {
+        //     return view('login');
+        // }
+    }
+
+    // direct dashboard page
+    public function dashboardPage()
+    {
+        $menuItems = MenuItem::get()->toArray();
+        $saleQuantitites = SalesDetail::sum('quantity');
+
+        if ($saleQuantitites == null) {
+            $saleQuantitites = 0;
+        }
+
+        $sales = Sales::get()->toArray();
+
+        $today = Carbon::today();
+        $monday = $today->copy()->startOfWeek(Carbon::MONDAY);
+        $tuesday = $monday->copy()->addDays(1);
+        $wednesday = $monday->copy()->addDays(2);
+        $tursday = $monday->copy()->addDays(3);
+        $friday = $monday->copy()->addDays(4);
+        $saturday = $monday->copy()->addDays(5);
+        $sunday = $monday->copy()->addDays(6);
+
+        $saleItemWeekList = SalesDetail::select('MI.item_name as item_name', SalesDetail::raw('SUM(quantity) as total_quantity'))
+            ->join('menu_items as MI', 'sales_details.item_id', '=', 'MI.item_id')
+            ->whereDate('order_time', '>=', $monday->toDateString())
+            ->whereDate('order_time', '<=', $sunday->toDateString())
+            ->groupBy('sales_details.item_id', 'MI.item_name')
+            ->orderBy('total_quantity', 'desc')
+            ->take(3)
+            ->get()
+            ->toArray();
+
+        $saleItemForMonday = SalesDetail::select('MI.item_name as item_name', SalesDetail::raw('SUM(quantity) as total_quantity'))
+            ->join('menu_items as MI', 'sales_details.item_id', '=', 'MI.item_id')
+            ->whereDate('order_time', $monday->toDateString())
+            ->groupBy('sales_details.item_id', 'MI.item_name')
+            ->orderBy('total_quantity', 'desc')
+            ->take(3)
+            ->get()
+            ->toArray();
+
+        $saleItemForTuesday = SalesDetail::select('MI.item_name as item_name', SalesDetail::raw('SUM(quantity) as total_quantity'))
+            ->join('menu_items as MI', 'sales_details.item_id', '=', 'MI.item_id')
+            ->whereDate('order_time', $tuesday->toDateString())
+            ->groupBy('sales_details.item_id', 'MI.item_name')
+            ->orderBy('total_quantity', 'desc')
+            ->take(3)
+            ->get()
+            ->toArray();
+
+        $saleItemForWednesday = SalesDetail::select('MI.item_name as item_name', SalesDetail::raw('SUM(quantity) as total_quantity'))
+            ->join('menu_items as MI', 'sales_details.item_id', '=', 'MI.item_id')
+            ->whereDate('order_time', $wednesday->toDateString())
+            ->groupBy('sales_details.item_id', 'MI.item_name')
+            ->orderBy('total_quantity', 'desc')
+            ->take(3)
+            ->get()
+            ->toArray();
+
+        $saleItemForTursday = SalesDetail::select('MI.item_name as item_name', SalesDetail::raw('SUM(quantity) as total_quantity'))
+            ->join('menu_items as MI', 'sales_details.item_id', '=', 'MI.item_id')
+            ->whereDate('order_time', $tursday->toDateString())
+            ->groupBy('sales_details.item_id', 'MI.item_name')
+            ->orderBy('total_quantity', 'desc')
+            ->take(3)
+            ->get()
+            ->toArray();
+
+        $saleItemForFriday = SalesDetail::select('MI.item_name as item_name', SalesDetail::raw('SUM(quantity) as total_quantity'))
+            ->join('menu_items as MI', 'sales_details.item_id', '=', 'MI.item_id')
+            ->whereDate('order_time', $friday->toDateString())
+            ->groupBy('sales_details.item_id', 'MI.item_name')
+            ->orderBy('total_quantity', 'desc')
+            ->take(3)
+            ->get()
+            ->toArray();
+        // dd($saleItemForFriday);
+        $saleItemForSaturday = SalesDetail::select('MI.item_name as item_name', SalesDetail::raw('SUM(quantity) as total_quantity'))
+            ->join('menu_items as MI', 'sales_details.item_id', '=', 'MI.item_id')
+            ->whereDate('order_time', $saturday->toDateString())
+            ->groupBy('sales_details.item_id', 'MI.item_name')
+            ->orderBy('total_quantity', 'desc')
+            ->take(3)
+            ->get()
+            ->toArray();
+
+        $saleItemForSunday = SalesDetail::select('MI.item_name as item_name', SalesDetail::raw('SUM(quantity) as total_quantity'))
+            ->join('menu_items as MI', 'sales_details.item_id', '=', 'MI.item_id')
+            ->whereDate('order_time', $sunday->toDateString())
+            ->groupBy('sales_details.item_id', 'MI.item_name')
+            ->orderBy('total_quantity', 'desc')
+            ->take(3)
+            ->get()
+            ->toArray();
+
+        $saleItemWeek = (object)[
+            'saleItemForMonday' => $saleItemForMonday,
+            'saleItemForTuesday' => $saleItemForTuesday,
+            'saleItemForWednesday' => $saleItemForWednesday,
+            'saleItemForTursday' => $saleItemForTursday,
+            'saleItemForFriday' => $saleItemForFriday,
+            'saleItemForSaturday' => $saleItemForSaturday,
+            'saleItemForSunday' => $saleItemForSunday,
+        ];
+
+        $forMondayAmount = 0;
+        $saleForMonday = Sales::whereDate('order_date', date($monday->toDateString()))
+            ->get()->toArray();
+
+        foreach ($saleForMonday as $forMonday) {
+            $forMondayAmount += (int)$forMonday['total_amount'];
+        }
+
+        $forTuesdayAmount = 0;
+        $saleForTuesday = Sales::whereDate('order_date', date($tuesday->toDateString()))
+            ->get()->toArray();
+        foreach ($saleForTuesday as $forTuesday) {
+            $forTuesdayAmount += (int)$forTuesday['total_amount'];
+        }
+
+        $forWednesdayAmount = 0;
+        $saleForWednesday = Sales::whereDate('order_date', date($wednesday->toDateString()))
+            ->get()->toArray();
+        foreach ($saleForWednesday as $forWednesday) {
+            $forWednesdayAmount += (int)$forWednesday['total_amount'];
+        }
+
+        $forTursdayAmount = 0;
+        $saleForTursday = Sales::whereDate('order_date', date($tursday->toDateString()))
+            ->get()->toArray();
+        foreach ($saleForTursday as $forTursday) {
+            $forTursdayAmount += (int)$forTursday['total_amount'];
+        }
+
+        $forFridayAmount = 0;
+        $saleForFriday = Sales::whereDate('order_date', date($friday->toDateString()))
+            ->get()->toArray();
+        foreach ($saleForFriday as $forFriday) {
+            $forFridayAmount += (int)$forFriday['total_amount'];
+        }
+
+        $forSaturdayAmount = 0;
+        $saleForSaturday = Sales::whereDate('order_date', date($saturday->toDateString()))
+            ->get()->toArray();
+        foreach ($saleForSaturday as $forSaturday) {
+            $forSaturdayAmount += (int)$forSaturday['total_amount'];
+        }
+
+        $forSundayAmount = 0;
+        $saleForSunday = Sales::whereDate('order_date', date($sunday->toDateString()))
+            ->get()->toArray();
+        foreach ($saleForSunday as $forSunday) {
+            $forSundayAmount += (int)$forSunday['total_amount'];
+        }
+
+        $saleWeek = (object)[
+            'forMondayAmount' => $forMondayAmount,
+            'forTuesdayAmount' => $forTuesdayAmount,
+            'forWednesdayAmount' => $forWednesdayAmount,
+            'forTursdayAmount' => $forTursdayAmount,
+            'forFridayAmount' => $forFridayAmount,
+            'forSaturdayAmount' => $forSaturdayAmount,
+            'forSundayAmount' => $forSundayAmount
+        ];
+
+        $forPurchaseMondayAmount = 0;
+        $purchaseForMonday = Purchase::whereDate('purchase_date', date($monday->toDateString()))
+            ->get()->toArray();
+        foreach ($purchaseForMonday as $forMonday) {
+            $forPurchaseMondayAmount += (int)$forMonday['total_amount'];
+        }
+
+        $forPurchaseTuesdayAmount = 0;
+        $purchaseForTuesday = Purchase::whereDate('purchase_date', date($tuesday->toDateString()))
+            ->get()->toArray();
+        foreach ($purchaseForTuesday as $forTuesday) {
+            $forPurchaseTuesdayAmount += (int)$forTuesday['total_amount'];
+        }
+
+        $forPurchaseWednesdayAmount = 0;
+        $purchaseForWednesday = Purchase::whereDate('purchase_date', date($wednesday->toDateString()))
+            ->get()->toArray();
+        foreach ($purchaseForWednesday as $forWednesday) {
+            $forPurchaseWednesdayAmount += (int)$forWednesday['total_amount'];
+        }
+
+        $forPurchaseTursdayAmount = 0;
+        $purchaseForTursday = Purchase::whereDate('purchase_date', date($tursday->toDateString()))
+            ->get()->toArray();
+        foreach ($purchaseForTursday as $forTursday) {
+            $forPurchaseTursdayAmount += (int)$forTursday['total_amount'];
+        }
+
+        $forPurchaseFridayAmount = 0;
+        $purchaseForFriday = Purchase::whereDate('purchase_date', date($friday->toDateString()))
+            ->get()->toArray();
+        foreach ($purchaseForFriday as $forFriday) {
+            $forPurchaseFridayAmount += (int)$forFriday['total_amount'];
+        }
+
+        $forPurchaseSaturdayAmount = 0;
+        $purchaseForSaturday = Purchase::whereDate('purchase_date', date($saturday->toDateString()))
+            ->get()->toArray();
+        foreach ($purchaseForSaturday as $forSaturday) {
+            $forPurchaseSaturdayAmount += (int)$forSaturday['total_amount'];
+        }
+
+        $forPurchaseSundayAmount = 0;
+        $purchaseForSunday = Purchase::whereDate('purchase_date', date($sunday->toDateString()))
+            ->get()->toArray();
+        foreach ($purchaseForSunday as $forSunday) {
+            $forPurchaseSundayAmount += (int)$forSunday['total_amount'];
+        }
+
+        $purchaseWeek = (object)[
+            'forPurchaseMondayAmount' => $forPurchaseMondayAmount,
+            'forPurchaseTuesdayAmount' => $forPurchaseTuesdayAmount,
+            'forPurchaseWednesdayAmount' => $forPurchaseWednesdayAmount,
+            'forPurchaseTursdayAmount' => $forPurchaseTursdayAmount,
+            'forPurchaseFridayAmount' => $forPurchaseFridayAmount,
+            'forPurchaseSaturdayAmount' => $forPurchaseSaturdayAmount,
+            'forPurchaseSundayAmount' => $forPurchaseSundayAmount
+        ];
+
+        return view('admin.dashboard.dashboard', compact('menuItems', 'saleQuantitites', 'sales', 'saleWeek', 'purchaseWeek', 'saleItemWeek', 'saleItemWeekList'));
+    }
+
+    //private function
+
+    private function validationCheck($req)
+    {
+        $validationRules = [
+            'username' => 'required',
+            'password' => 'required',
+        ];
+        $validationMessages = [
+            'username.required' => 'User Name ဖြည့်ရန်လိုအပ်ပါသည်',
+            'password.required' => 'Password ဖြည့်ရန်လိုအပ်ပါသည်',
+        ];
+        Validator::make($req->all(), $validationRules, $validationMessages)->validate();
+    }
+}

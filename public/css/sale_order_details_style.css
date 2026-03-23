@@ -1,0 +1,101 @@
+.sale_order_details_info_container,
+.sale_order_details_list_container,
+.sale_order_details_list_info_container {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    /* transition: max-height 0.5s ease-out, opacity 0.5s ease-out; */
+    background-color: #fff;
+}
+
+.sale_order_details_info_container.show_container,
+.sale_order_details_list_container.show_container,
+.sale_order_details_list_info_container.show_container {
+    padding: 30px;
+    max-height: 800px;
+    opacity: 1;
+    background-color: #fff;
+    border-radius: 5px 5px 10px 10px;
+    margin: -20px 1px 20px 1px;
+    transition: max-height 0.5s ease-out, opacity 0.5s ease-out;
+}
+
+.custom_btn {
+    color: #fff;
+    background-color: #512da8;
+}
+
+.custom_btn:hover {
+    color: #fff;
+    background-color: #6f44d1;
+}
+
+.page-item.active .page-link {
+    background-color: #6f44d1 !important;
+    border: 1px solid black;
+    color: #fff !important;
+    font-size: 13px;
+}
+
+.page-link {
+    color: black !important;
+    font-size: 13px;
+}
+
+.dataTables_wrapper .row {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+#sale_order_details_info_label,
+#sale_order_details_list_label,
+#sale_order_details_list_info_label {
+    height: 40px;
+    border-radius: 10px;
+    margin-left: 1px;
+    margin-right: 1px;
+    margin-bottom: 10px;
+}
+
+i {
+    transition: all 0.3s ease;
+}
+
+#sale_order_details_info_label.show i.arrow,
+#sale_order_details_list_label.show i.arrow,
+#sale_order_details_list_info_label.show i.arrow {
+    transform: rotate(-180deg);
+}
+
+table.dataTable thead tr th,
+table.dataTable tfoot tr th {
+    color: #512da8;
+}
+
+#orderInvoiceForm input {
+    text-align: end;
+}
+
+@media (max-width: 720px) {
+    .sale-order-details-info-left {
+        width: 100%;
+        border: none !important;
+    }
+    .sale-order-details-info-right {
+        width: 100%;
+    }
+}
+
+@media (max-width: 1200px) {
+    .sale-order-details-left {
+        width: 100%;
+        border: none !important;
+    }
+    .sale-order-details-mid {
+        width: 100%;
+        border: none !important;
+    }
+    .sale-order-details-right {
+        width: 100%;
+    }
+}

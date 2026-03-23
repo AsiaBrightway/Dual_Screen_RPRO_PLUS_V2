@@ -1,0 +1,125 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\MenuItem;
+use Illuminate\Http\Request;
+use App\Models\PurchaseDetail;
+use App\Models\ItemSellingPrice;
+use App\Models\StockReceiveDetail;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+
+class ItemSellingPriceController extends Controller
+{
+    //direct price control page
+    public function priceControlPage()
+    {
+        $menu_items = MenuItem::select('*')
+            ->whereIn('item_type_id', [1, 3])
+            ->where('is_discontinued', 0)
+            ->where('is_deleted', 0)
+            ->get()->toArray();
+        $stock_items = [];
+        foreach ($menu_items as $key => $menu_item) {
+            $purchaseLists = PurchaseDetail::select('*')
+                ->where('item_id', $menu_item['item_id'])
+                ->where('unit_id', $menu_item['unit_id'])
+                ->get();
+
+            $receiveLists = StockReceiveDetail::select('*')
+                ->where('item_id', $menu_item['item_id'])
+                ->where('unit_id', $menu_item['unit_id'])
+                ->get();
+
+            if ($purchaseLists != null || $receiveLists != null) {
+                if ($purchaseLists->isNotEmpty() || $receiveLists->isNotEmpty()) {
+                    array_push($stock_items, $menu_item);
+                }
+            }
+        }
+
+        $itemSellingPrices = ItemSellingPrice::select('*', 'MI.item_name as item_name', 'U.unit_name as unit_name', 'MainCat.main_category_name as main_category_name', 'MenuCat.menu_category_name as sub_category_name')
+            ->join('menu_items as MI', 'item_selling_prices.item_id', 'MI.item_id')
+            ->join('units as U', 'item_selling_prices.unit_id', 'U.unit_id')
+            ->join('main_categories as MainCat', 'MI.main_category_id', 'MainCat.main_category_id')
+            ->join('menu_categories as MenuCat', 'MI.sub_category_id', 'MenuCat.category_id')
+            ->get()->toArray();
+
+        return view('admin.configuration.item.price_control.price_control', compact('stock_items', 'itemSellingPrices'));
+    }
+
+    //Price Control create
+    public function createPriceControl(Request $req)
+    {
+        $this->validationCheck($req);
+        $data = $this->addPriceControlData($req);
+        ItemSellingPrice::create($data);
+        return redirect()->route('config#item#priceControlPage');
+    }
+
+    public function updatePriceControl(Request $req)
+    {
+        $item_selling_price_id = $req->edit_item_selling_price_id;
+        $data = $this->addPriceControlUpdateData($req);
+
+        ItemSellingPrice::where('item_selling_price_id', $item_selling_price_id)->update($data);
+        return redirect()->route('config#item#priceControlPage');
+    }
+
+    //Private Functions
+    //add Customer data
+    private function addPriceControlData($req)
+    {
+        $data = [
+            'item_id' => $req->item_name,
+            'unit_id' => $req->unit_id,
+            'currency_id' => 1,
+            'unit_cost' => $req->unit_cost,
+            'item_selling_price' => $req->selling_price,
+            'is_updated' => "0",
+            'modified_by' => Auth::user()->id,
+
+        ];
+        return $data;
+    }
+
+    //add customer type update data
+    private function addPriceControlUpdateData($req)
+    {
+        $data = [
+            'item_selling_price' => $req->edit_selling_price,
+            'is_updated' => "1",
+            'modified_by' => Auth::user()->id,
+        ];
+        return $data;
+    }
+
+    //Validation
+    private function validationCheck($req)
+    {
+        $validationRules = [
+            'item_name' => 'required|not_in:0|unique:item_selling_prices,item_id',
+            'selling_price' => [
+                'required',
+                'numeric',
+                'gte:' . $req->unit_cost, // Ensure selling price is greater than or equal to avgcost
+            ]
+        ];
+
+        $validationMessages = [
+            'item_name.required' => 'Item Name ရွေးရန်လိုအပ်ပါသည်',
+            'item_name.not_in' => 'Item Name ရွေးရန်လိုအပ်ပါသည်',
+            'item_name.unique' => 'Item Name တူနေပါသည်',
+            'selling_price.required' => 'Selling Price ဖြည့်ရန်လိုအပ်ပါသည်',
+            'selling_price.numeric' => 'Selling Price သည် Number ဖြစ်ရပါမည်',
+            'selling_price.gte' => 'Selling Price သည် အနည်းဆုံး ' . $req->unit_cost . ' ရှိရပါမည်',
+        ];
+
+        Validator::make(
+            $req->all(),
+            $validationRules,
+            $validationMessages
+        )->validate();
+    }
+}

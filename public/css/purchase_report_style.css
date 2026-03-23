@@ -1,0 +1,118 @@
+.purchase_report_container {
+    height: calc(100vh - 140px);
+    margin: 0;
+}
+
+.purchase_report_list_by_default {
+    table-layout: fixed;
+    width: 100%;
+}
+
+.purchase_report_list_by_default th {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.total_div {
+    background-color: #fff;
+    border-radius: 10px;
+    margin: 0;
+    margin-top: 10px;
+    height: 100px;
+}
+
+.purchase_filter {
+    background-color: #fff;
+    border-radius: 10px;
+}
+
+.purchase_table {
+    background-color: #fff;
+    height: calc(100% - 110px);
+    border-radius: 10px;
+    overflow-y: auto;
+}
+
+#btn_purchase_search {
+    color: #fff !important;
+    background-color: #512da8 !important;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 820px) {
+    .purchase-report-left {
+        width: 100%;
+        border: none !important;
+    }
+
+    .purchase-report-right {
+        margin-left: 0 !important;
+        margin-top: 10px;
+        width: 100%;
+    }
+}
+
+@media (max-width: 520px) {
+    .total-amount-lbl {
+        width: 150px !important;
+        height: 40px;
+        margin-top: 20px;
+        margin-left: 20px;
+    }
+
+    .total-amount-text {
+        width: 150px !important;
+        height: 40px;
+        margin-top: 13px;
+    }
+}
+
+.total-amount-lbl {
+    width: 200px;
+    height: 40px;
+    margin-top: 20px;
+    margin-left: 20px;
+}
+
+.total-amount-text {
+    width: 200px;
+    height: 40px;
+    margin-top: 13px;
+}
+
+
+/* @media print {
+    .dataTables_scrollBody {
+        overflow: visible !important;
+    }
+    .dataTables_wrapper {
+        width: 100% !important;
+    }
+    table {
+        width: 100% !important;
+        table-layout: fixed;
+    }
+    table th,
+    table td {
+        width: 20px !important;
+        word-wrap: break-word;
+        text-align: left;
+        padding: 4px !important;
+        font-size: 10px !important;
+    }
+    .dataTables_scroll {
+        width: 100% !important;
+    }
+} */
+
+
+/* table th,
+table td {
+    width: 400px !important;
+    word-wrap: break-word;
+    text-align: left;
+    padding: 4px !important;
+    font-size: 10px !important;
+} */
