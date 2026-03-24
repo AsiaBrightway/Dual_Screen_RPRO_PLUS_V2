@@ -205,7 +205,9 @@
         $serviceCharges = $sale['service_charges_amount'] ?? 0;
         $tax = $sale['tax_amount'] ?? 0;
         $netAmount = $totalAmount + $serviceCharges + $tax - $totalDiscount;
-        $paidAmount = ($sale['online_paid'] ?? 0) + ($sale['paid_amount'] ?? 0);
+        $onlinePaid = $sale['online_paid'] ?? 0;
+        $cashPaid = $sale['paid_amount'] ?? 0;
+        $paidAmount = $onlinePaid + $cashPaid;
         $change = $paidAmount - $netAmount;
         if ($change < 0) $change=0;
             @endphp
@@ -245,10 +247,20 @@
             </table>
 
             <table class="totals-table fw-bold">
-                <tr>
-                    <td>Paid</td>
-                    <td class="text-end">{{ number_format($paidAmount) }}</td>
-                </tr>
+                @if($cashPaid > 0)
+                    <tr>
+                        <td>Cash</td>
+                        <td class="text-end">{{ number_format($cashPaid) }}</td>
+                    </tr>
+                @endif
+                
+                @if($onlinePaid > 0)
+                    <tr>
+                        <td>{{ $sale['payment_type_name'] }}</td>
+                        <td class="text-end">{{ number_format($onlinePaid) }}</td>
+                    </tr>
+                @endif
+                
                 <tr>
                     <td>Change</td>
                     <td class="text-end">{{ number_format($change) }}</td>
