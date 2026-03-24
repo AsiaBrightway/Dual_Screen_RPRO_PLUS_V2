@@ -591,10 +591,10 @@
     </script>
     <script src="{{ asset('script/jquery.printPage.js') }}"></script>
     {{-- Dual Order Script --}}
-    <script src="{{ asset('script/dual_order_script.js') }}"></script>
+    {{-- <script src="{{ asset('script/dual_order_script.js') }}"></script> --}}
 
     {{-- Normal Order Script --}}
-    {{-- <script src="{{ asset('script/order_script.js') }}"></script> --}}
+    <script src="{{ asset('script/order_script.js') }}"></script>
     <script>
         $(document).ready(function() {
 
