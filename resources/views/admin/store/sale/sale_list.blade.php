@@ -56,19 +56,19 @@
                     <th>Voucher No:</th>
                     <th>Floor Name</th>
                     <th>Table Name</th>
-                    <th>Table Order No:</th>
+                    <th>Order No:</th>
                     <th>Total Amount</th>
                     <th>Net Amount</th>
                     <th>Payment Type</th>
-                    <th>Online Paid</th>
-                    <th>Cash Paid</th>
-                    <th>Balance</th>
+                    <th>Online</th>
+                    <th>Cash</th>
+                    {{-- <th>Balance</th>
                     <th>Change</th>
                     <th>Customer Name</th>
                     <th>Waiter Name</th>
                     <th>Cashier Name</th>
                     <th>Order Date / Time</th>
-                    {{-- <th>Delivery Charges</th> --}}
+                    <th>Delivery Charges</th> --}}
                     <th>View</th>
                     <th>Delete</th>
                 </tr>
@@ -95,13 +95,13 @@
                     <td>{{ $sale['payment_type_name'] }}</td>
                     <td>{{ $sale['online_paid'] }}</td>
                     <td>{{ $sale['paid_amount'] }}</td>
-                    <td>{{ $sale['balance_amount'] }}</td>
+                    {{-- <td>{{ $sale['balance_amount'] }}</td>
                     <td>{{ $sale['change_amount'] }}</td>
                     <td>{{ $sale['customer_name'] ?? '-----' }}</td>
                     <td>{{ $sale['waiter_name'] ?? '-----' }}</td>
                     <td>{{ $sale['cashier_name'] }}</td>
                     <td>{{ $sale['order_date'] }}</td>
-                    {{-- <td>{{ $sale['delivery_charges'] }}</td> --}}
+                    <td>{{ $sale['delivery_charges'] }}</td> --}}
                     <td><a href="{{ route('sale#saleOrderDetails', [$sale['sale_id'], 'date' => $dailyPrintDate]) }}"><i
                                 class="fa-solid fa-eye" style="color: green; cursor: pointer;"></i></a>
                     </td>
