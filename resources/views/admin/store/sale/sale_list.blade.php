@@ -78,6 +78,9 @@
                 $totalCashPayment = 0;
                 $totalOnlinePayment = 0;
                 $totalNetAmount = 0;
+                $totalService = 0;
+                $totalTax = 0;
+                $totalAmount = 0;
                 @endphp
                 @if (count($sales) != 0)
                 @php
@@ -117,6 +120,9 @@
                 $totalNetAmount += $sale['net_amount'];
                 $totalCashPayment += $sale['paid_amount'];
                 $totalOnlinePayment += $sale['online_paid'];
+                $totalService += $sale['service_charges_amount'];
+                $totalTax += $sale['tax_amount'];
+                $totalAmount += $sale['total_amount'];
                 @endphp
                 @endforeach
                 @endif
@@ -124,11 +130,6 @@
         </table>
     </div>
     <div class="sale_list_total_div p-2 bg-white shadow-sm mt-4 flex-column flex-md-row">
-        <div class="form-group">
-            <label class="form-label">Total Net Amount</label>
-            <input class="form-control muted text-start" type="text" id="total_quantity"
-                value="{{ $totalNetAmount }}" readonly>
-        </div>
         <div class="form-group">
             <label class="form-label">Total Cash Payment</label>
             <input class="form-control muted text-start" type="text" id="total_quantity"
@@ -139,6 +140,26 @@
             <input class="form-control muted text-start" type="text" id="total_quantity"
                 value="{{ $totalOnlinePayment }}" readonly>
         </div>
+        <div class="form-group">
+            <label class="form-label">Total Amount</label>
+            <input class="form-control muted text-start" type="text" id="total_quantity"
+                value="{{ $totalAmount }}" readonly>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Total Service Charge</label>
+            <input class="form-control muted text-start" type="text" id="total_quantity"
+                value="{{ $totalService }}" readonly>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Total Tax</label>
+            <input class="form-control muted text-start" type="text" id="total_quantity"
+                value="{{ $totalTax }}" readonly>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Total Net Amount</label>
+            <input class="form-control muted text-start" type="text" id="total_quantity"
+                value="{{ $totalNetAmount }}" readonly>
+        </div> 
     </div>
     <!--Delete Sale Modal -->
     <div class="modal fade" id="delete_sale_modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
