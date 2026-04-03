@@ -81,6 +81,7 @@
                 $totalService = 0;
                 $totalTax = 0;
                 $totalAmount = 0;
+                $totalPromo = 0;
                 @endphp
                 @if (count($sales) != 0)
                 @php
@@ -123,43 +124,94 @@
                 $totalService += $sale['service_charges_amount'];
                 $totalTax += $sale['tax_amount'];
                 $totalAmount += $sale['total_amount'];
+
+                $totalPromo += abs($sale['total_item_promo_amount'] ?? 0) + ($sale['voucher_discount_amount'] ?? 0);
+                
                 @endphp
                 @endforeach
                 @endif
             </tbody>
         </table>
-    </div>
-    <div class="sale_list_total_div p-2 bg-white shadow-sm mt-4 flex-column flex-md-row">
-        <div class="form-group">
-            <label class="form-label">Total Cash Payment</label>
-            <input class="form-control muted text-start" type="text" id="total_quantity"
-                value="{{ $totalCashPayment }}" readonly>
+
+        <div class="row justify-content-around align-items-end">
+            <div class="col-sm-6 col-md-4 col-lg-5">
+                <div id="left-total">
+                    <!-- Total Amount -->
+                    <div
+                        class="d-flex justify-content-between align-items-center p-1 rounded hover-bg-light">
+                        <span class="text-secondary">
+                            Total Amount
+                        </span>
+                        <span id="total_amount"
+                            class="fw-bold text-secondary">{{ number_format($totalAmount) }}</span>
+                    </div>
+
+                    <!-- Total Service -->
+                    <div
+                        class="d-flex justify-content-between align-items-center p-1 rounded hover-bg-light">
+                        <span class="text-secondary">
+                            Service Charges
+                        </span>
+                        <span id="total_service"
+                            class="fw-bold text-secondary">{{ number_format($totalService) }}</span>
+                    </div>
+
+                    <!-- Total Tax -->
+                    <div
+                        class="d-flex justify-content-between align-items-center p-1 rounded hover-bg-light">
+                        <span class="text-secondary">
+                            Tax
+                        </span>
+                        <span id="total_tax"
+                            class="fw-bold text-secondary">{{ number_format($totalTax) }}</span>
+                    </div>
+
+                    <!-- Total Discount -->
+                    <div
+                        class="d-flex justify-content-between align-items-center p-1 rounded hover-bg-light">
+                        <span class="text-secondary">
+                            Discount
+                        </span>
+                        <span id="total_promo"
+                            class="fw-bold text-secondary">{{ number_format($totalPromo) }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-md-4 col-lg-5">
+                <div class="pb-1 d-flex flex-column justify-content-end">
+                    <!-- Total Cash Payment -->
+                    <div
+                        class="d-flex justify-content-between align-items-center p-1 rounded hover-bg-light">
+                        <span class="text-secondary">
+                            Cash Payment
+                        </span>
+                        <span id="total_cash_payment"
+                            class="fw-bold text-secondary">{{ number_format($totalCashPayment) }}</span>
+                    </div>
+
+                    <!-- Total Online Payment -->
+                    <div
+                        class="d-flex justify-content-between align-items-center p-1 rounded hover-bg-light">
+                        <span class="text-secondary">
+                            Online Payment
+                        </span>
+                        <span id="total_online_payment"
+                            class="fw-bold text-secondary">{{ number_format($totalOnlinePayment) }}</span>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center p-1 rounded hover-bg-light">
+                        <span id="total_net_text" class="text-secondary">
+                            Total Net Amount
+                        </span>
+                        <span id="total_net_amount" class="fw-bold text-secondary"
+                            style="font-size: 1.1rem;">
+                            {{ number_format($totalNetAmount) }}
+                        </span>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="form-group">
-            <label class="form-label">Total Online Payment</label>
-            <input class="form-control muted text-start" type="text" id="total_quantity"
-                value="{{ $totalOnlinePayment }}" readonly>
-        </div>
-        <div class="form-group">
-            <label class="form-label">Total Amount</label>
-            <input class="form-control muted text-start" type="text" id="total_quantity"
-                value="{{ $totalAmount }}" readonly>
-        </div>
-        <div class="form-group">
-            <label class="form-label">Total Service Charge</label>
-            <input class="form-control muted text-start" type="text" id="total_quantity"
-                value="{{ $totalService }}" readonly>
-        </div>
-        <div class="form-group">
-            <label class="form-label">Total Tax</label>
-            <input class="form-control muted text-start" type="text" id="total_quantity"
-                value="{{ $totalTax }}" readonly>
-        </div>
-        <div class="form-group">
-            <label class="form-label">Total Net Amount</label>
-            <input class="form-control muted text-start" type="text" id="total_quantity"
-                value="{{ $totalNetAmount }}" readonly>
-        </div> 
     </div>
     <!--Delete Sale Modal -->
     <div class="modal fade" id="delete_sale_modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"

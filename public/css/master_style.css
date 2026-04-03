@@ -458,3 +458,11 @@ label.error {
 .blurred {
     filter: blur(15px);
 }
+
+.hover-bg-light {
+    transition: background-color 0.2s ease;
+}
+
+.hover-bg-light:hover {
+    background-color: #f8f9fa !important;
+}

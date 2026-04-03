@@ -1,19 +1,18 @@
-new DataTable("#item_list", {
+let table = new DataTable("#item_list", {
     scrollX: true,
+    autoWidth: false,
     columns: [
-        { width: "50px" },
-        { width: "100px" },
-        { width: "150px" },
-        { width: "150px" },
-        { width: "100px" },
-        { width: "80px" },
-        { width: "130px" },
-        { width: "120px" },
-        { width: "100px" },
-        { width: "100px" },
-        { width: "120px" },
-        { width: "70px" },
-        { width: "70px" }
+        { width: "4%" },   // No
+        { width: "7%" },   // Image
+        { width: "13%" },  // Item Name
+        { width: "8%" },   // Item Code
+        { width: "12%" },  // Main Category
+        { width: "11%" },  // Sub Category
+        { width: "8%" },   // Item Unit
+        { width: "8%" },   // Item Type
+        { width: "10%" },   // Discontinued
+        { width: "5%" },   // Edit
+        { width: "5%" }    // Delete
     ]
 });
 
@@ -46,6 +45,7 @@ if (localStorage.getItem("showItemInfoContainer")) {
 let item_list_container = document.querySelector(".item_list_container");
 if (localStorage.getItem("showItemListContainer")) {
     item_list_container.classList.add("show_container");
+    table.columns.adjust().draw();
 }
 
 let item_info_label = document.querySelector("#item_info_label");
@@ -67,6 +67,7 @@ item_list_label.addEventListener("click", (e) => {
     item_list_container.classList.toggle("show_container");
     if (item_list_container.classList.contains("show_container")) {
         localStorage.setItem("showItemListContainer", "true");
+        table.columns.adjust().draw();
     } else {
         localStorage.removeItem("showItemListContainer");
     }

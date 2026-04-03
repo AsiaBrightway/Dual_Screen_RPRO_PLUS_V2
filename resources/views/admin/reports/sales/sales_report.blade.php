@@ -46,10 +46,6 @@
             border-top-color: #512DA8 !important;
         }
 
-        .hover-bg-light:hover {
-            background-color: #f8f9fa;
-        }
-
         .bg-light-danger {
             background-color: rgba(220, 53, 69, 0.05);
         }
