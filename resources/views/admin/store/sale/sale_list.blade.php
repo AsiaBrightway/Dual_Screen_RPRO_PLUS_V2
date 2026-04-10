@@ -93,7 +93,7 @@
                     <td>{{ $sale['sale_voucher_number'] }}</td>
                     <td>{{ $sale['floor_name'] }}</td>
                     <td>{{ $sale['table_name'] }}</td>
-                    <td>{{ $sale['table_order_number'] }}</td>
+                    <td style="text-align: center;">{{ $sale['table_order_number'] }}</td>
                     <td>{{ $sale['total_amount'] }}</td>
                     <td>{{ $sale['net_amount'] }}</td>
                     <td>{{ $sale['payment_type_name'] }}</td>
@@ -126,7 +126,7 @@
                 $totalAmount += $sale['total_amount'];
 
                 $totalPromo += abs($sale['total_item_promo_amount'] ?? 0) + ($sale['voucher_discount_amount'] ?? 0);
-                
+
                 @endphp
                 @endforeach
                 @endif
@@ -199,7 +199,7 @@
                         <span id="total_online_payment"
                             class="fw-bold text-secondary">{{ number_format($totalOnlinePayment) }}</span>
                     </div>
-                    
+
                     <div class="d-flex justify-content-between align-items-center p-1 rounded hover-bg-light">
                         <span id="total_net_text" class="text-secondary">
                             Total Net Amount

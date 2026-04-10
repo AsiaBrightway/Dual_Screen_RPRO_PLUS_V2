@@ -21,6 +21,7 @@
 
     <link rel="stylesheet" href="{{ asset('css/sale_list_style.css') }}">
     <link rel="stylesheet" href="{{ asset('css/sale_order_details_style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/canceled_orders_style.css') }}">
 
     <link rel="stylesheet" href="{{ asset('css/table_reservation_style.css') }}">
 
@@ -164,6 +165,7 @@
             'setting_form',
             'stockControl_stockBalance_form',
             // 'reports_multishop_form',
+            'canceled_orders',
             ];
 
             foreach ($forms as $form) {
@@ -230,6 +232,7 @@
             50 => 'reports_top_sales_form',
             51 => 'setting_form',
             52 => 'stockControl_stockBalance_form',
+            53 => 'canceled_orders'
             // 'reports_multishop_form',
             ];
 
@@ -262,35 +265,20 @@
                 </div>
                 <ul class="sub-menu">
                     <li><a href="#" class="link_name">My Store</a></li>
-                    <li class="dine-in {{ $store_dineIn_form }}"><a href="{{ route('store#dineInPage') }}"
-                            class="plain_text">Dine-In</a>
-                    <li class="sale-lists {{ $store_saleLists_form }}"><a href="{{ route('sale#saleListPage') }}"
-                            class="plain_text">Sale-Lists</a>
+                    <li class="dine-in {{ $store_dineIn_form }}">
+                        <a href="{{ route('store#dineInPage') }}" class="plain_text">Dine-In</a>
                     </li>
-                    <li class="reservation {{ $store_reservation_form }}"><a
-                            href="{{ route('store#reservationPage') }}" class="plain_text">Reservation</a>
-                        {{-- <li class="sub-sub-list">
-                        <div class="icon-link">
-                            <a href="#" class="sub-arrow">Order Delivery </a>
-                            <i class="bx bxs-chevron-down sub-arrow"></i>
-                        </div>
-                        <ul class="sub-sub-menu">
-                            <li><a href="#">Delivery</a></li>
-                            <li><a href="#">Delivery Lists</a></li>
-                        </ul>
-                    </li> --}}
-                        {{-- <li class="sub-sub-list">
-                        <div class="icon-link">
-                            <a href="#" class="sub-arrow">Reservation</a>
-                            <i class="bx bxs-chevron-down sub-arrow"></i>
-                        </div>
-                        <ul class="sub-sub-menu">
-                            <li class="reservation"><a href="{{ route('store#reservationPage') }}">Table Reservation</a>
+                    <li class="sale-lists {{ $store_saleLists_form }}">
+                        <a href="{{ route('sale#saleListPage') }}" class="plain_text">Sale-Lists</a>
+                    </li>
+                    <li class="canceled-orders {{ $canceled_orders }}">
+                        <a href="{{ route('canceledOrders')}}" class="plain_text">Canceled Orders</a>
+                    </li>
+                    <li class="reservation {{ $store_reservation_form }}">
+                        <a href="{{ route('store#reservationPage') }}" class="plain_text">Reservation</a>
                     </li>
                 </ul>
-            </li> --}}
-        </ul>
-        </li>
+            </li>
         {{-- <li class="customer-list {{ $customers_form }}">
             <div class="icon-link">
                 <a href="#">

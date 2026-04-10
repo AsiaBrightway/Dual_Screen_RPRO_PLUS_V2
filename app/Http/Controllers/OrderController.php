@@ -70,6 +70,28 @@ class OrderController extends Controller
         return view('admin.store.order', compact('mainCategories', 'menuCategories', 'items', 'table', 'tableOrderValue', 'orderDetails'));
     }
 
+    public function canceledOrders(Request $request)
+    {
+        $filterDate = $request->query('filterDate', Carbon::now()->format('Y-m-d'));
+
+        $canceledOrders = DeletedOrder::select(
+            'deleted_orders.*',
+            'menu_items.item_name',
+            'orders.table_order_number',
+            'tables.table_name',
+            'users.name as ordered_by_name'
+        )
+            ->leftJoin('menu_items', 'deleted_orders.item_id', '=', 'menu_items.item_id')
+            ->leftJoin('orders', 'deleted_orders.order_id', '=', 'orders.order_id')
+            ->leftJoin('tables', 'orders.table_id', '=', 'tables.table_id')
+            ->leftJoin('users', 'deleted_orders.ordered_by', '=', 'users.id')
+            ->whereDate('deleted_orders.created_at', $filterDate)
+            ->orderBy('deleted_orders.created_at', 'desc')
+            ->get();
+
+        return view('admin.store.canceled_orders', compact('canceledOrders', 'filterDate'));
+    }
+
     public function getItemBySearchKey()
     {
         $dbItems = MenuItem::select('*', 'item_selling_prices.item_selling_price as item_price')
