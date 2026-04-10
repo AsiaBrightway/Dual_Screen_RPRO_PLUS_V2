@@ -260,8 +260,9 @@ class DineInController extends Controller
             'remark' => $request['remark'],
             'is_ordered' => $request['is_ordered'],
             'is_foc' => $request['is_foc'],
-            'ordered_by' => Auth::user()->id,
+            'ordered_by' => $request['ordered_by'],
             'table_id' => $tableid,
+            'deleted_by' => Auth::user()->id,
         ];
         return $data;
     }

@@ -283,7 +283,8 @@ class OrderController extends Controller
             $orderDetails = [];
             $orderDetailsTemp = OrderDetails::where('order_detail_id', $orderDetailID)->first();
             if ($orderDetailsTemp != null) {
-                $detail_data = $this->addDeletedOrderData($orderDetailsTemp);
+                $tableid = Order::where('order_id', $orderDetailsTemp->order_id)->first()->table_id;
+                $detail_data = $this->addDeletedOrderData($orderDetailsTemp, $tableid);
                 $detail_data['is_ordered'] = 1;
                 DeletedOrder::create($detail_data);
 
@@ -311,17 +312,19 @@ class OrderController extends Controller
         }
     }
 
-    private function addDeletedOrderData($orderDetailsTemp)
+    private function addDeletedOrderData($orderDetailsTemp, $tableid)
     {
         $data = [
 
             'order_id' => $orderDetailsTemp->order_id,
+            'table_id' => $tableid,
             'item_id' => $orderDetailsTemp->item_id,
             'quantity' => $orderDetailsTemp->quantity,
             'remark' => $orderDetailsTemp->remark,
             'is_ordered' => $orderDetailsTemp->is_ordered,
             'is_foc' => $orderDetailsTemp->is_foc,
-            'ordered_by' => 1,
+            'ordered_by' => Auth::id(),
+            'deleted_by' => Auth::id(),
         ];
         return $data;
     }

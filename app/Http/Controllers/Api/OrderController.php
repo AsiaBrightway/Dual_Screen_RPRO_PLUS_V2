@@ -242,6 +242,7 @@ class OrderController extends Controller
             $orderDetailsList = $request->input('unOrderItems');
             $tableID = $request->input('tableID');
             $tableOrderNumber = $request->input('tableOrderNumber');
+            $user_id = $request->input('user_id');
             $today = Carbon::today();
 
             // Remove reservation if exists
@@ -276,12 +277,12 @@ class OrderController extends Controller
 
                         $dayOfWeek = $today->format('l');
                         if (!array_filter($weekDays) || $weekDays[$dayOfWeek]) {
-                            $detailData = $this->addOrderDetailsPromotionData($detail, $orderID, $discountItem->promotion_price);
+                            $detailData = $this->addOrderDetailsPromotionData($detail, $orderID, $discountItem->promotion_price, $user_id);
                         } else {
-                            $detailData = $this->addOrderDetailsData($detail, $orderID);
+                            $detailData = $this->addOrderDetailsData($detail, $orderID, $user_id);
                         }
                     } else {
-                        $detailData = $this->addOrderDetailsData($detail, $orderID);
+                        $detailData = $this->addOrderDetailsData($detail, $orderID, $user_id);
                     }
 
                     $detailData['remark'] = $detailData['remark'] ?? '';
@@ -305,13 +306,13 @@ class OrderController extends Controller
         $data = [
             'table_id' => $request->input('tableID'),
             'table_order_number' => $request->input('tableOrderNumber'),
-            'ordered_by' => 1,
+            'ordered_by' => $request->input('user_id'),
 
         ];
         return $data;
     }
 
-    private function addOrderDetailsData($detail, $orderID)
+    private function addOrderDetailsData($detail, $orderID, $user_id)
     {
         $data = [
 
@@ -321,13 +322,13 @@ class OrderController extends Controller
             'remark' => $detail['orderItemRemark'],
             'is_ordered' => $detail['is_ordered'],
             'is_foc' => $detail['is_foc'],
-            'ordered_by' => 1,
+            'ordered_by' => $user_id,
         ];
         return $data;
     }
 
     //add order details promotion data
-    private function addOrderDetailsPromotionData($detail, $orderID, $promotionPrice)
+    private function addOrderDetailsPromotionData($detail, $orderID, $promotionPrice, $user_id)
     {
         $data = [
             'order_id' => $orderID,
@@ -337,21 +338,24 @@ class OrderController extends Controller
             'remark' => $detail['orderItemRemark'],
             'is_ordered' => $detail['is_ordered'],
             'is_foc' => $detail['is_foc'],
-            'ordered_by' => 1,
+            'ordered_by' => $user_id,
         ];
         return $data;
     }
-    public function deleteorderitem(string $id)
+    public function deleteorderitem(Request $request, string $id)
     {
         try {
             DB::beginTransaction();
             $orderDetail = OrderDetails::where('order_detail_id', $id)->first();
+            $user_id = $request->user_id;
 
             // $orderDetail = DB::table('order_details')->where('order_detail_id', $id)->first();
             if (!$orderDetail) {
                 return response()->json(['message' => 'Order detail not found'], 404);
             }
-            $detailData = $this->addDeletedOrderData($orderDetail, $id);
+            $tableid = Order::where('order_id', $orderDetail->order_id)->first()->table_id;
+
+            $detailData = $this->addDeletedOrderData($orderDetail, $tableid, $user_id);
             $detailData['is_ordered'] = 1;
             DeletedOrder::create($detailData);
 
@@ -375,17 +379,19 @@ class OrderController extends Controller
         }
     }
 
-    private function addDeletedOrderData($request, $orderID)
+    private function addDeletedOrderData($request, $tableid, $user_id)
     {
         $data = [
 
-            'order_id' => $orderID,
+            'order_id' => $request['order_id'],
+            'table_id' => $tableid,
             'item_id' => $request['item_id'],
             'quantity' => $request['quantity'],
             'remark' => $request['remark'],
             'is_ordered' => $request['is_ordered'],
             'is_foc' => $request['is_foc'],
-            'ordered_by' => 1,
+            'ordered_by' => $request['ordered_by'],
+            'deleted_by' => $user_id,
         ];
         return $data;
     }

@@ -21,5 +21,6 @@ class DeletedOrder extends Model
         'ordered_by',
         'created_at',
         'table_id',
+        'deleted_by'
     ];
 }
