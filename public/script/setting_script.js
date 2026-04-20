@@ -9,6 +9,7 @@ $(document).ready(function () {
     var store_dine_in_check_value = 0;
     var store_sale_lists_check_value = 0;
     var store_reservation_check_value = 0;
+    var store_canceled_orders_value = 0;
 
     var customers_check_value = 0;
     var customers_customer_check_value = 0;
@@ -73,6 +74,7 @@ $(document).ready(function () {
         $("#store_dine_in_check").prop("checked", false);
         $("#store_sale_lists_check").prop("checked", false);
         $("#store_reservation_check").prop("checked", false);
+        $("#store_canceled_orders_check").prop("checked", false);
 
         $("#customers_check").prop("checked", false);
         $("#customers_customer_check").prop("checked", false);
@@ -163,6 +165,7 @@ $(document).ready(function () {
             store_dine_in_check_value = 1;
             store_sale_lists_check_value = 1;
             store_reservation_check_value = 1;
+            store_canceled_orders_value = 1;
 
             customers_check_value = 1;
             customers_customer_check_value = 1;
@@ -226,6 +229,7 @@ $(document).ready(function () {
             $("#store_dine_in_check").prop("checked", true);
             $("#store_sale_lists_check").prop("checked", true);
             $("#store_reservation_check").prop("checked", true);
+            $("#store_canceled_orders_check").prop("checked", true);
 
             $("#customers_check").prop("checked", true);
             $("#customers_customer_check").prop("checked", true);
@@ -320,6 +324,7 @@ $(document).ready(function () {
             store_dine_in_check_value = 0;
             store_sale_lists_check_value = 0;
             store_reservation_check_value = 0;
+            store_canceled_orders_value = 0;
 
             customers_check_value = 0;
             customers_customer_check_value = 0;
@@ -382,6 +387,7 @@ $(document).ready(function () {
             $("#store_dine_in_check").prop("checked", false);
             $("#store_sale_lists_check").prop("checked", false);
             $("#store_reservation_check").prop("checked", false);
+            $("#store_canceled_orders_check").prop("checked", false);
 
             $("#customers_check").prop("checked", false);
             $("#customers_customer_check").prop("checked", false);
@@ -519,14 +525,27 @@ $(document).ready(function () {
                     store_reservation_check_value = 0;
                 }
             });
+            $("#store_canceled_orders_check").click(function () {
+                $("#select_all_check").prop("checked", false);
+                var store_canceled_orders_check = $("#store_canceled_orders_check").is(
+                    ":checked"
+                );
+                if (store_canceled_orders_check) {
+                    store_canceled_orders_check_value = 1;
+                } else {
+                    store_canceled_orders_check_value = 0;
+                }
+            })
         } else {
             store_check_value = 0;
             store_dine_in_check_value = 0;
             store_sale_lists_check_value = 0;
             store_reservation_check_value = 0;
+            store_canceled_orders_value = 0;
             $("#store_dine_in_check").prop("checked", false);
             $("#store_sale_lists_check").prop("checked", false);
             $("#store_reservation_check").prop("checked", false);
+            $("#store_canceled_orders_check").prop("checked", false);
             $(".store_child_div").addClass("d-none");
         }
     });
@@ -559,6 +578,17 @@ $(document).ready(function () {
             store_reservation_check_value = 1;
         } else {
             store_reservation_check_value = 0;
+        }
+    });
+    $("#store_canceled_orders_check").click(function () {
+        $("#select_all_check").prop("checked", false);
+        var store_canceled_orders_check = $("#store_canceled_orders_check").is(
+            ":checked"
+        );
+        if (store_canceled_orders_check) {
+            store_canceled_orders_value = 1;
+        } else {
+            store_canceled_orders_value = 0;
         }
     });
     $("#customers_check").click(function () {
@@ -1959,6 +1989,11 @@ $(document).ready(function () {
         },
         {
             role_id: userRole,
+            form_menu_id: 53,
+            is_used: store_canceled_orders_value,
+        },
+        {
+            role_id: userRole,
             form_menu_id: 6,
             is_used: customers_check_value,
         },
@@ -2256,6 +2291,7 @@ $(document).ready(function () {
                     { id: 3, checkboxId: "#store_dine_in_check" },
                     { id: 4, checkboxId: "#store_sale_lists_check" },
                     { id: 5, checkboxId: "#store_reservation_check" },
+                    { id: 53, checkboxId: "#store_canceled_orders_check" },
                     {
                         id: 6,
                         checkboxId: "#customers_check",
@@ -2422,6 +2458,9 @@ $(document).ready(function () {
                     }
                     if (menu.checkboxId === "#store_reservation_check") {
                         store_reservation_check_value = isChecked ? 1 : 0;
+                    }
+                    if (menu.checkboxId === "#store_canceled_orders_check") {
+                        store_canceled_orders_value = isChecked ? 1 : 0;
                     }
                     if (menu.checkboxId === "#customers_check") {
                         customers_check_value = isChecked ? 1 : 0;
