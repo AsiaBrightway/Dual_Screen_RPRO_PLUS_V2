@@ -86,6 +86,11 @@
                                     name="store_reservation_check">
                                 <label class="form-check-label" for="store_reservation_check">Reservation</label>
                             </div>
+                            <div class="form-check mb-3 ms-4">
+                                <input class="form-check-input" type="checkbox" id="store_canceled_orders_check"
+                                    name="store_canceled_orders_check">
+                                <label class="form-check-label" for="store_canceled_orders_check">Canceled Orders</label>
+                            </div>
                         </div>
                     </div>
                 </div>
