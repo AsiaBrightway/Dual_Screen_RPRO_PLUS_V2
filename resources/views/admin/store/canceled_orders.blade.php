@@ -32,12 +32,13 @@
                 <thead>
                     <tr>
                         <th>No</th>
-                        <th>Order ID</th>
                         <th>Item Name</th>
                         <th>Quantity</th>
+                        <th>Order ID</th>        
                         <th>Table</th>
-                        <th style="min-width: 300px;">Remark</th>
                         <th>Order By</th>
+                        <th>Deleted By</th>
+                        <th>Deleted Time</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -47,12 +48,13 @@
                     @foreach ($canceledOrders as $order)
                     <tr>
                         <td>{{ $count++ }}</td>
-                        <td>{{ $order->order_id }}</td>
                         <td>{{ $order->item_name }}</td>
                         <td>{{ $order->quantity }}</td>
+                        <td>{{ $order->order_id }}</td>                  
                         <td>{{ $order->table_name }}</td>
-                        <td style="white-space: normal;">{{ $order->remark }}</td>
                         <td>{{ $order->ordered_by_name }}</td>
+                        <td>{{ $order->deleted_by_name }}</td>
+                        <td>{{ \Carbon\Carbon::parse($order->created_at)->format('h:i A') }}</td>
                     </tr>
                     @endforeach
                     @endif
