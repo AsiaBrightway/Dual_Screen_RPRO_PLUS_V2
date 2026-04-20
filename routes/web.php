@@ -397,6 +397,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session')])->group(fun
         Route::get('searchKey/getItem', [OrderController::class, 'getItemBySearchKey']);
         Route::get('order/deleteOrderItem', [OrderController::class, 'deleteOrderItem']);
         Route::get('order/updateOrderItem', [OrderController::class, 'updateOrderItem']);
+        Route::get('order/canceledOrders', [OrderController::class, 'canceledOrders'])->name('canceledOrders');
 
         Route::get('saleListPage', [SalesController::class, 'saleListPage'])->name('sale#saleListPage');
         Route::post('sale/orderInvoice', [SalesController::class, 'orderInvoice'])->name('sale#orderInvoice');

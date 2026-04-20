@@ -287,7 +287,7 @@
                     <td>{{ $item['item_code'] }}</td>
                     <td>{{ $item['main_category_name'] }}</td>
                     <td>{{ $item['menu_category_name'] }}</td>
-                    <td>{{ $item['unit_name'] }}</td>
+                    <td style="text-align: center">{{ $item['unit_name'] }}</td>
                     <td>{{ $item['item_type_name'] }}</td>
                     @if ($item['item_is_discontinued'] == 0)
                     <td style="text-align: center"><input class="form-check-input" type="checkbox"
