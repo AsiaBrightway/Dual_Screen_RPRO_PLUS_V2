@@ -360,11 +360,14 @@ class SalesController extends Controller
             ->selectRaw('MI.item_name as item_name')
             ->selectRaw('MC.menu_category_name as menu_category_name')
             ->selectRaw('MC.category_id as menu_category_id')
+            ->selectRaw('MNC.main_category_id as main_category_id')
+            ->selectRaw('MNC.main_category_name as main_category_name')
             ->leftJoin('menu_items as MI', 'sales_details.item_id', '=', 'MI.item_id')
             ->leftJoin('menu_categories as MC', 'MI.sub_category_id', '=', 'MC.category_id')
+            ->leftJoin('main_categories as MNC', 'MI.main_category_id', '=', 'MNC.main_category_id')
             ->whereDate('sales_details.created_at', $dailyPrintDate)
             ->where('sales_details.is_foc', 0)
-            ->groupBy(['MI.item_name', 'MC.menu_category_name', 'MC.category_id'])
+            ->groupBy(['MI.item_name', 'MC.menu_category_name', 'MC.category_id', 'MNC.main_category_id', 'MNC.main_category_name'])
             ->orderBy('MC.category_id') // Add this line to order by menu_category_id
             ->get()
             ->toArray();
@@ -380,6 +383,8 @@ class SalesController extends Controller
                 $saleDetailsNestedDatas[$menuCategoryId] = [
                     'menu_category_name' => $menuCategoryName,
                     'menu_category_id' => $menuCategoryId,
+                    'main_category_id' => $detail['main_category_id'],
+                    'main_category_name' => $detail['main_category_name'],
                     'items' => [],
                 ];
             }
@@ -399,11 +404,14 @@ class SalesController extends Controller
             ->selectRaw('MI.item_name as item_name')
             ->selectRaw('MC.menu_category_name as menu_category_name')
             ->selectRaw('MC.category_id as menu_category_id')
+            ->selectRaw('MNC.main_category_id as main_category_id')
+            ->selectRaw('MNC.main_category_name as main_category_name')
             ->join('menu_items as MI', 'sales_details.item_id', '=', 'MI.item_id')
             ->join('menu_categories as MC', 'MI.sub_category_id', '=', 'MC.category_id')
+            ->leftJoin('main_categories as MNC', 'MI.main_category_id', '=', 'MNC.main_category_id')
             ->whereDate('sales_details.created_at', $dailyPrintDate)
             ->where('sales_details.is_foc', 1)
-            ->groupBy(['MI.item_name', 'MC.menu_category_name', 'MC.category_id'])
+            ->groupBy(['MI.item_name', 'MC.menu_category_name', 'MC.category_id', 'MNC.main_category_id', 'MNC.main_category_name'])
             ->orderBy('MC.category_id') // Add this line to order by menu_category_id
             ->get()
             ->toArray();
