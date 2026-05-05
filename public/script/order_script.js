@@ -141,17 +141,17 @@ $(document).ready(function () {
                         success: function (data) {
                             $(".item_div").empty();
                             $.each(data, function (key, value) {
-                                if (value.store_qty <= 0 && value.item_type_id == 1) {
-                                    var disabled = "";
-                                    var textColor = "orange";
-                                    value.store_qty = 0;
-                                } else if (value.store_qty <= 0) {
-                                    var disabled = "";
-                                    var textColor = "red";
-                                } else {
-                                    var disabled = "";
-                                    var textColor = "green"
-                                }
+                                // if (value.store_qty <= 0 && value.item_type_id == 1) {
+                                //     var disabled = "";
+                                //     var textColor = "orange";
+                                //     value.store_qty = 0;
+                                // } else if (value.store_qty <= 0) {
+                                //     var disabled = "";
+                                //     var textColor = "red";
+                                // } else {
+                                //     var disabled = "";
+                                //     var textColor = "green"
+                                // }
 
                                 $(".item_div").append(
                                     ' <button class="btn m-2 item-button p-0 shadow-sm" style="width: 178px; height: 200px; border-radius: 20px; border: none;" data-item_id="' +
@@ -163,7 +163,6 @@ $(document).ready(function () {
                                     '" data-item_price="' +
                                     value.item_price +
                                     '" ' +
-                                    disabled +
                                     ">" +
                                     '<div class="card h-100 w-100" style="background: white">' +
                                     '<img src="' +
@@ -171,16 +170,13 @@ $(document).ready(function () {
                                     '" class="card-img-top w-100" loading="lazy" alt="..." style="height:110px; object-fit: cover">' +
                                     // (value.item_image != null ? 'contain">' : 'cover">') +
                                     '<div class="card-body" style="height:0px">' +
-                                    '<p class="card-title text-muted" style="text-align: start; margin-top:-10px;font-size:12px">' +
+                                    '<p class="card-title text-muted" style="text-align: start; font-size:14px">' +
                                     truncateWords(value.item_name, 3, '...') +
                                     "</p>" +
-                                    '<p class="card-text" style="text-align: start; margin-top: -5px; font-size: 15px; font-weight: 600">' +
+                                    '<p class="card-text" style="text-align: start; font-size: 15px; font-weight: 600">' +
                                     value.item_price.toLocaleString() +
-                                    " MMK <br><span style='color:" +
-                                    textColor +
-                                    ";font-size:12px'>Store Qty: " +
-                                    value.store_qty +
-                                    "</span></p>" +
+                                    " MMK" +
+                                    "</p>" +
                                     '</div>' +
                                     '</div>' +
                                     '</button>'
@@ -200,17 +196,17 @@ $(document).ready(function () {
                         success: function (data) {
                             $(".item_div").empty();
                             $.each(data, function (key, value) {
-                                if (value.store_qty <= 0 && value.item_type_id == 1) {
-                                    var disabled = "";
-                                    var textColor = "orange";
-                                    value.store_qty = 0;
-                                } else if (value.store_qty <= 0) {
-                                    var disabled = "";
-                                    var textColor = "red";
-                                } else {
-                                    var disabled = "";
-                                    var textColor = "green"
-                                }
+                                // if (value.store_qty <= 0 && value.item_type_id == 1) {
+                                //     var disabled = "";
+                                //     var textColor = "orange";
+                                //     value.store_qty = 0;
+                                // } else if (value.store_qty <= 0) {
+                                //     var disabled = "";
+                                //     var textColor = "red";
+                                // } else {
+                                //     var disabled = "";
+                                //     var textColor = "green"
+                                // }
 
 
                                 $(".item_div").append(
@@ -223,7 +219,6 @@ $(document).ready(function () {
                                     '" data-item_price="' +
                                     value.item_price +
                                     '" ' +
-                                    disabled +
                                     ">" +
                                     '<div class="card h-100 w-100" style="background: white">' +
                                     '<img src="' +
@@ -231,16 +226,13 @@ $(document).ready(function () {
                                     '" class="card-img-top w-100" loading="lazy" alt="..." style="height:110px; object-fit: cover">' +
                                     // (value.item_image != null ? 'contain">' : 'cover">') +
                                     '<div class="card-body" style="height:0px">' +
-                                    '<p class="card-title text-muted" style="text-align: start; margin-top:-10px;font-size:12px">' +
+                                    '<p class="card-title text-muted" style="text-align: start; font-size:14px">' +
                                     truncateWords(value.item_name, 3, '...') +
                                     "</p>" +
-                                    '<p class="card-text" style="text-align: start; margin-top: -5px; font-size: 15px; font-weight: 600">' +
+                                    '<p class="card-text" style="text-align: start; font-size: 15px; font-weight: 600">' +
                                     value.item_price.toLocaleString() +
-                                    " MMK <br><span style='color:" +
-                                    textColor +
-                                    ";font-size:12px'>Store Qty: " +
-                                    value.store_qty +
-                                    "</span></p>" +
+                                    " MMK" +
+                                    "</p>" +
                                     '</div>' +
                                     '</div>' +
                                     '</button>'
@@ -346,18 +338,18 @@ $(document).ready(function () {
             success: function (data) {
                 $(".item_div").empty();
                 $.each(data, function (key, value) {
-                    console.log(value);
-                    if (value.store_qty <= 0 && value.item_type_id == 1) {
-                        var disabled = "";
-                        var textColor = "orange";
-                        value.store_qty = 0;
-                    } else if (value.store_qty <= 0) {
-                        var disabled = "";
-                        var textColor = "red";
-                    } else {
-                        var disabled = "";
-                        var textColor = "green"
-                    }
+                    // console.log(value);
+                    // if (value.store_qty <= 0 && value.item_type_id == 1) {
+                    //     var disabled = "";
+                    //     var textColor = "orange";
+                    //     value.store_qty = 0;
+                    // } else if (value.store_qty <= 0) {
+                    //     var disabled = "";
+                    //     var textColor = "red";
+                    // } else {
+                    //     var disabled = "";
+                    //     var textColor = "green"
+                    // }
 
                     $(".item_div").append(
                         ' <button class="btn m-2 item-button p-0 shadow-sm" style="width: 178px; height: 200px; border-radius: 20px; border: none;" data-item_id="' +
@@ -369,7 +361,6 @@ $(document).ready(function () {
                         '" data-item_price="' +
                         value.item_price +
                         '" ' +
-                        disabled +
                         ">" +
                         '<div class="card h-100 w-100" style="background: white">' +
                         '<img src="' +
@@ -377,16 +368,13 @@ $(document).ready(function () {
                         '" class="card-img-top w-100" loading="lazy" alt="..." style="height:110px; object-fit: cover">' +
                         // (value.item_image != null ? 'contain">' : 'cover">') +
                         '<div class="card-body" style="height:0px">' +
-                        '<p class="card-title text-muted" style="text-align: start; margin-top:-10px;font-size:12px">' +
+                        '<p class="card-title text-muted" style="text-align: start; font-size: 14px">' +
                         truncateWords(value.item_name, 3, '...') +
                         "</p>" +
-                        '<p class="card-text" style="text-align: start; margin-top: -5px; font-size: 15px; font-weight: 600">' +
+                        '<p class="card-text" style="text-align: start; font-size: 15px; font-weight: 600">' +
                         value.item_price.toLocaleString() +
-                        " MMK <br><span style='color:" +
-                        textColor +
-                        ";font-size:12px'>Store Qty: " +
-                        value.store_qty +
-                        '</span></p>' +
+                        " MMK" +
+                        '</p>' +
                         "</div>" +
                         "</div>" +
                         "</button>"
@@ -973,17 +961,17 @@ $(document).ready(function () {
             success: function (data) {
                 $(".item_div").empty();
                 $.each(data, function (key, value) {
-                    if (value.store_qty <= 0 && value.item_type_id == 1) {
-                        var disabled = "";
-                        var textColor = "orange";
-                        value.store_qty = 0;
-                    } else if (value.store_qty <= 0) {
-                        var disabled = "";
-                        var textColor = "red";
-                    } else {
-                        var disabled = "";
-                        var textColor = "green";
-                    };
+                    // if (value.store_qty <= 0 && value.item_type_id == 1) {
+                    //     var disabled = "";
+                    //     var textColor = "orange";
+                    //     value.store_qty = 0;
+                    // } else if (value.store_qty <= 0) {
+                    //     var disabled = "";
+                    //     var textColor = "red";
+                    // } else {
+                    //     var disabled = "";
+                    //     var textColor = "green";
+                    // };
 
                     $(".item_div").append(
                         '<button class="btn m-2 item-button p-0" style="width: 180px; height: 200px; border-radius: 20px; border: none;" data-item_id="' +
@@ -995,22 +983,18 @@ $(document).ready(function () {
                         '" data-item_price="' +
                         value.item_price +
                         '" ' +
-                        disabled +
                         ">" +
                         '<div class="card h-100 w-100" style="background: white">' +
                         '<img src="' + (value.item_image != null ? '/storage/Images/' + value.item_image : '/404_image.png') +
-                        '" class="card-img-top w-100" loading="lazy" alt="..." style="height:110px">' +
+                        '" class="card-img-top w-100" loading="lazy" alt="..." style="height:110px; object-fit: cover;">' +
                         '<div class="card-body" style="height:0px">' +
-                        '<p class="card-title text-muted" style="text-align: start; margin-top:-10px;font-size:12px">' +
+                        '<p class="card-title text-muted" style="text-align: start; font-size:14px">' +
                         truncateWords(value.item_name, 3, '...') +
                         "</p>" +
-                        '<p class="card-text" style="text-align: start; margin-top: -5px; font-size: 15px; font-weight: 600">' +
+                        '<p class="card-text" style="text-align: start; font-size: 15px; font-weight: 600">' +
                         value.item_price.toLocaleString() +
-                        " MMK <br><span style='color:" +
-                        textColor +
-                        ";font-size:12px'>Store Qty: " +
-                        value.store_qty +
-                        "</span></p>" +
+                        " MMK" +
+                        "</p>" +
                         "</div>" +
                         "</div>" +
                         "</button>"

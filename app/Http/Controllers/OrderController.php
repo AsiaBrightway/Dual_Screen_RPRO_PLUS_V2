@@ -42,9 +42,7 @@ class OrderController extends Controller
 
         // dd($dbItems);
 
-        $items = $this->addStoreQtyToItems($dbItems);
-
-        // dd(count($menuCategories), $menuCategories);
+        // $items = $this->addStoreQtyToItems($dbItems);
 
         $table = Table::where('table_id', $tableID)->get();
 
@@ -67,7 +65,7 @@ class OrderController extends Controller
 
         // dd($table);
         // dd($orderDetails);
-        return view('admin.store.order', compact('mainCategories', 'menuCategories', 'items', 'table', 'tableOrderValue', 'orderDetails'));
+        return view('admin.store.order', compact('mainCategories', 'menuCategories', 'dbItems', 'table', 'tableOrderValue', 'orderDetails'));
     }
 
     public function canceledOrders(Request $request)
@@ -108,10 +106,10 @@ class OrderController extends Controller
             })
             ->get();
 
-        $items = $this->addStoreQtyToItems($dbItems);
+        // $items = $this->addStoreQtyToItems($dbItems);
         // dd($items);
 
-        return response()->json($items);
+        return response()->json($dbItems);
     }
 
 
@@ -140,7 +138,7 @@ class OrderController extends Controller
                 ->whereIn('item_type_id', [1, 3])
                 ->get()->toArray();
 
-            $items = $this->addStoreQtyToItems($dbItems);
+            // $items = $this->addStoreQtyToItems($dbItems);
         } else {
             $dbItems = MenuItem::select('*', 'item_selling_prices.item_selling_price as item_price')
                 ->join('item_selling_prices', 'menu_items.item_id', 'item_selling_prices.item_id')
@@ -150,10 +148,10 @@ class OrderController extends Controller
                 ->where('sub_category_id', $selectedSubCategoryID)
                 ->get()->toArray();
 
-            $items = $this->addStoreQtyToItems($dbItems);
+            // $items = $this->addStoreQtyToItems($dbItems);
         }
         // dd($items);
-        return response()->json($items);
+        return response()->json($dbItems);
     }
 
     public function getItemByMainCategory(Request $req)
@@ -167,7 +165,7 @@ class OrderController extends Controller
                 ->whereIn('item_type_id', [1, 3])
                 ->get()->toArray();
 
-            $items = $this->addStoreQtyToItems($dbItems);
+            // $items = $this->addStoreQtyToItems($dbItems);
         } else {
             $dbItems = MenuItem::select('*', 'item_selling_prices.item_selling_price as item_price')
                 ->join('item_selling_prices', 'menu_items.item_id', 'item_selling_prices.item_id')
@@ -177,10 +175,10 @@ class OrderController extends Controller
                 ->where('main_category_id', $selectedMainCategoryID)
                 ->get()->toArray();
 
-            $items = $this->addStoreQtyToItems($dbItems);
+            // $items = $this->addStoreQtyToItems($dbItems);
         }
 
-        return response()->json($items);
+        return response()->json($dbItems);
     }
 
     public function addOrderItem(Request $req)
