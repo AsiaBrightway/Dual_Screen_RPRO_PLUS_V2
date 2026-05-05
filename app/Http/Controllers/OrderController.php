@@ -343,7 +343,7 @@ class OrderController extends Controller
             'remark' => $orderDetailsTemp->remark,
             'is_ordered' => $orderDetailsTemp->is_ordered,
             'is_foc' => $orderDetailsTemp->is_foc,
-            'ordered_by' => Auth::id(),
+            'ordered_by' => $orderDetailsTemp->ordered_by,
             'deleted_by' => Auth::id(),
         ];
         return $data;
