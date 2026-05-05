@@ -105,18 +105,22 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @php
+                        $count = 1;
+                        @endphp
+                        @foreach ($selectedReceiveDetail as $item)
                         <tr>
-                            <td>{{ count($selectedReceiveDetail) }}</td>
-                            <td>{{ $selectedReceiveDetail[0]['item_name'] }}</td>
-                            <td>{{ $selectedReceiveDetail[0]['item_code'] }}</td>
-                            <td>{{ $selectedReceiveDetail[0]['bar_code'] }}</td>
-                            <td>{{ $selectedReceiveDetail[0]['unit_name'] }}</td>
-                            <td>{{ number_format($selectedReceiveDetail[0]['quantity']) }}</td>
-                            <td>{{ number_format($selectedReceiveDetail[0]['unit_cost']) }} MMK</td>
-                            <td>{{ number_format($selectedReceiveDetail[0]['unit_cost'] * $selectedReceiveDetail[0]['quantity']) }} MMK</td>
-                            <td>{{ date('Y-m-d', strtotime($selectedReceiveDetail[0]['expire_date'])) }}</td>
+                            <td>{{ $count++ }}</td>
+                            <td>{{ $item['item_name'] }}</td>
+                            <td>{{ $item['item_code'] }}</td>
+                            <td>{{ $item['bar_code'] }}</td>
+                            <td>{{ $item['unit_name'] }}</td>
+                            <td>{{ number_format($item['quantity']) }}</td>
+                            <td>{{ number_format($item['unit_cost']) }} MMK</td>
+                            <td>{{ number_format($item['unit_cost'] * $item['quantity']) }} MMK</td>
+                            <td>{{ date('Y-m-d', strtotime($item['expire_date'])) }}</td>
                         </tr>
-
+                        @endforeach
                     </tbody>
                 </table>
             </div>

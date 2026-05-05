@@ -17,9 +17,10 @@ sale_list_label.addEventListener("click", (e) => {
 
 new DataTable("#sale_list", {
     scrollX: true,
+    scrollY: "410px",
+    scrollCollapse: true,
+    pageLength: 10,
 });
-
-
 
 $(document).on("click", ".delete_sale_modal_dialog", function () {
     var sale_voucher_number = $(this).data("sale_voucher_number");

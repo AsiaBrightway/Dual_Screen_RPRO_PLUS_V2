@@ -112,17 +112,22 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @php
+                        $count = 1;
+                        @endphp
+                        @foreach ($selectedStockIssuesDetailList as $item)
                         <tr>
-                            <td>{{ count($selectedStockIssuesDetailList) }}</td>
-                            <td>{{ $selectedStockIssuesDetailList[0]['item_name'] }}</td>
-                            <td>{{ $selectedStockIssuesDetailList[0]['item_code'] }}</td>
-                            <td>{{ $selectedStockIssuesDetailList[0]['barcode'] }}</td>
-                            <td>{{ $selectedStockIssuesDetailList[0]['batch_number'] }}</td>
-                            <td>{{ $selectedStockIssuesDetailList[0]['unit_name'] }}</td>
-                            <td>{{ number_format($selectedStockIssuesDetailList[0]['quantity']) }}</td>
-                            <td>{{ $selectedStockIssuesDetailList[0]['issue_type'] }}</td>
-                            <td>{{ date('Y-m-d', strtotime($selectedStockIssuesDetailList[0]['expire_date'])) }}</td>
+                            <td>{{ $count++ }}</td>
+                            <td>{{ $item['item_name'] }}</td>
+                            <td>{{ $item['item_code'] }}</td>
+                            <td>{{ $item['barcode'] }}</td>
+                            <td>{{ $item['batch_number'] }}</td>
+                            <td>{{ $item['unit_name'] }}</td>
+                            <td>{{ number_format($item['quantity']) }}</td>
+                            <td>{{ $item['issue_type'] }}</td>
+                            <td>{{ date('Y-m-d', strtotime($item['expire_date'])) }}</td>
                         </tr>
+                        @endforeach
                     </tbody>
                 </table>
             </div>

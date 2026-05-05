@@ -2,6 +2,25 @@
 @section('title', 'Sale Lists')
 
 @section('content')
+<style>
+    .dataTables_scrollHead {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: #fff;
+        border-bottom: 2px solid #dee2e6;
+        scrollbar-gutter: stable;
+    }
+
+    .dataTables_scrollHead thead th {
+        background-color: #f8f9fa;
+        white-space: nowrap;
+    }
+
+    .dataTables_scrollBody {
+        scrollbar-gutter: stable;
+    }
+</style>
 <section class="home-section">
     <div class="home-title">
         <i class='bx bx-menu'></i>
@@ -59,7 +78,7 @@
                     <th>Order No:</th>
                     <th>Total Amount</th>
                     <th>Net Amount</th>
-                    <th>Payment Type</th>
+                    <th>Payment</th>
                     <th>Online</th>
                     <th>Cash</th>
                     {{-- <th>Balance</th>
