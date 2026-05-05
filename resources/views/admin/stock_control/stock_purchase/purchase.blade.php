@@ -635,7 +635,7 @@
                     var expire_date = new Date(purchase_detail_entry.expire_date);
                     $('#purchase_detail').append(
                         `<tr><td>${purchase_detail_entry.no}</td>
-                                <td style="word-wrap:break-world; white-space:normal;">${purchase_detail_entry.item_name}</td><td>${purchase_detail_entry.item_code}</td><td>${purchase_detail_entry.barcode}</td><td>${purchase_detail_entry.unit_name}</td>
+                                <td>${purchase_detail_entry.item_name}</td><td>${purchase_detail_entry.item_code}</td><td>${purchase_detail_entry.barcode}</td><td>${purchase_detail_entry.unit_name}</td>
                                 <td>${purchase_detail_entry.qty}</td><td>${purchase_detail_entry.unit_cost}</td><td>${purchase_detail_entry.amount}</td>
                                 <td>${purchase_detail_entry.discount}</td><td>${purchase_detail_entry.net_amount}</td><td><input type="checkbox" ${purchase_detail_entry.foc?'checked':'unchecked'} disabled></td><td>${('0' + expire_date.getDate()).slice(-2)+ '/' + ('0' + (expire_date.getMonth() + 1)).slice(-2) + '/' + expire_date.getFullYear()}</td></tr>`
                     );
@@ -688,7 +688,7 @@
                     var row = table.insertRow(index);
                     var j = 0;
                     $.each(purchase_detail_entry, function(key, value) {
-                        if (key != "itemID" && key != "unit_id") {
+                        if (key != "itemID" && key != "unit_id" && key != "store_qty") {
                             var cell = row.insertCell(j);
                             if (key == "foc") {
                                 var chkbox = document.createElement('input');
@@ -776,6 +776,7 @@
                     $('#unit_id').append('<option value="' + selecteddetail.unit_id + '">' + selecteddetail
                         .unit_name +
                         '</option>');
+                    $('#store_Qty').val(selecteddetail.store_qty);
                     $('#unit_id').val(selecteddetail.unit_id);
                     $('#qty').val(selecteddetail.qty);
                     $('#unit_cost').val(selecteddetail.unit_cost);
@@ -988,6 +989,7 @@
                 $('#item_code').val(0);
                 $('#barcode').val(null);
                 $('#unit_id').empty();
+                $('#store_Qty').val('0');
                 $('#qty').val(null);
                 $('#unit_cost').val('');
                 $('#amount').val(0);

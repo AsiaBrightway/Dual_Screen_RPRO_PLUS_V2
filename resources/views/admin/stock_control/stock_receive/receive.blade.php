@@ -550,6 +550,7 @@
                 $('#item_code').val(0);
                 $('#bar_code').val('');
                 $('#unit_name').val('');
+                $('#store_Qty').val('0');
                 $('#quantity').val('1');
                 $('#unit_cost').val('');
                 $('#amount').val('');
@@ -647,6 +648,7 @@
                 document.getElementById('item_code').value = rowData.item_id; // item_code
                 document.getElementById('bar_code').value = rowData.bar_code; // bar_code
                 document.getElementById('unit_name').value = rowData.unit_id; // unit_name
+                document.getElementById('store_Qty').value = rowData.store_qty; // store_Qty
                 document.getElementById('quantity').value = rowData.quantity; // quantity
                 document.getElementById('unit_cost').value = rowData.unit_cost; // unit_cost
                 document.getElementById('amount').value = rowData.quantity * rowData.unit_cost; // amount
