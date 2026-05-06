@@ -516,13 +516,14 @@
                     $('#item_name').val(selected_item[0].item_id);
                     $('#item_code').val(selected_item[0].item_id);
                     $('#bar_code').val(selected_item[0].bar_code);
-
                     $('#unit_name').empty();
                     $('#unit_name').append('<option value="' + selected_item[0].unit_id + '">' + selected_item[0]
                         .unit_name +
                         '</option>');
                     $('#unit_name').val(selected_item[0].unit_id);
-                    $('#unit_name').val(selected_item[0].unit_id);
+                    // Reset unit_cost and amount immediately when a new item is selected
+                    $('#unit_cost').val('');
+                    $('#amount').val('');
                     $.ajax({
                         url: "checkStoreQty",
                         type: "get",
@@ -537,10 +538,11 @@
                             let Unit_Cost = response.unitCost;
                             $('#store_Qty').val(Store_Qty);
                             $('#unit_cost').val(Unit_Cost);
+                            // Recalculate amount after unit_cost is loaded
+                            getTotal();
                         }
                     });
                     clearTextError();
-                    getTotal();
                 }
             };
 
