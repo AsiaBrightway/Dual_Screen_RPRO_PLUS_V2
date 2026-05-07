@@ -521,7 +521,6 @@
                         .unit_name +
                         '</option>');
                     $('#unit_name').val(selected_item[0].unit_id);
-                    // Reset unit_cost and amount immediately when a new item is selected
                     $('#unit_cost').val('');
                     $('#amount').val('');
                     $.ajax({
