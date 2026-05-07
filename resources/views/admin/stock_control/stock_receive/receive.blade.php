@@ -225,8 +225,8 @@
                                         <th scope="col">Item Name</th>
                                         <th scope="col">Item Code</th>
                                         <th scope="col">Bar Code</th>
-                                        <th scope="col">Unit</th>
                                         <th scope="col">Quantity</th>
+                                        <th scope="col">Unit</th>
                                         <th scope="col">Unit Cost</th>
                                         <th scope="col">Amount</th>
                                         <th scope="col">Expire Date</th>
@@ -723,14 +723,14 @@
                         tableBody.deleteRow(index);
                         var newRow = tableBody.insertRow(index);
                         newRow.innerHTML =
-                            `<td>${index+1}</td><td style="display:none">${item_id}</td><td style="word-wrap:break-world; white-space:normal;">${item_name}</td><td>${item_code}</td><td>${bar_code}</td><td style="display:none">${unit_id}</td><td>${unit_name}</td>
-                            <td>${quantity}</td><td>${unit_cost}</td><td>${amount}</td><td>${('0' + expireDate.getDate()).slice(-2)+ '/' + ('0' + (expireDate.getMonth() + 1)).slice(-2) + '/' + expireDate.getFullYear()}</td>`;
+                            `<td>${index+1}</td><td style="display:none">${item_id}</td><td style="word-wrap:break-world; white-space:normal;">${item_name}</td><td>${item_code}</td><td>${bar_code}</td><td style="display:none">${unit_id}</td><td>${quantity}</td><td>${unit_name}</td>
+                            <td>${unit_cost}</td><td>${amount}</td><td>${('0' + expireDate.getDate()).slice(-2)+ '/' + ('0' + (expireDate.getMonth() + 1)).slice(-2) + '/' + expireDate.getFullYear()}</td>`;
 
                     } else {
                         var newRow = tableBody.insertRow();
                         newRow.innerHTML =
-                            `<td>${row_count}</td><td style="display:none">${item_id}</td><td style="word-wrap:break-world; white-space:normal;">${item_name}</td><td>${item_code}</td><td>${bar_code}</td><td style="display:none">${unit_id}</td><td>${unit_name}</td>
-                            <td>${quantity}</td><td>${unit_cost}</td><td>${amount}</td><td>${('0' + expireDate.getDate()).slice(-2)+ '/' + ('0' + (expireDate.getMonth() + 1)).slice(-2) + '/' + expireDate.getFullYear()}</td>`;
+                            `<td>${row_count}</td><td style="display:none">${item_id}</td><td style="word-wrap:break-world; white-space:normal;">${item_name}</td><td>${item_code}</td><td>${bar_code}</td><td style="display:none">${unit_id}</td><td>${quantity}</td><td>${unit_name}</td>
+                            <td>${unit_cost}</td><td>${amount}</td><td>${('0' + expireDate.getDate()).slice(-2)+ '/' + ('0' + (expireDate.getMonth() + 1)).slice(-2) + '/' + expireDate.getFullYear()}</td>`;
                         receiveDetailList.push(dataToStore);
                     }
                     clearDetail();

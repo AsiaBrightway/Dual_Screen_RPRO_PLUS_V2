@@ -264,8 +264,8 @@
                                         <th scope="col">Item Name</th>
                                         <th scope="col">Item Code</th>
                                         <th scope="col">Bar Code</th>
-                                        <th scope="col">Unit</th>
                                         <th scope="col">Quantity</th>
+                                        <th scope="col">Unit</th>
                                         <th scope="col">Unit Cost</th>
                                         <th scope="col">Amount</th>
                                         <th scope="col">Discount</th>
@@ -590,6 +590,10 @@
                     $('#unit_id').val(selected_item[0].unit_id);
                     $('#qty').val(1);
                     $('#is_foc').prop('checked', false);
+                    // Reset unit_cost, amount, and net_amount immediately when a new item is selected
+                    $('#unit_cost').val('');
+                    $('#amount').val('');
+                    $('#net_amount').val('');
 
                     $.ajax({
                         url: "checkStoreQty",
@@ -605,6 +609,8 @@
                             let Unit_Cost = response.unitCost;
                             $('#store_Qty').val(Store_Qty);
                             $('#unit_cost').val(Unit_Cost);
+                            // Recalculate amount after unit_cost is loaded
+                            CalculateItemDetail();
                         }
                     });
                 } else {
@@ -614,9 +620,11 @@
                     $('#unit_id').empty();
                     $('#qty').val(null);
                     $('#is_foc').prop('checked', false);
+                    $('#unit_cost').val('');
+                    $('#amount').val('');
+                    $('#net_amount').val('');
+                    CalculateItemDetail();
                 }
-
-                CalculateItemDetail();
             }
             $(document).on("input", "#qty, #unit_cost, #tax, #discount", CalculateItemDetail);
 
@@ -635,8 +643,8 @@
                     var expire_date = new Date(purchase_detail_entry.expire_date);
                     $('#purchase_detail').append(
                         `<tr><td>${purchase_detail_entry.no}</td>
-                                <td>${purchase_detail_entry.item_name}</td><td>${purchase_detail_entry.item_code}</td><td>${purchase_detail_entry.barcode}</td><td>${purchase_detail_entry.unit_name}</td>
-                                <td>${purchase_detail_entry.qty}</td><td>${purchase_detail_entry.unit_cost}</td><td>${purchase_detail_entry.amount}</td>
+                                <td>${purchase_detail_entry.item_name}</td><td>${purchase_detail_entry.item_code}</td><td>${purchase_detail_entry.barcode}</td><td>${purchase_detail_entry.qty}</td><td>${purchase_detail_entry.unit_name}</td>
+                                <td>${purchase_detail_entry.unit_cost}</td><td>${purchase_detail_entry.amount}</td>
                                 <td>${purchase_detail_entry.discount}</td><td>${purchase_detail_entry.net_amount}</td><td><input type="checkbox" ${purchase_detail_entry.foc?'checked':'unchecked'} disabled></td><td>${('0' + expire_date.getDate()).slice(-2)+ '/' + ('0' + (expire_date.getMonth() + 1)).slice(-2) + '/' + expire_date.getFullYear()}</td></tr>`
                     );
                     setRowNumber_changed();
@@ -814,9 +822,9 @@
                     item_code: $('#item_code :selected').text(),
                     barcode: $('#barcode').val(),
                     unit_id: $('#unit_id :selected').val(),
-                    unit_name: $('#unit_id :selected').text(),
                     store_qty: $('#store_Qty').val(),
                     qty: $('#qty').val(),
+                    unit_name: $('#unit_id :selected').text(),
                     unit_cost: $('#unit_cost').val(),
                     amount: $('#amount').val(),
                     discount: $('#discount').val(),

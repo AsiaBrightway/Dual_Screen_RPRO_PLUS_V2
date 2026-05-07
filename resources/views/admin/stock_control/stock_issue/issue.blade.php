@@ -184,8 +184,8 @@
                                         <th scope="col">Item Code</th>
                                         <th scope="col">Bar Code</th>
                                         <th scope="col">Batch No</th>
-                                        <th scope="col">Unit</th>
                                         <th scope="col">Quantity</th>
+                                        <th scope="col">Unit</th>
                                         <th scope="col">Type</th>
                                         {{-- <th scope="col">Unit Cost</th>
                                         <th scope="col">Amount</th> --}}
@@ -291,8 +291,8 @@
                             <td>${issue_detail_entry.item_code}</td>
                             <td>${issue_detail_entry.barcode}</td>
                             <td>${issue_detail_entry.batch_number}</td>
-                            <td>${issue_detail_entry.unit_name}</td>
                             <td>${issue_detail_entry.quantity}</td>
+                            <td>${issue_detail_entry.unit_name}</td>
                             <td>${issue_detail_entry.issue_type}</td>
                             <td>${('0' + expire_date.getDate()).slice(-2) + '/' + ('0' + (expire_date.getMonth() + 1)).slice(-2) + '/' + expire_date.getFullYear()}</td>
                         </tr>`
