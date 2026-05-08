@@ -34,8 +34,9 @@
                         <th>No</th>
                         <th>Item Name</th>
                         <th>Quantity</th>
-                        <th>Order ID</th>        
+                        <th>Order ID</th>
                         <th>Table</th>
+                        <th>Order Time</th>
                         <th>Order By</th>
                         <th>Deleted By</th>
                         <th>Deleted Time</th>
@@ -50,8 +51,9 @@
                         <td>{{ $count++ }}</td>
                         <td>{{ $order->item_name }}</td>
                         <td>{{ $order->quantity }}</td>
-                        <td>{{ $order->order_id }}</td>                  
+                        <td>{{ $order->order_id }}</td>
                         <td>{{ $order->table_name }}</td>
+                        <td>{{ \Carbon\Carbon::parse($order->order_time)->format(' d-m-y h:i A') }}</td>
                         <td>{{ $order->ordered_by_name }}</td>
                         <td>{{ $order->deleted_by_name }}</td>
                         <td>{{ \Carbon\Carbon::parse($order->created_at)->format('h:i A') }}</td>

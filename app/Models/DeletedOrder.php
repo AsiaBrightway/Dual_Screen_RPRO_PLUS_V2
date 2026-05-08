@@ -18,6 +18,7 @@ class DeletedOrder extends Model
         'is_ordered',
         'is_foc',
         'order_type',
+        'order_time',
         'ordered_by',
         'created_at',
         'table_id',

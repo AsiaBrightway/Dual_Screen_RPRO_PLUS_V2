@@ -390,6 +390,7 @@ class OrderController extends Controller
             'remark' => $request['remark'],
             'is_ordered' => $request['is_ordered'],
             'is_foc' => $request['is_foc'],
+            'order_time' => $request['created_at'],
             'ordered_by' => $request['ordered_by'],
             'deleted_by' => $user_id,
         ];
