@@ -357,6 +357,11 @@
                                 <label class="form-check-label" for="reports_sales_check">Sales</label>
                             </div>
                             <div class="form-check mt-3 mb-3 ms-5">
+                                <input class="form-check-input" type="checkbox" id="reports_stock_ledger_check"
+                                    name="reports_stock_ledger_check">
+                                <label class="form-check-label" for="reports_stock_ledger_check">Stock Ledger</label>
+                            </div>
+                            <div class="form-check mt-3 mb-3 ms-5">
                                 <input class="form-check-input" type="checkbox" id="reports_top_sales_items_check"
                                     name="reports_top_sales_items_check">
                                 <label class="form-check-label" for="reports_top_sales_items_check">Top Sales Items</label>
