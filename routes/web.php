@@ -417,6 +417,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session')])->group(fun
         Route::get('reports/purchase', [ReportsController::class, 'purchaseReport'])->name('reports#purchase');
         Route::get('reports/purchaseReportByFilter', [ReportsController::class, 'purchaseReportByFilter'])->name('reports#purchaseReportByFilter');
         Route::get('reports/sales', [ReportsController::class, 'salesReport'])->name('reports#sales');
+        Route::get('reports/stock-ledger', [ReportsController::class, 'stockLedger'])->name('reports#stockLedger');
         Route::get('reports/top-sale', [ReportsController::class, 'topSaleReport'])->name('reports#topSales');
         // New Balance Report
         Route::get('reports/balance', [ReportsController::class, 'balanceReport'])->name('reports#balance');

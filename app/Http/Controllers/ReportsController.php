@@ -437,6 +437,135 @@ class ReportsController extends Controller
         return view('admin.reports.sales.sales_report', compact('sales', 'total_sale_cost'));
     }
 
+    public function stockLedger(Request $request)
+    {
+        $selectedDate = $request->query('dailyPrintDate')
+            ? Carbon::parse($request->query('dailyPrintDate'))->toDateString()
+            : Carbon::now()->toDateString();
+
+        // Get all stock items (non-deleted, item_type_id = 2)
+        $items = MenuItem::leftJoin('menu_categories as MC', 'menu_items.sub_category_id', '=', 'MC.category_id')
+            ->leftJoin('units', 'units.unit_id', '=', 'menu_items.unit_id')
+            ->where('menu_items.is_deleted', 0)
+            ->where('menu_items.item_type_id', 2)
+            ->select(
+                'menu_items.item_id',
+                'menu_items.item_name',
+                'MC.menu_category_name',
+                'units.unit_name'
+            )
+            ->orderBy('menu_items.item_name')
+            ->get();
+
+        // dd($items->toArray());
+
+        $stockLedgerData = [];
+        $count = 1;
+
+        foreach ($items as $item) {
+            $itemId = $item->item_id;
+
+            // ---- OPENING BALANCE: all stock in - all stock out BEFORE selected date ----
+
+            $purchasedBefore = PurchaseDetail::join('purchases', 'purchase_details.purchase_id', '=', 'purchases.purchase_id')
+                ->where('purchase_details.item_id', $itemId)
+                ->whereDate('purchases.purchase_date', '<', $selectedDate)
+                ->where(function ($q) {
+                    $q->whereNull('purchases.is_delete')->orWhere('purchases.is_delete', 0);
+                })
+                ->sum('purchase_details.quantity');
+
+            $receivedBefore = StockReceiveDetail::join('stock_receives', 'stock_receive_details.stock_receive_id', '=', 'stock_receives.stock_receive_id')
+                ->where('stock_receive_details.item_id', $itemId)
+                ->whereDate('stock_receives.receive_date', '<', $selectedDate)
+                ->where(function ($q) {
+                    $q->whereNull('stock_receives.is_delete')->orWhere('stock_receives.is_delete', 0);
+                })
+                ->sum('stock_receive_details.quantity');
+
+            // Total sold qty before selected date
+            // $soldBefore = SalesDetail::join('sales', 'sales_details.sale_id', '=', 'sales.sale_id')
+            //     ->where('sales_details.item_id', $itemId)
+            //     ->whereDate('sales.order_date', '<', $selectedDate)
+            //     ->where(function ($q) {
+            //         $q->whereNull('sales.is_delete')->orWhere('sales.is_delete', 0);
+            //     })
+            //     ->sum('sales_details.quantity');
+
+            $issuedBefore = StockIssueDetail::join('stock_issues', 'stock_issue_details.stock_issue_id', '=', 'stock_issues.stock_issue_id')
+                ->where('stock_issue_details.item_id', $itemId)
+                ->whereDate('stock_issues.issue_date', '<', $selectedDate)
+                ->where(function ($q) {
+                    $q->whereNull('stock_issues.is_delete')->orWhere('stock_issues.is_delete', 0);
+                })
+                ->sum('stock_issue_details.quantity');
+
+            $openingBalance = ($purchasedBefore + $receivedBefore) - $issuedBefore;
+
+            // ---- TODAY'S STOCK IN: purchases + receives ON selected date ----
+
+            $purchasedToday = PurchaseDetail::join('purchases', 'purchase_details.purchase_id', '=', 'purchases.purchase_id')
+                ->where('purchase_details.item_id', $itemId)
+                ->whereDate('purchases.purchase_date', '=', $selectedDate)
+                ->where(function ($q) {
+                    $q->whereNull('purchases.is_delete')->orWhere('purchases.is_delete', 0);
+                })
+                ->sum('purchase_details.quantity');
+
+            $receivedToday = StockReceiveDetail::join('stock_receives', 'stock_receive_details.stock_receive_id', '=', 'stock_receives.stock_receive_id')
+                ->where('stock_receive_details.item_id', $itemId)
+                ->whereDate('stock_receives.receive_date', '=', $selectedDate)
+                ->where(function ($q) {
+                    $q->whereNull('stock_receives.is_delete')->orWhere('stock_receives.is_delete', 0);
+                })
+                ->sum('stock_receive_details.quantity');
+
+            $stockIn = $purchasedToday + $receivedToday;
+
+            // ---- TODAY'S STOCK OUT: sales + issues ON selected date ----
+
+            // $soldToday = SalesDetail::join('sales', 'sales_details.sale_id', '=', 'sales.sale_id')
+            //     ->where('sales_details.item_id', $itemId)
+            //     ->whereDate('sales.order_date', '=', $selectedDate)
+            //     ->where(function ($q) {
+            //         $q->whereNull('sales.is_delete')->orWhere('sales.is_delete', 0);
+            //     })
+            //     ->sum('sales_details.quantity');
+
+            $issuedToday = StockIssueDetail::join('stock_issues', 'stock_issue_details.stock_issue_id', '=', 'stock_issues.stock_issue_id')
+                ->where('stock_issue_details.item_id', $itemId)
+                ->whereDate('stock_issues.issue_date', '=', $selectedDate)
+                ->where(function ($q) {
+                    $q->whereNull('stock_issues.is_delete')->orWhere('stock_issues.is_delete', 0);
+                })
+                ->sum('stock_issue_details.quantity');
+
+            // $stockOut = $soldToday + $issuedToday;
+
+            // ---- CLOSING BALANCE ----
+            $closingBalance = $openingBalance + $stockIn - $issuedToday;
+
+            $remarks = '';
+            if ($closingBalance < 0) {
+                $remarks = 'Negative stock';
+            }
+
+            $stockLedgerData[] = [
+                'no'              => $count++,
+                'item_name'       => $item->item_name,
+                'opening_balance' => $openingBalance,
+                'stock_in'        => $stockIn,
+                'stock_out'       => $issuedToday,
+                'closing_balance' => $closingBalance,
+                'remarks'         => $remarks,
+            ];
+        }
+
+        // dd($stockLedgerData);
+
+        return view('admin.reports.stock_ledger.stock_ledger_report', compact('stockLedgerData', 'selectedDate'));
+    }
+
     public function modifySaleReportBySearch(Request $req)
     {
 
