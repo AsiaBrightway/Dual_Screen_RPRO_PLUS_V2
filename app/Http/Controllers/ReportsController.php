@@ -815,6 +815,10 @@ class ReportsController extends Controller
         foreach ($activeItemIds as $itemId) {
             $itemReport = $this->calculateItemFIFOBalance($itemId, $searchDate);
 
+            if (!$itemReport) {
+                continue;
+            }
+
             // Apply category filter if needed
             if ($searchCategoryID && $searchCategoryID != 0) {
                 if ($itemReport['sub_category_id'] != $searchCategoryID) {
@@ -829,6 +833,8 @@ class ReportsController extends Controller
         if ($req->expectsJson() || $req->wantsJson()) {
             return response()->json(($balance_report_list));
         }
+
+        // dd($balance_report_list->toArray(), $searchDate, $searchCategoryID);
 
         return view('admin.reports.balance.balance_report', compact('balance_report_list', 'searchDate', 'searchCategoryID'));
     }
@@ -891,6 +897,7 @@ class ReportsController extends Controller
             ->leftJoin('units', 'units.unit_id', '=', 'menu_items.unit_id')
             ->leftJoin('item_selling_prices as ISP', 'ISP.item_id', '=', 'menu_items.item_id')
             ->where('menu_items.item_id', $itemId)
+            ->where('menu_items.item_type_id', '!=', 2)
             ->select(
                 'menu_items.item_id',
                 'menu_items.item_name',
@@ -902,6 +909,10 @@ class ReportsController extends Controller
             )
             ->groupBy('menu_items.item_id', 'menu_items.item_name', 'menu_items.sub_category_id', 'MC.menu_category_name', 'units.unit_name')
             ->first();
+
+        if (!$item) {
+            return null;
+        }
 
         // Step 1: Get all incoming transactions (purchases + receives) up to search date, ordered by date and batch
         $incomingBatches = $this->getIncomingBatches($itemId, $searchDate);

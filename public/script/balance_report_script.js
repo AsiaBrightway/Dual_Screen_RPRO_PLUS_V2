@@ -6,6 +6,8 @@ if (localStorage.getItem("showMenu")) {
 $(document).ready(function () {
     var salesDefaultTable = new DataTable("#sales_report_list_by_default", {
         scrollX: true,
+        scrollY: "500px",
+        scrollCollapse: true,
     });
 
     $("#sales_report_list_by_default_wrapper .dataTables_scroll").addClass(

@@ -133,6 +133,7 @@ class BalanceReportPdfExport
             ->leftJoin('units', 'units.unit_id', '=', 'menu_items.unit_id')
             ->leftJoin('item_selling_prices as ISP', 'ISP.item_id', '=', 'menu_items.item_id')
             ->where('menu_items.item_id', $itemId)
+            ->where('menu_items.item_type_id', '!=', 2)
             ->select(
                 'menu_items.item_id',
                 'menu_items.item_name',
