@@ -162,9 +162,9 @@
             'reports_purchase_form',
             'reports_sales_form',
             'reports_top_sales_form',
-            'reports_stock_ledger_form',
             'setting_form',
             'stockControl_stockBalance_form',
+            'stockControl_stock_ledger_form',
             // 'reports_multishop_form',
             'canceled_orders',
             ];
@@ -234,7 +234,7 @@
             51 => 'setting_form',
             52 => 'stockControl_stockBalance_form',
             53 => 'canceled_orders',
-            54 => 'reports_stock_ledger_form'
+            54 => 'stockControl_stock_ledger_form'
             // 'reports_multishop_form',
             ];
 
@@ -401,6 +401,9 @@
                     <li class="stockBalance-list {{ $stockControl_stockBalance_form }}">
                         <a href="{{ route('reports#balance') }}" class="plain_text">Stock Balance</a>
                     </li>
+                    <li class="sub-sub-list {{ $stockControl_stock_ledger_form }}">
+                        <a href="{{ route('reports#stockLedger') }}" class="plain_text">Stock Ledger</a>
+                    </li>
                 </ul>
             </li>
             <li class="{{ $configuration_form }}">
@@ -471,9 +474,6 @@
                     </li>
                     <li class="sub-sub-list {{ $reports_sales_form }}">
                         <a href="{{ route('reports#sales') }}" class="plain_text">Sales</a>
-                    </li>
-                    <li class="sub-sub-list {{ $reports_stock_ledger_form }}">
-                        <a href="{{ route('reports#stockLedger') }}" class="plain_text">Stock Ledger</a>
                     </li>
                     <li
                         class="sub-sub-list {{ $reports_top_sales_form }} {{ request()->routeIs('reports#topSales') ? 'active' : '' }}">

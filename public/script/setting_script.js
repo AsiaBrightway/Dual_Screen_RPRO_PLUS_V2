@@ -1,4 +1,4 @@
-﻿// let delivery_list = document.querySelector(".delivery-list");
+// let delivery_list = document.querySelector(".delivery-list");
 // if (localStorage.getItem("showMenu")) {
 //     delivery_list.parentElement.parentElement.classList.add("showMenu");
 // }
@@ -26,6 +26,7 @@ $(document).ready(function () {
     var stock_control_stock_purchase_check_value = 0;
     var stock_control_stock_purchase_purchase_check_value = 0;
     var stock_control_stock_purchase_purchase_lists_check_value = 0;
+    var stock_control_stock_ledger_check_value = 0;
 
     var card_check_value = 0;
     var card_coupon_card_check_value = 0;
@@ -62,7 +63,6 @@ $(document).ready(function () {
     var reports_purchase_check_value = 0;
     var reports_sales_check_value = 0;
     var reports_top_sales_items_check_value = 0;
-    var reports_stock_ledger_check_value = 0;
     // var reports_multishop_report_check_value = 0;
 
     var setting_check_value = 0;
@@ -104,6 +104,7 @@ $(document).ready(function () {
             "checked",
             false
         );
+        $("#stock_control_stock_ledger_check").prop("checked", false);
 
         $("#card_check").prop("checked", false);
         $("#card_coupon_card_check").prop("checked", false);
@@ -138,7 +139,6 @@ $(document).ready(function () {
         $("#reports_purchase_check").prop("checked", false);
         $("#reports_sales_check").prop("checked", false);
         $("#reports_top_sales_items_check").prop("checked", false);
-        $("#reports_stock_ledger_check").prop("checked", false);
         // $("#reports_multishop_report_check").prop("checked", false);
 
         $("#setting_check").prop("checked", false);
@@ -185,6 +185,7 @@ $(document).ready(function () {
             stock_control_stock_purchase_purchase_check_value = 1;
             stock_control_stock_purchase_purchase_lists_check_value = 1;
             stock_control_stock_balance_check_value = 1;
+            stock_control_stock_ledger_check_value = 1;
 
             card_check_value = 1;
             card_coupon_card_check_value = 1;
@@ -221,7 +222,6 @@ $(document).ready(function () {
             reports_purchase_check_value = 1;
             reports_sales_check_value = 1;
             reports_top_sales_items_check_value = 1;
-            reports_stock_ledger_check_value = 1;
             // reports_multishop_report_check_value = 1;
 
             setting_check_value = 1;
@@ -265,6 +265,7 @@ $(document).ready(function () {
                 true
             );
             $("#stock_control_stock_balance_check").prop("checked", true);
+            $("#stock_control_stock_ledger_check").prop("checked", true);
 
             $("#card_check").prop("checked", true);
             $("#card_coupon_card_check").prop("checked", true);
@@ -301,7 +302,6 @@ $(document).ready(function () {
             $("#reports_purchase_check").prop("checked", true);
             $("#reports_sales_check").prop("checked", true);
             $("#reports_top_sales_items_check").prop("checked", true);
-            $("#reports_stock_ledger_check").prop("checked", true);
             // $("#reports_multishop_report_check").prop("checked", true);
 
             $("#setting_check").prop("checked", true);
@@ -424,6 +424,7 @@ $(document).ready(function () {
                 false
             );
             $("#stock_control_stock_balance_check").prop("checked", false);
+            $("#stock_control_stock_ledger_check").prop("checked", false);
 
             $("#card_check").prop("checked", false);
             $("#card_coupon_card_check").prop("checked", false);
@@ -460,7 +461,6 @@ $(document).ready(function () {
             $("#reports_purchase_check").prop("checked", false);
             $("#reports_sales_check").prop("checked", false);
             $("#reports_top_sales_items_check").prop("checked", false);
-            $("#reports_stock_ledger_check").prop("checked", false);
             // $("#reports_multishop_report_check").prop("checked", false);
 
             $("#setting_check").prop("checked", false);
@@ -851,6 +851,7 @@ $(document).ready(function () {
             stock_control_stock_purchase_purchase_check_value = 0;
             stock_control_stock_purchase_purchase_lists_check_value = 0;
             stock_control_stock_balance_check_value = 0;
+            stock_control_stock_ledger_check_value = 0;
 
             $("#stock_control_stock_receive_check").prop("checked", false);
             $("#stock_control_stock_receive_receive_check").prop(
@@ -878,6 +879,7 @@ $(document).ready(function () {
                 false
             );
             $("#stock_control_stock_balance_check").prop("checked", false);
+            $("#stock_control_stock_ledger_check").prop("checked", false);
 
             $(".stock_control_stock_receive_child_div").addClass("d-none");
             $(".stock_control_stock_issue_child_div").addClass("d-none");
@@ -1880,7 +1882,6 @@ $(document).ready(function () {
             reports_purchase_check_value = 0;
             reports_sales_check_value = 0;
             reports_top_sales_items_check_value = 0;
-            reports_stock_ledger_check_value = 0;
             // reports_multishop_report_check_value = 0;
 
             $("#reports_stock_in_check").prop("checked", false);
@@ -1888,7 +1889,6 @@ $(document).ready(function () {
             $("#reports_purchase_check").prop("checked", false);
             $("#reports_sales_check").prop("checked", false);
             $("#reports_top_sales_items_check").prop("checked", false);
-            $("#reports_stock_ledger_check").prop("checked", false);
             // $("#reports_multishop_report_check").prop("checked", false);
             $(".reports_child_div").addClass("d-none");
         }
@@ -1946,13 +1946,13 @@ $(document).ready(function () {
             reports_top_sales_items_check_value = 0;
         }
     });
-    $("#reports_stock_ledger_check").click(function () {
+    $("#stock_control_stock_ledger_check").click(function () {
         $("#select_all_check").prop("checked", false);
-        var reports_stock_ledger_check = $("#reports_stock_ledger_check").is(":checked");
-        if (reports_stock_ledger_check) {
-            reports_stock_ledger_check_value = 1;
+        var stock_control_stock_ledger_check = $("#stock_control_stock_ledger_check").is(":checked");
+        if (stock_control_stock_ledger_check) {
+            stock_control_stock_ledger_check_value = 1;
         } else {
-            reports_stock_ledger_check_value = 0;
+            stock_control_stock_ledger_check_value = 0;
         }
     });
     // $("#reports_multishop_report_check").click(function () {
@@ -2236,7 +2236,7 @@ $(document).ready(function () {
         {
             role_id: userRole,
             form_menu_id: 54,
-            is_used: reports_stock_ledger_check_value,
+            is_used: stock_control_stock_ledger_check_value,
         },
         {
             role_id: userRole,
@@ -2444,7 +2444,7 @@ $(document).ready(function () {
                     { id: 48, checkboxId: "#reports_purchase_check" },
                     { id: 49, checkboxId: "#reports_sales_check" },
                     { id: 50, checkboxId: "#reports_top_sales_items_check" },
-                    { id: 54, checkboxId: "#reports_stock_ledger_check" },
+                    { id: 54, checkboxId: "#stock_control_stock_ledger_check" },
                     { id: 51, checkboxId: "#setting_check" },
                     { id: 52, checkboxId: "#stock_control_stock_balance_check" },
                     // { id: 53, checkboxId: "#reports_multishop_report_check" },
@@ -2685,8 +2685,8 @@ $(document).ready(function () {
                     if (menu.checkboxId === "#reports_top_sales_items_check") {
                         reports_top_sales_items_check_value = isChecked ? 1 : 0;
                     }
-                    if (menu.checkboxId === "#reports_stock_ledger_check") {
-                        reports_stock_ledger_check_value = isChecked ? 1 : 0;
+                    if (menu.checkboxId === "#stock_control_stock_ledger_check") {
+                        stock_control_stock_ledger_check_value = isChecked ? 1 : 0;
                     }
                     if (menu.checkboxId === "#stock_control_stock_balance_check") {
                         stock_control_stock_balance_check_value = isChecked ? 1 : 0;
