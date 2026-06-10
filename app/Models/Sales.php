@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Sales extends Model
 {
     use HasFactory;
+    protected $primaryKey = 'sale_id';
     protected $fillable = [
         'sale_voucher_number',
         'table_id',

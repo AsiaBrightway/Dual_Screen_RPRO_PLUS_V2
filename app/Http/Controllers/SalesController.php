@@ -61,7 +61,7 @@ class SalesController extends Controller
 
     public function orderInvoice(Request $req)
     {
-        $sale = Sales::get()->last();
+        $sale = Sales::orderByDesc('sale_id')->first();
 
         if ($sale == null || $sale == "null") {
             $saleLastID = 1;
@@ -74,7 +74,7 @@ class SalesController extends Controller
 
         $table = Table::where('table_id', $tableID)->get()->toArray();
         $customers = Customer::get()->toArray();
-        $employees = Employee::get()->toArray();
+        // $employees = Employee::get()->toArray();
         $paymentTypes = PaymentType::get()->toArray();
         $orders = Order::where('table_id', $tableID)
             ->where('table_order_number', $tableOrderNumber)
@@ -215,8 +215,8 @@ class SalesController extends Controller
 
             $data = $this->addSaleData($req, $orderDate, $invoiceNumber); // not use totalPromo
             $result = Sales::create($data);
-            // dd($result);
-            $saleID = $result->id;
+            // dd($result->toArray());
+            $saleID = $result->sale_id;
 
             $orderDetails = OrderDetails::where('order_id', $orderID)->get();
 
@@ -334,6 +334,8 @@ class SalesController extends Controller
             return response()->json($saleID);
         } catch (Exception $e) {
             DB::rollBack();
+            Log::error('Checkout Failed: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
