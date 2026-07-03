@@ -12,6 +12,7 @@ use App\Models\MainCategory;
 use App\Models\StockReceive;
 use Illuminate\Http\Request;
 use App\Models\PurchaseDetail;
+use App\Models\StockBalance;
 use App\Models\StockReceiveDetail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -46,7 +47,7 @@ class StockReceiveController extends Controller
         $itemTypes = ItemType::get()->toArray();
         $units  = Unit::where('is_discontinued', 0)
             ->get()->toArray();
-        
+
         // dd($menu_item->toArray());
         return view('admin.stock_control.stock_receive.receive', compact('menu_item',  'voucherNumber', 'mainCategories', 'subCategories', 'itemTypes', 'units'));
     }
@@ -55,18 +56,18 @@ class StockReceiveController extends Controller
     public function receiveListPage(Request $req)
     {
         $dailyReceiveDate = $req->query('dailyReceiveDate');
-        
+
         $stock_receive_list = StockReceive::select('stock_receives.stock_receive_id', 'receive_voucher_number', 'receive_date', 'remark')
             ->selectRaw('SUM(amount) as total_amount')
             ->join('stock_receive_details as RD', 'RD.stock_receive_id', '=', 'stock_receives.stock_receive_id')
             ->groupBy(['stock_receive_id', 'receive_voucher_number', 'receive_date', 'remark'])
             ->where('stock_receives.is_delete', 0)
-            ->when($req->has('dailyReceiveDate'), function($query) use($req) {
+            ->when($req->has('dailyReceiveDate'), function ($query) use ($req) {
                 $query->whereDate('stock_receives.receive_date', $req->dailyReceiveDate);
-            }, function($query) {
+            }, function ($query) {
                 // $query->orderBy('stock_receives.stock_receive_id', 'DESC')->limit(10);
                 $query->whereDate('stock_receives.receive_date', '>=', now()->subDays(30))
-                  ->orderBy('stock_receives.stock_receive_id', 'DESC');
+                    ->orderBy('stock_receives.stock_receive_id', 'DESC');
             })
             ->get();
         // dd($stock_receive_list->toArray());
@@ -112,7 +113,7 @@ class StockReceiveController extends Controller
         $data = $this->addItemData($req);
 
         if ($data['is_discontinued'] == null || $data['is_discontinued'] == "null") {
-                    $data['is_discontinued'] = 0;
+            $data['is_discontinued'] = 0;
         }
         if ($data['is_discontinued'] == "on") {
             $data['is_discontinued'] = 1;
@@ -135,12 +136,11 @@ class StockReceiveController extends Controller
             } catch (\Exception $e) {
                 Log::error('ItemSellingPrice insert failed: ' . $e->getMessage());
             }
-            
+
             DB::commit();
 
             // Return Success JSON instead of Redirect
             return response()->json(['success' => 'Item created successfully!']);
-
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['errors' => ['general' => $e->getMessage()]], 500);
@@ -192,7 +192,7 @@ class StockReceiveController extends Controller
     //         'create_item_selling_price.numeric' => 'Selling Price သည် Number ဖြစ်ရပါမည်',
     //         'create_item_selling_price.gte' => 'Selling Price သည် Unit Cost ထပ်များရမည်',
     //     ];
-        
+
     //     Validator::make($req->all(), $validationRules, $validationMessages)->validate();
     // }
 
@@ -211,6 +211,7 @@ class StockReceiveController extends Controller
                 $receiveID = $result->id;
                 $detail_data = $this->addStockReceiveDetailData($detail, $receiveID);
                 $receiveDetail = StockReceiveDetail::create($detail_data);
+                StockBalance::syncClosingBalance($receiveDetail->item_id, $request->receiveDate, $receiveDetail->quantity);
                 if ((int)$detail['store_qty'] < 0) {
                     $data = [
                         'batch_number' => $receiveDetail->batch_number,
@@ -288,12 +289,21 @@ class StockReceiveController extends Controller
             $receiveID = $request->receiveID;
             $detailList = $request->detailList;
             $master_data = $this->addStockReceiveMasterData($request, $request->voucherNo);
+            $oldDetails = StockReceiveDetail::where('stock_receive_id', $receiveID)->get();
+            $oldReceiveDate = StockReceive::where('stock_receive_id', $receiveID)->value('receive_date');
+
             StockReceive::where('stock_receive_id', '=', $receiveID)->update($master_data);
             StockReceiveDetail::where('stock_receive_id', '=', $receiveID)->delete();
+
+            foreach ($oldDetails as $old) {
+                StockBalance::syncClosingBalance($old->item_id, $oldReceiveDate, -$old->quantity);
+            }
+
             foreach ($detailList as $detail) {
                 $detail_data = $this->addStockReceiveDetailData($detail, $receiveID);
                 $detail_data['is_updated'] = true;
-                StockReceiveDetail::create($detail_data);
+                $newDetail = StockReceiveDetail::create($detail_data);
+                StockBalance::syncClosingBalance($newDetail->item_id, $request->receiveDate, $newDetail->quantity);
             }
             DB::commit();
             return response()->json(['success' => "Update successful!"]);
@@ -314,6 +324,13 @@ class StockReceiveController extends Controller
             try {
                 DB::beginTransaction();
                 $receiveID = $request->stockReceive_deleteID;
+
+                $oldDetails = StockReceiveDetail::where('stock_receive_id', $receiveID)->get();
+                $oldReceiveDate = StockReceive::where('stock_receive_id', $receiveID)->value('receive_date');
+                foreach ($oldDetails as $old) {
+                    StockBalance::syncClosingBalance($old->item_id, $oldReceiveDate, -$old->quantity);
+                }
+
                 StockReceive::where('stock_receive_id', $receiveID)->update([
                     'is_delete' => true,
                     'delete_reason' => $request->delete_reason,

@@ -41,6 +41,10 @@
                         value="{{ $selectedDate }}"
                         onchange="this.form.submit()">
                 </form>
+                <a href="{{ route('reports#closingBalanceEntry') }}" class="btn btn-sm custom_btn d-flex align-items-center" id="closingBalanceEntryBtn" onclick="this.classList.add('disabled');">
+                    <i class="fa-solid fa-pen-to-square" style="padding-right: 5px;"></i>
+                    လက်ကျန်ထည့်ရန်
+                </a>
             </div>
         </div>
 
@@ -63,7 +67,6 @@
                         <th>ကုန်သစ်</th>
                         <th>ကုန်ထုတ်</th>
                         <th>လက်ကျန်</th>
-                        <th>မှတ်ချက်</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -78,7 +81,6 @@
                         <td>
                             {{ number_format($row['closing_balance']) }}
                         </td>
-                        <td class="{{ $row['remarks'] ? 'negative-stock' : '' }}">{{ $row['remarks'] }}</td>
                     </tr>
                     @endforeach
                     @endif

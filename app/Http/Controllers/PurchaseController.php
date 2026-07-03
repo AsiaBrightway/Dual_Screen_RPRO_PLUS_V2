@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use App\Models\PurchaseDetail;
 use App\Models\SupplierLedger;
 use App\Models\PurchasePaymentLog;
+use App\Models\StockBalance;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -303,6 +304,7 @@ class PurchaseController extends Controller
                 foreach ($purchase_detaillist as $detail) {
                     $detail_data = $this->addPurchaseDetailData($detail, $result->id);
                     $purchaseDetail = PurchaseDetail::create($detail_data);
+                    StockBalance::syncClosingBalance($purchaseDetail->item_id, $request->purchase_date, $purchaseDetail->quantity);
 
                     if ((int)$detail['store_qty'] < 0) {
                         $data = [
@@ -343,11 +345,20 @@ class PurchaseController extends Controller
                 $data['is_updated'] = true;
                 Purchase::where('purchase_id', $request->purchaseID)->update($data);
 
+                $oldDetails = PurchaseDetail::where('purchase_id', $request->purchaseID)->get();
+                $oldPurchaseDate = Purchase::where('purchase_id', $request->purchaseID)->value('purchase_date');
+
                 PurchaseDetail::where('purchase_id',  $request->purchaseID)->delete(); //Delete old detail by purchaseID
+
+                foreach ($oldDetails as $old) {
+                    StockBalance::syncClosingBalance($old->item_id, $oldPurchaseDate, -$old->quantity);
+                }
+
                 foreach ($purchase_detaillist as $detail) {
                     $detail_data = $this->addPurchaseDetailData($detail, $request->purchaseID);
                     $detail_data['is_updated'] = true;
-                    PurchaseDetail::create($detail_data);
+                    $newDetail = PurchaseDetail::create($detail_data);
+                    StockBalance::syncClosingBalance($newDetail->item_id, $request->purchase_date, $newDetail->quantity);
                 }
 
                 // $total = PurchasePaymentLog::where('purchase_id','=',$request->purchaseID)->pluck('total_amount');
@@ -441,6 +452,12 @@ class PurchaseController extends Controller
             try {
                 DB::beginTransaction();
                 $purchaseID = $request->purchase_deleteID;
+
+                $oldDetails = PurchaseDetail::where('purchase_id', $purchaseID)->get();
+                $oldPurchaseDate = Purchase::where('purchase_id', $purchaseID)->value('purchase_date');
+                foreach ($oldDetails as $old) {
+                    StockBalance::syncClosingBalance($old->item_id, $oldPurchaseDate, -$old->quantity);
+                }
 
                 Purchase::where('purchase_id', $purchaseID)->update([
                     'is_delete' => 1,

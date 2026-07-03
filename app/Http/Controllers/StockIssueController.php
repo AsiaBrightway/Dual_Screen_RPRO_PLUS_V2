@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\MenuItem;
 use App\Models\PurchaseDetail;
 use App\Models\SalesDetail;
+use App\Models\StockBalance;
 use App\Models\StockIssue;
 use Illuminate\Http\Request;
 use App\Models\StockIssueType;
@@ -35,11 +36,18 @@ class StockIssueController extends Controller
 
     public function checkStoreQty(Request $request)
     {
-
         try {
             [$storeQty, $stockIn, $unitCost] = $this->getStockBalance($request->itemID, $request->unitID);
+
+            $item = MenuItem::where('item_id', $request->itemID)->first();
+            if ($item && $item->item_type_id == 2) {
+                $ledgerData = ReportsController::getStockDataForDate(date('Y-m-d'), collect([$item]));
+                if (isset($ledgerData[$item->item_id])) {
+                    $storeQty = $ledgerData[$item->item_id]['closing_balance'];
+                }
+            }
+
             $unitCost = (int)$unitCost;
-            // dd($unitCost);
             return response()->json(['success' => $storeQty, 'unitCost' => $unitCost]);
         } catch (\Exception $e) {
             return response()->json(['errors' => $e->getMessage()]);
@@ -317,7 +325,7 @@ class StockIssueController extends Controller
                 'quantity.numeric' => "Quantity သည် Number ဖြစ်ရပါမည်",
                 'quantity.gt' => 'Quantity ဖြည့်ရန်လိုအပ်ပါသည်',
             ]);
-            
+
             if ($validator->passes()) {
                 $balanceList = $this->getStockBalance($request->itemID, $request->unitID);
                 $BQty = $balanceList[0];
@@ -339,12 +347,12 @@ class StockIssueController extends Controller
         $stockIssueList = StockIssue::query()->where(['stock_issues.is_delete' => 0])
             ->select('stock_issues.*', 'S.issue_type_name_1 as issue_type')
             ->join('stock_issue_types as S', 'S.issue_type_id', '=', 'stock_issues.issue_type_id')
-            ->when($req->has('issueDate'), function($query) use ($req) {
+            ->when($req->has('issueDate'), function ($query) use ($req) {
                 $query->whereDate('stock_issues.issue_date', $req->issueDate);
-            }, function($query) {
+            }, function ($query) {
                 // $query->orderBy('stock_issues.stock_issue_id', 'DESC');
                 $query->whereDate('stock_issues.issue_date', '>=', now()->subDays(30))
-                  ->orderBy('stock_issues.stock_issue_id', 'DESC');
+                    ->orderBy('stock_issues.stock_issue_id', 'DESC');
             })
             ->get();
 
@@ -379,9 +387,8 @@ class StockIssueController extends Controller
                         DB::rollBack();
                         return response()->json(['errors' => $validator->getMessageBag()->toArray()]);
                     } else {
-
-                        // return response()->json(['errors' => $balance_result[0]]);
                         $issue_Qty = (int)($detail['quantity']);
+                        StockBalance::syncClosingBalance($detail['itemID'], $request->issue_date, -$issue_Qty);
                         foreach ($balanceList as $item) {
                             $balanceQty = $item->receiveQty + $item->purchaseQty;
 
@@ -483,7 +490,14 @@ class StockIssueController extends Controller
                 $detailList = $request->issue_detailList;
                 $master_data = $this->addStockIssueMasterData($request, $request->voucher_no);
                 StockIssue::where('stock_issue_id', '=', $issueID)->update($master_data);
+
+                $oldDetails = StockIssueDetail::where('stock_issue_id', $issueID)->get();
+                $oldIssueDate = StockIssue::where('stock_issue_id', $issueID)->value('issue_date');
                 StockIssueDetail::where('stock_issue_id', '=', $issueID)->delete();
+
+                foreach ($oldDetails as $old) {
+                    StockBalance::syncClosingBalance($old->item_id, $oldIssueDate, $old->quantity);
+                }
 
                 foreach ($detailList as $detail) {
                     $balance_result = $this->getStockBalance($detail['itemID'], $detail['unitID']);
@@ -499,6 +513,7 @@ class StockIssueController extends Controller
                         return response()->json(['errors' => $validator->getMessageBag()->toArray()]);
                     } else {
                         $issue_Qty = (int)($detail['quantity']);
+                        StockBalance::syncClosingBalance($detail['itemID'], $request->issue_date, -$issue_Qty);
                         foreach ($balanceList as $item) {
                             $balanceQty = $item->receiveQty + $item->purchaseQty;
                             if (floatval($balanceQty) >= floatval($issue_Qty)) {
@@ -540,6 +555,13 @@ class StockIssueController extends Controller
             try {
                 DB::beginTransaction();
                 $issueID = $request->issue_deleteID;
+
+                $oldDetails = StockIssueDetail::where('stock_issue_id', $issueID)->get();
+                $oldIssueDate = StockIssue::where('stock_issue_id', $issueID)->value('issue_date');
+                foreach ($oldDetails as $old) {
+                    StockBalance::syncClosingBalance($old->item_id, $oldIssueDate, $old->quantity);
+                }
+
                 StockIssue::where('stock_issue_id', $issueID)->update([
                     'is_delete' => true,
                     'delete_reason' => $request->delete_reason,
@@ -581,7 +603,7 @@ class StockIssueController extends Controller
     public function issueDetailsPage($id, Request $request)
     {
         $issueDate = $request->query('issueDate');
-    
+
         $itemList = MenuItem::query()->where(['menu_items.is_discontinued' => 0, 'menu_items.is_deleted' => 0])
             ->where('I.item_type_id', "!=", 1)
             ->select('menu_items.*', 'U.unit_name')
@@ -599,11 +621,10 @@ class StockIssueController extends Controller
             ->join('menu_items as I', 'I.item_id', '=', 'stock_issue_details.item_id')
             ->join('units as U', 'U.unit_id', '=', 'stock_issue_details.unit_id')
             ->get();
-        
+
         $issueTypeName = $stockIssueTypeList->firstWhere('issue_type_id', $selectedStockIssue[0]['issue_type_id'])->issue_type_name_1 ?? '';
         // dd($selectedStockIssue->toArray());
         // dd($itemList->toArray(), $stockIssueTypeList->toArray(), $selectedStockIssue->toArray() ,$selectedStockIssuesDetailList->toArray());
         return view('admin.stock_control.stock_issue.issue_details', compact('itemList', 'stockIssueTypeList', 'selectedStockIssue', 'selectedStockIssuesDetailList', 'issueTypeName', 'issueDate'));
     }
-
 }

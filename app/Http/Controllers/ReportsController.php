@@ -30,6 +30,7 @@ use Illuminate\Support\Facades\Http;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use App\Exports\BalanceReportPdfExport;
+use App\Models\StockBalance;
 use Illuminate\Support\Facades\Log;
 
 class ReportsController extends Controller
@@ -437,6 +438,177 @@ class ReportsController extends Controller
         return view('admin.reports.sales.sales_report', compact('sales', 'total_sale_cost'));
     }
 
+    public static function getStockDataForDate($selectedDate, $items)
+    {
+        $itemIds = $items->pluck('item_id')->toArray();
+        if (empty($itemIds)) return [];
+
+        // 1. Get the latest stock balance for each item before $selectedDate
+        $latestBalances = StockBalance::whereIn('item_id', $itemIds)
+            ->whereDate('balance_date', '<', $selectedDate)
+            ->select('item_id', DB::raw('MAX(balance_date) as max_date'))
+            ->groupBy('item_id');
+
+        $lastBalancesAll = StockBalance::joinSub($latestBalances, 'latest', function ($join) {
+            $join->on('stock_balances.item_id', '=', 'latest.item_id')
+                ->on('stock_balances.balance_date', '=', 'latest.max_date');
+        })
+            ->get()
+            ->keyBy('item_id');
+
+        // 2. Fetch all historical transactions before $selectedDate grouped by item and date
+        $purchasesHistory = PurchaseDetail::join('purchases', 'purchase_details.purchase_id', '=', 'purchases.purchase_id')
+            ->whereIn('purchase_details.item_id', $itemIds)
+            ->whereDate('purchases.purchase_date', '<', $selectedDate)
+            ->where(function ($q) {
+                $q->whereNull('purchases.is_delete')->orWhere('purchases.is_delete', 0);
+            })
+            ->selectRaw('purchase_details.item_id, purchases.purchase_date as txn_date, SUM(purchase_details.quantity) as total')
+            ->groupBy('purchase_details.item_id', 'purchases.purchase_date')
+            ->get();
+
+        $receivesHistory = StockReceiveDetail::join('stock_receives', 'stock_receive_details.stock_receive_id', '=', 'stock_receives.stock_receive_id')
+            ->whereIn('stock_receive_details.item_id', $itemIds)
+            ->whereDate('stock_receives.receive_date', '<', $selectedDate)
+            ->where(function ($q) {
+                $q->whereNull('stock_receives.is_delete')->orWhere('stock_receives.is_delete', 0);
+            })
+            ->selectRaw('stock_receive_details.item_id, stock_receives.receive_date as txn_date, SUM(stock_receive_details.quantity) as total')
+            ->groupBy('stock_receive_details.item_id', 'stock_receives.receive_date')
+            ->get();
+
+        $issuesHistory = StockIssueDetail::join('stock_issues', 'stock_issue_details.stock_issue_id', '=', 'stock_issues.stock_issue_id')
+            ->whereIn('stock_issue_details.item_id', $itemIds)
+            ->whereDate('stock_issues.issue_date', '<', $selectedDate)
+            ->where(function ($q) {
+                $q->whereNull('stock_issues.is_delete')->orWhere('stock_issues.is_delete', 0);
+            })
+            ->selectRaw('stock_issue_details.item_id, stock_issues.issue_date as txn_date, SUM(stock_issue_details.quantity) as total')
+            ->groupBy('stock_issue_details.item_id', 'stock_issues.issue_date')
+            ->get();
+
+        // 3. Fetch "Today's" transactions
+        $purchasedTodayAll = PurchaseDetail::join('purchases', 'purchase_details.purchase_id', '=', 'purchases.purchase_id')
+            ->whereIn('purchase_details.item_id', $itemIds)
+            ->whereDate('purchases.purchase_date', '=', $selectedDate)
+            ->where(function ($q) {
+                $q->whereNull('purchases.is_delete')->orWhere('purchases.is_delete', 0);
+            })
+            ->selectRaw('purchase_details.item_id, SUM(purchase_details.quantity) as total')
+            ->groupBy('purchase_details.item_id')
+            ->pluck('total', 'item_id');
+
+        $receivedTodayAll = StockReceiveDetail::join('stock_receives', 'stock_receive_details.stock_receive_id', '=', 'stock_receives.stock_receive_id')
+            ->whereIn('stock_receive_details.item_id', $itemIds)
+            ->whereDate('stock_receives.receive_date', '=', $selectedDate)
+            ->where(function ($q) {
+                $q->whereNull('stock_receives.is_delete')->orWhere('stock_receives.is_delete', 0);
+            })
+            ->selectRaw('stock_receive_details.item_id, SUM(stock_receive_details.quantity) as total')
+            ->groupBy('stock_receive_details.item_id')
+            ->pluck('total', 'item_id');
+
+        $issuedTodayAll = StockIssueDetail::join('stock_issues', 'stock_issue_details.stock_issue_id', '=', 'stock_issues.stock_issue_id')
+            ->whereIn('stock_issue_details.item_id', $itemIds)
+            ->whereDate('stock_issues.issue_date', '=', $selectedDate)
+            ->where(function ($q) {
+                $q->whereNull('stock_issues.is_delete')->orWhere('stock_issues.is_delete', 0);
+            })
+            ->selectRaw('stock_issue_details.item_id, SUM(stock_issue_details.quantity) as total')
+            ->groupBy('stock_issue_details.item_id')
+            ->pluck('total', 'item_id');
+
+        $closingBalanceTodayAll = StockBalance::whereIn('item_id', $itemIds)
+            ->whereDate('balance_date', '=', $selectedDate)
+            ->pluck('closing_balance', 'item_id');
+
+        // Organize historical data in PHP memory for fast lookup
+        $history = [];
+        foreach (['purchases' => $purchasesHistory, 'receives' => $receivesHistory, 'issues' => $issuesHistory] as $type => $data) {
+            foreach ($data as $row) {
+                if (!isset($history[$row->item_id])) {
+                    $history[$row->item_id] = ['purchases' => [], 'receives' => [], 'issues' => []];
+                }
+                $history[$row->item_id][$type][] = $row;
+            }
+        }
+
+        // 4. Calculate everything per item
+        $result = [];
+        foreach ($items as $item) {
+            $itemId = $item->item_id;
+
+            // Calculate Opening Balance
+            $lastBalance = $lastBalancesAll[$itemId] ?? null;
+            $openingBalance = 0;
+
+            if ($lastBalance) {
+                $baseBalance = $lastBalance->closing_balance;
+                $fromDate = Carbon::parse($lastBalance->balance_date);
+
+                $purchasedBetween = 0;
+                $receivedBetween = 0;
+                $issuedBetween = 0;
+
+                if (isset($history[$itemId])) {
+                    foreach ($history[$itemId]['purchases'] as $row) {
+                        if (Carbon::parse($row->txn_date)->gt($fromDate)) $purchasedBetween += $row->total;
+                    }
+                    foreach ($history[$itemId]['receives'] as $row) {
+                        if (Carbon::parse($row->txn_date)->gt($fromDate)) $receivedBetween += $row->total;
+                    }
+                    foreach ($history[$itemId]['issues'] as $row) {
+                        if (Carbon::parse($row->txn_date)->gt($fromDate)) $issuedBetween += $row->total;
+                    }
+                }
+                $openingBalance = $baseBalance + $purchasedBetween + $receivedBetween - $issuedBetween;
+            } else {
+                $purchasedBefore = 0;
+                $receivedBefore = 0;
+                $issuedBefore = 0;
+                if (isset($history[$itemId])) {
+                    foreach ($history[$itemId]['purchases'] as $row) {
+                        $purchasedBefore += $row->total;
+                    }
+                    foreach ($history[$itemId]['receives'] as $row) {
+                        $receivedBefore += $row->total;
+                    }
+                    foreach ($history[$itemId]['issues'] as $row) {
+                        $issuedBefore += $row->total;
+                    }
+                }
+                $openingBalance = ($purchasedBefore + $receivedBefore) - $issuedBefore;
+            }
+
+            // Today's values
+            $purchasedToday = $purchasedTodayAll[$itemId] ?? 0;
+            $receivedToday = $receivedTodayAll[$itemId] ?? 0;
+            $stockIn = $purchasedToday + $receivedToday;
+
+            $closingBalanceObj = $closingBalanceTodayAll[$itemId] ?? null;
+
+            if ($closingBalanceObj !== null) {
+                // User entered closing balance
+                $closingBalance = $closingBalanceObj;
+                $issuedToday = $openingBalance + $stockIn - $closingBalance;
+            } else {
+                // Fallback to stock issues
+                $issuedToday = $issuedTodayAll[$itemId] ?? 0;
+                $closingBalance = $openingBalance + $stockIn - $issuedToday;
+            }
+
+            $result[$itemId] = [
+                'opening_balance' => $openingBalance,
+                'stock_in' => $stockIn,
+                'issued_today' => $issuedToday,
+                'closing_balance' => $closingBalance,
+                'manual_closing_val' => $closingBalanceObj // the raw db value for entry page
+            ];
+        }
+
+        return $result;
+    }
+
     public function stockLedger(Request $request)
     {
         $selectedDate = $request->query('dailyPrintDate')
@@ -457,113 +629,104 @@ class ReportsController extends Controller
             ->orderBy('menu_items.item_name')
             ->get();
 
-        // dd($items->toArray());
+        $stockData = self::getStockDataForDate($selectedDate, $items);
 
         $stockLedgerData = [];
         $count = 1;
 
         foreach ($items as $item) {
             $itemId = $item->item_id;
-
-            // ---- OPENING BALANCE: all stock in - all stock out BEFORE selected date ----
-
-            $purchasedBefore = PurchaseDetail::join('purchases', 'purchase_details.purchase_id', '=', 'purchases.purchase_id')
-                ->where('purchase_details.item_id', $itemId)
-                ->whereDate('purchases.purchase_date', '<', $selectedDate)
-                ->where(function ($q) {
-                    $q->whereNull('purchases.is_delete')->orWhere('purchases.is_delete', 0);
-                })
-                ->sum('purchase_details.quantity');
-
-            $receivedBefore = StockReceiveDetail::join('stock_receives', 'stock_receive_details.stock_receive_id', '=', 'stock_receives.stock_receive_id')
-                ->where('stock_receive_details.item_id', $itemId)
-                ->whereDate('stock_receives.receive_date', '<', $selectedDate)
-                ->where(function ($q) {
-                    $q->whereNull('stock_receives.is_delete')->orWhere('stock_receives.is_delete', 0);
-                })
-                ->sum('stock_receive_details.quantity');
-
-            // Total sold qty before selected date
-            // $soldBefore = SalesDetail::join('sales', 'sales_details.sale_id', '=', 'sales.sale_id')
-            //     ->where('sales_details.item_id', $itemId)
-            //     ->whereDate('sales.order_date', '<', $selectedDate)
-            //     ->where(function ($q) {
-            //         $q->whereNull('sales.is_delete')->orWhere('sales.is_delete', 0);
-            //     })
-            //     ->sum('sales_details.quantity');
-
-            $issuedBefore = StockIssueDetail::join('stock_issues', 'stock_issue_details.stock_issue_id', '=', 'stock_issues.stock_issue_id')
-                ->where('stock_issue_details.item_id', $itemId)
-                ->whereDate('stock_issues.issue_date', '<', $selectedDate)
-                ->where(function ($q) {
-                    $q->whereNull('stock_issues.is_delete')->orWhere('stock_issues.is_delete', 0);
-                })
-                ->sum('stock_issue_details.quantity');
-
-            $openingBalance = ($purchasedBefore + $receivedBefore) - $issuedBefore;
-
-            // ---- TODAY'S STOCK IN: purchases + receives ON selected date ----
-
-            $purchasedToday = PurchaseDetail::join('purchases', 'purchase_details.purchase_id', '=', 'purchases.purchase_id')
-                ->where('purchase_details.item_id', $itemId)
-                ->whereDate('purchases.purchase_date', '=', $selectedDate)
-                ->where(function ($q) {
-                    $q->whereNull('purchases.is_delete')->orWhere('purchases.is_delete', 0);
-                })
-                ->sum('purchase_details.quantity');
-
-            $receivedToday = StockReceiveDetail::join('stock_receives', 'stock_receive_details.stock_receive_id', '=', 'stock_receives.stock_receive_id')
-                ->where('stock_receive_details.item_id', $itemId)
-                ->whereDate('stock_receives.receive_date', '=', $selectedDate)
-                ->where(function ($q) {
-                    $q->whereNull('stock_receives.is_delete')->orWhere('stock_receives.is_delete', 0);
-                })
-                ->sum('stock_receive_details.quantity');
-
-            $stockIn = $purchasedToday + $receivedToday;
-
-            // ---- TODAY'S STOCK OUT: sales + issues ON selected date ----
-
-            // $soldToday = SalesDetail::join('sales', 'sales_details.sale_id', '=', 'sales.sale_id')
-            //     ->where('sales_details.item_id', $itemId)
-            //     ->whereDate('sales.order_date', '=', $selectedDate)
-            //     ->where(function ($q) {
-            //         $q->whereNull('sales.is_delete')->orWhere('sales.is_delete', 0);
-            //     })
-            //     ->sum('sales_details.quantity');
-
-            $issuedToday = StockIssueDetail::join('stock_issues', 'stock_issue_details.stock_issue_id', '=', 'stock_issues.stock_issue_id')
-                ->where('stock_issue_details.item_id', $itemId)
-                ->whereDate('stock_issues.issue_date', '=', $selectedDate)
-                ->where(function ($q) {
-                    $q->whereNull('stock_issues.is_delete')->orWhere('stock_issues.is_delete', 0);
-                })
-                ->sum('stock_issue_details.quantity');
-
-            // $stockOut = $soldToday + $issuedToday;
-
-            // ---- CLOSING BALANCE ----
-            $closingBalance = $openingBalance + $stockIn - $issuedToday;
-
-            $remarks = '';
-            if ($closingBalance < 0) {
-                $remarks = 'Negative stock';
-            }
+            $data = $stockData[$itemId] ?? [
+                'opening_balance' => 0,
+                'stock_in' => 0,
+                'issued_today' => 0,
+                'closing_balance' => 0
+            ];
 
             $stockLedgerData[] = [
                 'no'              => $count++,
                 'item_name'       => $item->item_name,
-                'opening_balance' => $openingBalance,
-                'stock_in'        => $stockIn,
-                'stock_out'       => $issuedToday,
-                'closing_balance' => $closingBalance,
-                'remarks'         => $remarks,
+                'opening_balance' => $data['opening_balance'],
+                'stock_in'        => $data['stock_in'],
+                'stock_out'       => $data['issued_today'],
+                'closing_balance' => $data['closing_balance'],
             ];
         }
 
-        // dd($stockLedgerData);
-
         return view('admin.reports.stock_ledger.stock_ledger_report', compact('stockLedgerData', 'selectedDate'));
+    }
+
+    /**
+     * Show the closing balance entry form (only for today's date).
+     */
+    public function closingBalanceEntry(Request $request)
+    {
+        $today = Carbon::now()->toDateString();
+
+        // Get all stock items (non-deleted, item_type_id = 2)
+        $items = MenuItem::leftJoin('menu_categories as MC', 'menu_items.sub_category_id', '=', 'MC.category_id')
+            ->leftJoin('units', 'units.unit_id', '=', 'menu_items.unit_id')
+            ->where('menu_items.is_deleted', 0)
+            ->where('menu_items.item_type_id', 2)
+            ->select(
+                'menu_items.item_id',
+                'menu_items.item_name',
+                'MC.menu_category_name',
+                'units.unit_name'
+            )
+            ->orderBy('menu_items.item_name')
+            ->get();
+
+        $stockData = self::getStockDataForDate($today, $items);
+
+        $entryData = [];
+        $count = 1;
+
+        foreach ($items as $item) {
+            $itemId = $item->item_id;
+            $data = $stockData[$itemId] ?? [
+                'opening_balance' => 0,
+                'stock_in' => 0,
+                'manual_closing_val' => null
+            ];
+
+            $entryData[] = [
+                'no'              => $count++,
+                'item_id'         => $itemId,
+                'item_name'       => $item->item_name,
+                'opening_balance' => $data['opening_balance'],
+                'stock_in'        => $data['stock_in'],
+                'closing_balance' => $data['manual_closing_val'] ?? '',
+            ];
+        }
+
+        return view('admin.reports.stock_ledger.closing_balance_entry', compact('entryData', 'today'));
+    }
+
+    /**
+     * Save closing balances (bulk save for today's date only).
+     */
+    public function saveClosingBalance(Request $request)
+    {
+        $today = Carbon::now()->toDateString();
+        $items = $request->input('items', []);
+
+        foreach ($items as $itemId => $closingBalance) {
+            if ($closingBalance !== null && $closingBalance !== '') {
+                \App\Models\StockBalance::updateOrCreate(
+                    [
+                        'item_id'      => $itemId,
+                        'balance_date' => $today,
+                    ],
+                    [
+                        'closing_balance' => $closingBalance,
+                    ]
+                );
+            }
+        }
+
+        return redirect()->route('reports#closingBalanceEntry')
+            ->with('success', 'Closing balances saved successfully.');
     }
 
     public function modifySaleReportBySearch(Request $req)
