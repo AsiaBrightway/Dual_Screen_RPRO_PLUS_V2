@@ -176,7 +176,7 @@
                                         <th>Voucher No:</th>
                                         <th>Floor Name</th>
                                         <th>Table Name</th>
-                                        <th>Table Order No:</th>                                       
+                                        <th>Table Order No:</th>
                                         <th>Total Amount</th>
                                         <th>Item Promo</th>
                                         <th>Voucher Promo </th>
@@ -215,7 +215,7 @@
                                                 <td>{{ $sale['sale_voucher_number'] }}</td>
                                                 <td>{{ $sale['floor_name'] }}</td>
                                                 <td>{{ $sale['table_name'] }}</td>
-                                                <td>{{ $sale['table_order_number'] }}</td>                                              
+                                                <td>{{ $sale['table_order_number'] }}</td>
                                                 <td style="text-align:end; padding-right:25px">{{ $sale['total_amount'] }}
                                                 </td>
                                                 @if ($sale['total_item_promo_amount'] != null)
@@ -267,7 +267,7 @@
                                                 <td>{{ $sale['waiter_name'] ?? '-----' }}</td>
                                                 <td data-toggle="tooltip" title="{{ $sale['cashier_name'] }}"
                                                     style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 130px">
-                                                    {{ $sale['cashier_name'] }}</td>
+                                                    {{ $sale['cashier_name'] ?? '-----' }}</td>
                                                 <td>{{ date('d-M-y', strtotime($sale['order_date'])) }}</td>
                                                 {{-- <td style="text-align:end; padding-right:25px">
                                                     {{ $sale['delivery_charges'] }}</td> --}}

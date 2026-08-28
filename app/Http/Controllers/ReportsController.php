@@ -416,7 +416,7 @@ class ReportsController extends Controller
             ->join('floors', 'tables.floor_id', 'floors.floor_id')
             ->leftjoin('customers', 'sales.customer_id', 'customers.customer_id')
             ->leftjoin('users as waiter', 'sales.waiter_id', 'waiter.id')
-            ->join('users as cashier', 'sales.cashier_id', 'cashier.id')
+            ->leftjoin('users as cashier', 'sales.cashier_id', 'cashier.id')
             ->where('sales.is_delete', 0)
             ->whereDate('sales.created_at', $todayDate)
             ->get()
@@ -657,7 +657,7 @@ class ReportsController extends Controller
                 ->join('floors', 'tables.floor_id', 'floors.floor_id')
                 ->leftjoin('customers', 'sales.customer_id', 'customers.customer_id')
                 ->leftjoin('users as waiter', 'sales.waiter_id', 'waiter.id')
-                ->join('users as cashier', 'sales.cashier_id', 'cashier.id')
+                ->leftjoin('users as cashier', 'sales.cashier_id', 'cashier.id')
                 // ->where('sales.is_delete', '0')
                 ->whereBetween('sales.created_at', [$startDate, $endDate]);
 

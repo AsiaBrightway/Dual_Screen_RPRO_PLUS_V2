@@ -105,7 +105,7 @@
                                 </div>
                                 <div class="col-8">
                                     <input class="form-control " type="text" id="waiter_name" name="waiter_name"
-                                        value="{{ $waiter->name }}" readonly>
+                                        value="{{ $waiter->name ?? '' }}" readonly>
                                 </div>
                             </div>
                             <div class="row mb-3" style="display: flex; align-items: center;">
@@ -114,7 +114,7 @@
                                 </div>
                                 <div class="col-8">
                                     <input class="form-control " type="text" id="cashier_name" name="cashier_name"
-                                        value="{{ $cashier->name }}" readonly>
+                                        value="{{ $cashier->name ?? ''}}" readonly>
                                 </div>
                             </div>
                         </div>
@@ -188,7 +188,7 @@
 
                     </tbody>
                 </table>
-                <input type="text" id="totalAmount" name="totalAmount" value={{ $totalAmount }} hidden>
+                {{-- <input type="text" id="totalAmount" name="totalAmount" value={{ $totalAmount }} hidden> --}}
                 <!--Edit Employee Modal -->
                 {{-- <div class="modal fade" id="edit_employee_modal" data-bs-backdrop="static" data-bs-keyboard="false"
                     tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">

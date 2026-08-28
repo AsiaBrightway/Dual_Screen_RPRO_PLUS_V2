@@ -609,7 +609,7 @@ $(document).ready(function () {
                         <th>Voucher No:</th>
                         <th>Floor Name</th>
                         <th>Table Name</th>
-                        <th>Table Order No:</th>                     
+                        <th>Table Order No:</th>
                         <th>Total Amount</th>
                         <th>Item Promo</th>
                         <th>Voucher Promo</th>
@@ -663,7 +663,7 @@ $(document).ready(function () {
                                 <td>${value.sale_voucher_number}</td>
                                 <td>${value.floor_name}</td>
                                 <td>${value.table_name}</td>
-                                <td>${value.table_order_number}</td>                              
+                                <td>${value.table_order_number}</td>
                                 <td style="text-align:end; padding-right:25px">${Number(value.total_amount)}</td>
                                 <td style="text-align:end; padding-right:25px">${Math.abs(Number(value.total_item_promo_amount))}</td>
                                 <td style="text-align:end; padding-right:25px">${Number(value.voucher_discount_amount)}</td>
@@ -676,7 +676,7 @@ $(document).ready(function () {
                                 <td style="text-align:end; padding-right:25px">${Number(value.change_amount)}</td>
                                 <td>${value.customer_name ?? '-----'}</td>
                                 <td>${value.waiter_name ?? '-----'}</td>
-                                <td data-toggle="tooltip" data-placement="top" title="${value.cashier_name}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 130px">${value.cashier_name}</td>
+                                <td data-toggle="tooltip" data-placement="top" title="${value.cashier_name}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 130px">${value.cashier_name ?? '-----'}</td>
                                 <td>${convertDataFormat(value.order_date)}</td>
                             </tr>`
                         );

@@ -45,7 +45,7 @@ class SalesController extends Controller
             ->join('floors', 'tables.floor_id', 'floors.floor_id')
             ->leftjoin('customers', 'sales.customer_id', 'customers.customer_id')
             ->leftjoin('users as waiter', 'sales.waiter_id', 'waiter.id')
-            ->join('users as cashier', 'sales.cashier_id', 'cashier.id')
+            ->leftjoin('users as cashier', 'sales.cashier_id', 'cashier.id')
             ->join('payment_types as PT', 'sales.payment_type_id', 'PT.payment_type_id')
             ->where('sales.is_delete', '0')
             ->whereDate('sales.created_at', $dailyPrintDate)
@@ -132,7 +132,7 @@ class SalesController extends Controller
         $saleDetails = SalesDetail::where('sale_id', $saleID)
             ->join('menu_items as items1', 'sales_details.item_id', '=', 'items1.item_id')
             ->join('units', 'units.unit_id', '=', 'items1.unit_id')
-            ->join('users as U', 'sales_details.ordered_by', 'U.id')
+            ->leftjoin('users as U', 'sales_details.ordered_by', 'U.id')
             ->get()
             ->toArray();
 
